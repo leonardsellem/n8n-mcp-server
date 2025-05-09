@@ -20,7 +20,7 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
    */
   async execute(args: Record<string, any>): Promise<ToolCallResult> {
     return this.handleExecution(async (args) => {
-      const { workflowId, name, nodes, connections, active, tags } = args;
+      const { workflowId, name, nodes, connections, settings, staticData } = args;
       
       if (!workflowId) {
         throw new N8nApiError('Missing required parameter: workflowId');
@@ -39,15 +39,18 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
       // Get the current workflow to update
       const currentWorkflow = await this.apiService.getWorkflow(workflowId);
       
-      // Prepare update object with changes
-      const workflowData: Record<string, any> = { ...currentWorkflow };
-      
-      // Update fields if provided
+      // Build update payload from scratch, only allowed fields
+      const workflowData: Record<string, any> = {};
       if (name !== undefined) workflowData.name = name;
+      else if (currentWorkflow.name !== undefined) workflowData.name = currentWorkflow.name;
       if (nodes !== undefined) workflowData.nodes = nodes;
+      else if (currentWorkflow.nodes !== undefined) workflowData.nodes = currentWorkflow.nodes;
       if (connections !== undefined) workflowData.connections = connections;
-      if (active !== undefined) workflowData.active = active;
-      if (tags !== undefined) workflowData.tags = tags;
+      else if (currentWorkflow.connections !== undefined) workflowData.connections = currentWorkflow.connections;
+      if (settings !== undefined) workflowData.settings = settings;
+      else if (currentWorkflow.settings !== undefined) workflowData.settings = currentWorkflow.settings;
+      if (staticData !== undefined) workflowData.staticData = staticData;
+      else if (currentWorkflow.staticData !== undefined) workflowData.staticData = currentWorkflow.staticData;
       
       // Update the workflow
       const updatedWorkflow = await this.apiService.updateWorkflow(workflowId, workflowData);
@@ -55,10 +58,10 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
       // Build a summary of changes
       const changesArray = [];
       if (name !== undefined && name !== currentWorkflow.name) changesArray.push(`name: "${currentWorkflow.name}" → "${name}"`);
-      if (active !== undefined && active !== currentWorkflow.active) changesArray.push(`active: ${currentWorkflow.active} → ${active}`);
       if (nodes !== undefined) changesArray.push('nodes updated');
       if (connections !== undefined) changesArray.push('connections updated');
-      if (tags !== undefined) changesArray.push('tags updated');
+      if (settings !== undefined) changesArray.push('settings updated');
+      if (staticData !== undefined) changesArray.push('staticData updated');
       
       const changesSummary = changesArray.length > 0
         ? `Changes: ${changesArray.join(', ')}`
@@ -107,16 +110,13 @@ export function getUpdateWorkflowToolDefinition(): ToolDefinition {
           type: 'object',
           description: 'Updated connection mappings between nodes',
         },
-        active: {
-          type: 'boolean',
-          description: 'Whether the workflow should be active',
+        settings: {
+          type: 'object',
+          description: 'Updated settings for the workflow',
         },
-        tags: {
-          type: 'array',
-          description: 'Updated tags to associate with the workflow',
-          items: {
-            type: 'string',
-          },
+        staticData: {
+          type: 'object',
+          description: 'Updated static data for the workflow',
         },
       },
       required: ['workflowId'],
