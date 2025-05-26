@@ -60,3 +60,4 @@ build/
 # Embeddings
 *.embedding
 embeddings/
+mcp-config.json
