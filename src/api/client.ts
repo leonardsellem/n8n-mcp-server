@@ -203,7 +203,19 @@ export class N8nApiClient {
    */
   async updateWorkflow(id: string, workflow: Record<string, any>): Promise<any> {
     try {
-      const response = await this.axiosInstance.put(`/workflows/${id}`, workflow);
+      // Remove read-only properties that cause issues with n8n API v1
+      const workflowToUpdate = { ...workflow };
+      delete workflowToUpdate.id; // Remove id property as it's read-only
+      delete workflowToUpdate.createdAt; // Remove createdAt property as it's read-only
+      delete workflowToUpdate.updatedAt; // Remove updatedAt property as it's read-only
+      delete workflowToUpdate.tags; // Remove tags property as it's read-only
+      
+      // Log request for debugging
+      if (this.config.debug) {
+        console.error('[DEBUG] Updating workflow with data:', JSON.stringify(workflowToUpdate, null, 2));
+      }
+      
+      const response = await this.axiosInstance.put(`/workflows/${id}`, workflowToUpdate);
       return response.data;
     } catch (error) {
       throw handleAxiosError(error, `Failed to update workflow ${id}`);
