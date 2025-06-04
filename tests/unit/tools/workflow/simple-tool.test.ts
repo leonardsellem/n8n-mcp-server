@@ -4,8 +4,21 @@
 
 import { describe, it, expect } from '@jest/globals';
 
+interface MockWorkflow {
+  id: string;
+  name: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  nodes: any[];
+}
+
+interface WorkflowFilter {
+  active?: boolean;
+}
+
 // Mock workflow data
-const mockWorkflows = [
+const mockWorkflows: MockWorkflow[] = [
   {
     id: '1234abc',
     name: 'Test Workflow 1',
@@ -43,7 +56,8 @@ function getListWorkflowsToolDefinition() {
 }
 
 // Simple function to test workflow filtering
-function filterWorkflows(workflows: Array<any>, filter: { active?: boolean }) {
+function filterWorkflows(workflows: MockWorkflow[], filter: WorkflowFilter): MockWorkflow[] {
+
   if (filter && typeof filter.active === 'boolean') {
     return workflows.filter(workflow => workflow.active === filter.active);
   }
