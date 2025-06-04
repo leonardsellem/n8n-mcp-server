@@ -12,7 +12,7 @@ This section covers everything you need to know to set up and configure the n8n 
 
 For a quick start, follow these steps:
 
-1. Install the server: `npm install -g n8n-mcp-server`
+1. Install the server: `npm install -g @leonardsellem/n8n-mcp-server`
 2. Create a `.env` file with your n8n API URL and API key
 3. Run the server: `n8n-mcp-server`
 4. Register the server with your AI assistant platform

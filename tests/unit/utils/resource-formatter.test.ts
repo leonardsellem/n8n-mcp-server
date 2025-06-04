@@ -1,20 +1,31 @@
+/**
+ * Resource formatter utility tests
+ */
+
 import { describe, it, expect } from '@jest/globals';
 import { formatResourceUri } from '../../../src/utils/resource-formatter.js';
 
 describe('formatResourceUri', () => {
-  it('should format workflow resource URIs', () => {
-    expect(formatResourceUri('workflow', '123')).toBe('n8n://workflows/123');
+  it('appends "s" for singular resource types', () => {
+    expect(formatResourceUri('workflow', '1')).toBe('n8n://workflows/1');
+    expect(formatResourceUri('execution', '2')).toBe('n8n://executions/2');
   });
 
-  it('should format execution resource URIs', () => {
+  it('does not append "s" for already plural resource types', () => {
+    expect(formatResourceUri('workflows', '3')).toBe('n8n://workflows/3');
+    expect(formatResourceUri('execution-stats', '4')).toBe('n8n://execution-stats/4');
+  });
+
+  it('returns URI without id when none is provided', () => {
+    expect(formatResourceUri('workflow')).toBe('n8n://workflow');
+    expect(formatResourceUri('workflows')).toBe('n8n://workflows');
+  });
+
+  it('formats execution resource URIs', () => {
     expect(formatResourceUri('execution', '456')).toBe('n8n://executions/456');
   });
 
-  it('should not double pluralize when resourceType is already plural', () => {
-    expect(formatResourceUri('workflows', '789')).toBe('n8n://workflows/789');
-  });
-
-  it('should handle execution-stats with id', () => {
+  it('handles execution-stats with id', () => {
     expect(formatResourceUri('execution-stats', 'abc')).toBe('n8n://execution-stats/abc');
   });
 });

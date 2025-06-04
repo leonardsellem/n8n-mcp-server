@@ -48,7 +48,7 @@ export function formatWorkflowDetails(workflow: Workflow): Record<string, any> {
     staticData: workflow.staticData,
     settings: workflow.settings,
     tags: workflow.tags,
-    // Exclude potentially sensitive or unuseful information
+    // Exclude potentially sensitive or unnecessary information
     // like pinData or other internal fields
   };
 }
@@ -134,17 +134,15 @@ export function formatExecutionStats(executions: Execution[]): Record<string, an
  * @param id Optional resource ID for specific resources
  * @returns Formatted resource URI
  */
-export function formatResourceUri(resourceType: 'workflow' | 'execution' | 'workflows' | 'execution-stats', id?: string): string {
-  let base: string = resourceType;
-
-  if (resourceType === 'workflow') {
-    base = 'workflows';
-  } else if (resourceType === 'execution') {
-    base = 'executions';
-  }
-
+export function formatResourceUri(
+  resourceType: 'workflow' | 'execution' | 'workflows' | 'execution-stats',
+  id?: string,
+): string {
   if (id) {
+    const base = ['workflow', 'execution'].includes(resourceType)
+      ? `${resourceType}s`
+      : resourceType;
     return `n8n://${base}/${id}`;
   }
-  return `n8n://${base}`;
+  return `n8n://${resourceType}`;
 }
