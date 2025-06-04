@@ -43,7 +43,7 @@ function getListWorkflowsToolDefinition() {
 }
 
 // Simple function to test workflow filtering
-function filterWorkflows(workflows, filter) {
+function filterWorkflows(workflows: any[], filter: { active?: boolean }) {
   if (filter && typeof filter.active === 'boolean') {
     return workflows.filter(workflow => workflow.active === filter.active);
   }

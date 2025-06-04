@@ -134,9 +134,15 @@ export function formatExecutionStats(executions: Execution[]): Record<string, an
  * @param id Optional resource ID for specific resources
  * @returns Formatted resource URI
  */
-export function formatResourceUri(resourceType: 'workflow' | 'execution' | 'workflows' | 'execution-stats', id?: string): string {
+export function formatResourceUri(
+  resourceType: 'workflow' | 'execution' | 'workflows' | 'execution-stats',
+  id?: string,
+): string {
   if (id) {
-    return `n8n://${resourceType}s/${id}`;
+    const base = ['workflow', 'execution'].includes(resourceType)
+      ? `${resourceType}s`
+      : resourceType;
+    return `n8n://${base}/${id}`;
   }
   return `n8n://${resourceType}`;
 }
