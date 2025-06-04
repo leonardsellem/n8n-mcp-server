@@ -135,8 +135,16 @@ export function formatExecutionStats(executions: Execution[]): Record<string, an
  * @returns Formatted resource URI
  */
 export function formatResourceUri(resourceType: 'workflow' | 'execution' | 'workflows' | 'execution-stats', id?: string): string {
-  if (id) {
-    return `n8n://${resourceType}s/${id}`;
+  let base: string = resourceType;
+
+  if (resourceType === 'workflow') {
+    base = 'workflows';
+  } else if (resourceType === 'execution') {
+    base = 'executions';
   }
-  return `n8n://${resourceType}`;
+
+  if (id) {
+    return `n8n://${base}/${id}`;
+  }
+  return `n8n://${base}`;
 }
