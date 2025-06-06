@@ -7,6 +7,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { EnvConfig } from '../config/environment.js';
 import { handleAxiosError, N8nApiError } from '../errors/index.js';
+import { sanitizeWorkflowForApi } from '../utils/workflow-utils.js';
 
 /**
  * n8n API Client class for making requests to the n8n API
@@ -176,12 +177,8 @@ export class N8nApiClient {
       }
       
       // Remove read-only properties that cause issues
-      const workflowToCreate = { ...workflow };
+      const workflowToCreate = sanitizeWorkflowForApi(workflow);
       delete workflowToCreate.active; // Remove active property as it's read-only
-      delete workflowToCreate.id; // Remove id property if it exists
-      delete workflowToCreate.createdAt; // Remove createdAt property if it exists
-      delete workflowToCreate.updatedAt; // Remove updatedAt property if it exists
-      delete workflowToCreate.tags; // Remove tags property as it's read-only
       
       // Log request for debugging
       console.error('[DEBUG] Creating workflow with data:', JSON.stringify(workflowToCreate, null, 2));
@@ -204,11 +201,7 @@ export class N8nApiClient {
   async updateWorkflow(id: string, workflow: Record<string, any>): Promise<any> {
     try {
       // Remove read-only properties that cause issues with n8n API v1
-      const workflowToUpdate = { ...workflow };
-      delete workflowToUpdate.id; // Remove id property as it's read-only
-      delete workflowToUpdate.createdAt; // Remove createdAt property as it's read-only
-      delete workflowToUpdate.updatedAt; // Remove updatedAt property as it's read-only
-      delete workflowToUpdate.tags; // Remove tags property as it's read-only
+      const workflowToUpdate = sanitizeWorkflowForApi(workflow);
 
       // Log request for debugging
       if (this.config.debug) {
