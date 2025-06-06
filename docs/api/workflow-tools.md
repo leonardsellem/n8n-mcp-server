@@ -142,6 +142,9 @@ Creates a new workflow.
 }
 ```
 
+Nodes, connections, and tags may also be provided as JSON strings. They will be
+parsed automatically by the tool before validation.
+
 **Example Usage:**
 
 ```javascript
