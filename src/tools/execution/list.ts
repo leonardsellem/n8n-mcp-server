@@ -39,6 +39,18 @@ export class ListExecutionsHandler extends BaseExecutionToolHandler {
         );
       }
       
+      // Convert and validate lastId if provided for pagination consistency
+      if (args.lastId) {
+        const numericLastId = this.convertToNumericId(args.lastId);
+        // Filter executions to start after the lastId for pagination
+        const lastIdIndex = filteredExecutions.findIndex(
+          (execution: Execution) => execution.id === numericLastId.toString()
+        );
+        if (lastIdIndex >= 0) {
+          filteredExecutions = filteredExecutions.slice(lastIdIndex + 1);
+        }
+      }
+      
       // Apply limit if provided
       const limit = args.limit && args.limit > 0 ? args.limit : filteredExecutions.length;
       filteredExecutions = filteredExecutions.slice(0, limit);
@@ -95,8 +107,11 @@ export function getListExecutionsToolDefinition(): ToolDefinition {
           description: 'Maximum number of executions to return',
         },
         lastId: {
-          type: 'string',
-          description: 'ID of the last execution for pagination',
+          oneOf: [
+            { type: 'string' },
+            { type: 'number' }
+          ],
+          description: 'ID of the last execution for pagination. Accepts both string and numeric formats. String IDs will be validated and converted to numeric format.',
         },
         includeSummary: {
           type: 'boolean',

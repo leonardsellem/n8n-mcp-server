@@ -8,6 +8,18 @@ A Model Context Protocol (MCP) server that allows AI assistants to interact with
 
 This project provides a Model Context Protocol (MCP) server that empowers AI assistants to seamlessly interact with n8n, a popular workflow automation tool. It acts as a bridge, enabling AI assistants to programmatically manage and control n8n workflows and executions using natural language commands.
 
+## 🤖 AI-Friendly Features
+
+This server includes **22 specialized tools** designed to help AI models use n8n more effectively without cognitive overload:
+
+- **Tool Discovery & Organization** (5 tools) - Understand available capabilities through categorized organization
+- **Lightweight Data Access** (5 tools) - Efficient data retrieval without overwhelming details
+- **AI Context Management** (4 tools) - Maintain working context across sessions
+- **Batch & Efficiency Operations** (4 tools) - Reduce API calls and improve performance
+- **AI-Friendly Output Formats** (4 tools) - Machine-readable, condensed outputs
+
+See [AI_FRIENDLY_FEATURES.md](./AI_FRIENDLY_FEATURES.md) for detailed documentation.
+
 ## Installation
 
 ### Prerequisites

@@ -1,0 +1,190 @@
+{
+  "category": "Productivity",
+  "count": 4,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.googleSheets",
+      "name": "Google Sheets",
+      "description": "Cloud-based spreadsheet application",
+      "category": "Productivity",
+      "credentials": [
+        "googleSheetsOAuth2Api"
+      ],
+      "tags": [
+        "spreadsheet",
+        "data",
+        "google",
+        "collaboration"
+      ],
+      "nodeType": "n8n-nodes-base.googleSheets",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.airtable",
+      "name": "Airtable",
+      "description": "Cloud collaboration and database service",
+      "category": "Productivity",
+      "credentials": [
+        "airtableApi"
+      ],
+      "tags": [
+        "database",
+        "collaboration",
+        "no-code",
+        "organization"
+      ],
+      "nodeType": "n8n-nodes-base.airtable",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.notion",
+      "name": "Notion",
+      "description": "All-in-one workspace for notes, docs, and collaboration",
+      "category": "Productivity",
+      "credentials": [
+        "notionApi"
+      ],
+      "tags": [
+        "notes",
+        "docs",
+        "collaboration",
+        "workspace"
+      ],
+      "nodeType": "n8n-nodes-base.notion",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.microsoftExcel",
+      "name": "Microsoft Excel",
+      "description": "Spreadsheet application from Microsoft",
+      "category": "Productivity",
+      "credentials": [
+        "microsoftExcelOAuth2Api"
+      ],
+      "tags": [
+        "spreadsheet",
+        "microsoft",
+        "data",
+        "office"
+      ],
+      "nodeType": "n8n-nodes-base.microsoftExcel",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

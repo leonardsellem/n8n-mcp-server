@@ -14,6 +14,20 @@ import { getUpdateWorkflowToolDefinition, UpdateWorkflowHandler } from './update
 import { getDeleteWorkflowToolDefinition, DeleteWorkflowHandler } from './delete.js';
 import { getActivateWorkflowToolDefinition, ActivateWorkflowHandler } from './activate.js';
 import { getDeactivateWorkflowToolDefinition, DeactivateWorkflowHandler } from './deactivate.js';
+import { getExecuteWorkflowToolDefinition, ExecuteWorkflowHandler } from './execute.js';
+import { getRepairWorkflowTriggersToolDefinition, RepairWorkflowTriggersHandler } from './repair-triggers.js';
+
+// Import enhanced workflow tools
+import {
+  CreateSmartWorkflowHandler,
+  AddNodeToWorkflowHandler,
+  OptimizeWorkflowHandler,
+  CloneWorkflowHandler,
+  getCreateSmartWorkflowToolDefinition,
+  getAddNodeToWorkflowToolDefinition,
+  getOptimizeWorkflowToolDefinition,
+  getCloneWorkflowToolDefinition,
+} from './enhanced-workflow.js';
 
 // Export handlers
 export {
@@ -24,11 +38,17 @@ export {
   DeleteWorkflowHandler,
   ActivateWorkflowHandler,
   DeactivateWorkflowHandler,
+  ExecuteWorkflowHandler,
+  RepairWorkflowTriggersHandler,
+  CreateSmartWorkflowHandler,
+  AddNodeToWorkflowHandler,
+  OptimizeWorkflowHandler,
+  CloneWorkflowHandler,
 };
 
 /**
  * Set up workflow management tools
- * 
+ *
  * @returns Array of workflow tool definitions
  */
 export async function setupWorkflowTools(): Promise<ToolDefinition[]> {
@@ -40,5 +60,11 @@ export async function setupWorkflowTools(): Promise<ToolDefinition[]> {
     getDeleteWorkflowToolDefinition(),
     getActivateWorkflowToolDefinition(),
     getDeactivateWorkflowToolDefinition(),
+    getExecuteWorkflowToolDefinition(),
+    getRepairWorkflowTriggersToolDefinition(),
+    getCreateSmartWorkflowToolDefinition(),
+    getAddNodeToWorkflowToolDefinition(),
+    getOptimizeWorkflowToolDefinition(),
+    getCloneWorkflowToolDefinition(),
   ];
 }
