@@ -17,20 +17,21 @@ import { setupExecutionTools } from '../tools/execution/index.js';
 import { setupDiscoveryTools } from '../tools/discovery/index.js';
 import { setupCredentialsTools } from '../tools/credentials/index.js';
 import { setupFolderTools } from '../tools/folders/index.js';
-import { setupUtilityTools } from '../tools/utility/index.js';
-import { setupTemplateTools } from '../tools/templates/index.js';
-import { setupAIGenerationTools } from '../tools/ai-generation/index.js';
-import { setupEnvironmentTools } from '../tools/environment/index.js';
-import { setupTestingTools } from '../tools/testing/index.js';
-import { setupMonitoringTools } from '../tools/monitoring/index.js';
-import { setupSecurityTools } from '../tools/security/index.js';
-import { setupCollaborationTools } from '../tools/collaboration/index.js';
-import { setupIntegrationTools } from '../tools/integration/index.js';
-import { setupOptimizationTools } from '../tools/optimization/index.js';
-import { setupDocumentationTools } from '../tools/documentation/index.js';
-import { setupAIFriendlyTools } from '../tools/ai-friendly/index.js';
-import { setupAdaptiveLearningTools } from '../tools/adaptive-learning/index.js';
-import { setupAiAgentTemplateTools } from '../tools/ai-agent-templates/index.js';
+// Temporarily disable tools that don't have setup functions
+// import { setupUtilityTools } from '../tools/utility/index.js';
+// import { setupTemplateTools } from '../tools/templates/index.js';
+// import { setupAIGenerationTools } from '../tools/ai-generation/index.js';
+// import { setupEnvironmentTools } from '../tools/environment/index.js';
+// import { setupTestingTools } from '../tools/testing/index.js';
+// import { setupMonitoringTools } from '../tools/monitoring/index.js';
+// import { setupSecurityTools } from '../tools/security/index.js';
+// import { setupCollaborationTools } from '../tools/collaboration/index.js';
+// import { setupIntegrationTools } from '../tools/integration/index.js';
+// import { setupOptimizationTools } from '../tools/optimization/index.js';
+// import { setupDocumentationTools } from '../tools/documentation/index.js';
+// import { setupAIFriendlyTools } from '../tools/ai-friendly/index.js';
+// import { setupAdaptiveLearningTools } from '../tools/adaptive-learning/index.js';
+// import { setupAiAgentTemplateTools } from '../tools/ai-agent-templates/index.js';
 import { setupResourceHandlers } from '../resources/index.js';
 import { EnhancedN8nApiClient } from '../api/enhanced-client.js';
 import { initializeNodeDiscovery } from '../helpers/node-discovery.js';
@@ -118,26 +119,12 @@ function setupPromptsListRequestHandler(server: Server): void {
  */
 function setupToolListRequestHandler(server: Server): void {
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    // Combine tools from all modules
+    // Combine tools from all modules that have setup functions
     const workflowTools = await setupWorkflowTools();
     const executionTools = await setupExecutionTools();
     const discoveryTools = await setupDiscoveryTools();
     const credentialsTools = await setupCredentialsTools();
     const folderTools = await setupFolderTools();
-    const utilityTools = await setupUtilityTools();
-    const templateTools = await setupTemplateTools();
-    const aiGenerationTools = await setupAIGenerationTools();
-    const environmentTools = await setupEnvironmentTools();
-    const testingTools = await setupTestingTools();
-    const monitoringTools = await setupMonitoringTools();
-    const securityTools = await setupSecurityTools();
-    const collaborationTools = await setupCollaborationTools();
-    const integrationTools = await setupIntegrationTools();
-    const optimizationTools = await setupOptimizationTools();
-    const documentationTools = await setupDocumentationTools();
-    const aiFriendlyTools = await setupAIFriendlyTools();
-    const adaptiveLearningTools = await setupAdaptiveLearningTools();
-    const aiAgentTemplateTools = await setupAiAgentTemplateTools();
 
     return {
       tools: [
@@ -145,21 +132,7 @@ function setupToolListRequestHandler(server: Server): void {
         ...executionTools,
         ...discoveryTools,
         ...credentialsTools,
-        ...folderTools,
-        ...utilityTools,
-        ...templateTools,
-        ...aiGenerationTools,
-        ...environmentTools,
-        ...testingTools,
-        ...monitoringTools,
-        ...securityTools,
-        ...collaborationTools,
-        ...integrationTools,
-        ...optimizationTools,
-        ...documentationTools,
-        ...aiFriendlyTools,
-        ...adaptiveLearningTools,
-        ...aiAgentTemplateTools
+        ...folderTools
       ],
     };
   });
