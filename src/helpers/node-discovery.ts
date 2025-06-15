@@ -56,7 +56,7 @@ export class NodeDiscoveryService {
     // Use massive registry as primary source (no API calls by default)
     this.initializeMassiveRegistry();
     
-    console.log(`[NodeDiscovery] Initialized with ${this.nodeTypes.size} node types from comprehensive registry`);
+    console.error(`[NodeDiscovery] Initialized with ${this.nodeTypes.size} node types from comprehensive registry`);
   }
 
   /**
@@ -80,11 +80,11 @@ export class NodeDiscoveryService {
       console.log('[NodeDiscovery] Attempting to fetch node types from n8n API...');
       const nodeTypes = await this.apiClient.getNodeTypes();
       
-      console.log(`[NodeDiscovery] API returned ${nodeTypes?.length || 0} node types`);
+      console.error(`[NodeDiscovery] API returned ${nodeTypes?.length || 0} node types`);
       
       // Supplement massive registry with API data (don't replace it)
       if (nodeTypes && nodeTypes.length > 0) {
-        console.log(`[NodeDiscovery] Supplementing massive registry with ${nodeTypes.length} API nodes`);
+        console.error(`[NodeDiscovery] Supplementing massive registry with ${nodeTypes.length} API nodes`);
         for (const apiNode of nodeTypes) {
           const nodeInfo = this.convertApiNodeToNodeInfo(apiNode);
           // Only add if we don't already have this node type
@@ -94,13 +94,13 @@ export class NodeDiscoveryService {
         }
         
         this.lastFetch = Date.now();
-        console.log(`[NodeDiscovery] Registry now contains ${this.nodeTypes.size} node types`);
+        console.error(`[NodeDiscovery] Registry now contains ${this.nodeTypes.size} node types`);
       } else {
-        console.log('[NodeDiscovery] API returned no node types, keeping massive registry as-is');
+        console.error('[NodeDiscovery] API returned no node types, keeping massive registry as-is');
       }
       
     } catch (error: any) {
-      console.log('[NodeDiscovery] API fetch failed (this is normal), keeping massive registry:', error?.message || 'Unknown error');
+      console.error('[NodeDiscovery] API fetch failed (this is normal), keeping massive registry:', error?.message || 'Unknown error');
     }
   }
 
@@ -278,7 +278,7 @@ export class NodeDiscoveryService {
    * Initialize core nodes that must always be available
    */
   private initializeCoreNodes(): void {
-    console.log('[NodeDiscovery] Initializing core n8n nodes...');
+    console.error('[NodeDiscovery] Initializing core n8n nodes...');
     
     // Core nodes are included in the massive registry, so they'll be loaded with it
     // This method ensures we track them separately for fallback purposes
@@ -300,37 +300,37 @@ export class NodeDiscoveryService {
       ALL_MASSIVE_NODES.find(node => node.name === name)
     ).filter(Boolean) as NodeTypeInfo[];
     
-    console.log(`[NodeDiscovery] Tracked ${this.coreNodes.length} core nodes`);
+    console.error(`[NodeDiscovery] Tracked ${this.coreNodes.length} core nodes`);
   }
 
   /**
    * Ensure core nodes are always available, even if massive registry fails
    */
   private ensureCoreNodesAvailable(): void {
-    console.log('[NodeDiscovery] Ensuring core nodes are available...');
+    console.error('[NodeDiscovery] Ensuring core nodes are available...');
     
     for (const coreNode of this.coreNodes) {
       if (!this.nodeTypes.has(coreNode.name)) {
-        console.log(`[NodeDiscovery] Adding missing core node: ${coreNode.name}`);
+        console.error(`[NodeDiscovery] Adding missing core node: ${coreNode.name}`);
         this.addNodeType(coreNode);
       }
     }
     
-    console.log(`[NodeDiscovery] Core nodes check complete. Total nodes: ${this.nodeTypes.size}`);
+    console.error(`[NodeDiscovery] Core nodes check complete. Total nodes: ${this.nodeTypes.size}`);
   }
 
   /**
    * Initialize massive node registry as primary source
    */
   private initializeMassiveRegistry(): void {
-    console.log('[NodeDiscovery] Initializing massive node registry with 1150+ integrations...');
+    console.error('[NodeDiscovery] Initializing massive node registry with 1150+ integrations...');
 
     // Load all massive nodes from registry
     for (const nodeType of ALL_MASSIVE_NODES) {
       this.addNodeType(nodeType);
     }
 
-    console.log(`[NodeDiscovery] Initialized ${this.nodeTypes.size} node types from massive registry`);
+    console.error(`[NodeDiscovery] Initialized ${this.nodeTypes.size} node types from massive registry`);
     
     // Update categories
     this.updateCategories();
@@ -352,7 +352,7 @@ export class NodeDiscoveryService {
   async getAllNodeTypes(): Promise<NodeTypeInfo[]> {
     // Ensure massive registry is loaded
     if (this.nodeTypes.size === 0) {
-      console.log('[NodeDiscovery] No node types available, initializing massive registry');
+      console.error('[NodeDiscovery] No node types available, initializing massive registry');
       this.initializeMassiveRegistry();
     }
     
@@ -741,7 +741,7 @@ export class NodeDiscoveryService {
    * Generate an enhanced workflow structure for a use case
    */
   generateWorkflowSkeleton(description: string): any {
-    console.log(`[NodeDiscovery] Generating enhanced skeleton for: "${description}"`);
+    console.error(`[NodeDiscovery] Generating enhanced skeleton for: "${description}"`);
     
     // Enhanced keyword analysis for better node suggestions
     const descLower = description.toLowerCase();
@@ -749,7 +749,7 @@ export class NodeDiscoveryService {
     
     // Detect specific workflow patterns
     const patterns = this.detectWorkflowPatterns(descLower);
-    console.log('[NodeDiscovery] Detected patterns:', patterns);
+    console.error('[NodeDiscovery] Detected patterns:', patterns);
     
     // Get base suggestions from existing logic
     let suggestions = this.suggestNodesForUseCase(description);
@@ -758,11 +758,11 @@ export class NodeDiscoveryService {
     suggestions = this.enhanceSuggestionsWithPatterns(suggestions, patterns, keywords);
     
     if (suggestions.length === 0) {
-      console.log('[NodeDiscovery] No suggestions found, creating basic workflow');
+      console.error('[NodeDiscovery] No suggestions found, creating basic workflow');
       return this.createBasicWorkflow(description);
     }
 
-    console.log(`[NodeDiscovery] Using ${suggestions.length} enhanced suggestions`);
+    console.error(`[NodeDiscovery] Using ${suggestions.length} enhanced suggestions`);
     
     const nodes = [];
     const connections: any = {};
@@ -791,7 +791,7 @@ export class NodeDiscoveryService {
       connections
     };
 
-    console.log(`[NodeDiscovery] Generated workflow with ${nodes.length} nodes and ${Object.keys(connections).length} connection points`);
+    console.error(`[NodeDiscovery] Generated workflow with ${nodes.length} nodes and ${Object.keys(connections).length} connection points`);
     return result;
   }
 
