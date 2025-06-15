@@ -595,7 +595,7 @@ export class MergeWorkflowChangesHandler extends BaseCollaborationToolHandler {
 
   private async createMergeCommit(sourceBranch: WorkflowBranch, targetBranch: WorkflowBranch, mergeResult: any): Promise<void> {
     // Simulate creating a merge commit
-    console.log(`Merge commit created: Merged '${sourceBranch.name}' into '${targetBranch.name}'`);
+    console.error(`Merge commit created: Merged '${sourceBranch.name}' into '${targetBranch.name}'`);
   }
 
   private initializeSampleBranches(): void {

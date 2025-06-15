@@ -348,9 +348,9 @@ export class ShareWorkflowHandler extends BaseCollaborationToolHandler {
   private async sendShareNotifications(shares: WorkflowShare[], message?: string): Promise<void> {
     // Simulate sending notifications
     for (const share of shares) {
-      console.log(`Notification sent to ${share.sharedWith.identifier}: Workflow "${share.workflowName}" has been shared with you.`);
+      console.error(`Notification sent to ${share.sharedWith.identifier}: Workflow "${share.workflowName}" has been shared with you.`);
       if (message) {
-        console.log(`Message: ${message}`);
+        console.error(`Message: ${message}`);
       }
     }
   }

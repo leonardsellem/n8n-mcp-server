@@ -77,7 +77,7 @@ export class NodeDiscoveryService {
     }
 
     try {
-      console.log('[NodeDiscovery] Attempting to fetch node types from n8n API...');
+      console.error('[NodeDiscovery] Attempting to fetch node types from n8n API...');
       const nodeTypes = await this.apiClient.getNodeTypes();
       
       console.error(`[NodeDiscovery] API returned ${nodeTypes?.length || 0} node types`);

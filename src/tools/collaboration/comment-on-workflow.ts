@@ -372,7 +372,7 @@ export class CommentOnWorkflowHandler extends BaseCollaborationToolHandler {
   private async sendMentionNotifications(comment: WorkflowComment): Promise<void> {
     // Simulate sending notifications for mentions
     for (const mention of comment.mentions) {
-      console.log(`Notification sent to ${mention}: You were mentioned in a comment on workflow "${comment.workflowName}"`);
+      console.error(`Notification sent to ${mention}: You were mentioned in a comment on workflow "${comment.workflowName}"`);
     }
   }
 

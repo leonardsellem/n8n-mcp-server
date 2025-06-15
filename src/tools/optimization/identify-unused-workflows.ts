@@ -612,11 +612,11 @@ export class IdentifyUnusedWorkflowsHandler extends OptimizationBaseHandler {
 
         if (firstPhase.action === 'delete' && cleanupMode === 'delete') {
           // Simulate deletion
-          console.log(`Deleting workflow ${workflowId}`);
+          console.error(`Deleting workflow ${workflowId}`);
           deleted.push(workflowId);
         } else {
           // Simulate archiving
-          console.log(`Archiving workflow ${workflowId}`);
+          console.error(`Archiving workflow ${workflowId}`);
           archived.push(workflowId);
         }
       } catch (error) {

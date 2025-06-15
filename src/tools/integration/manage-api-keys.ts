@@ -472,22 +472,22 @@ export class ManageApiKeysHandler extends IntegrationBaseHandler {
 
   private async storeApiKey(key: ApiKey, encryptedValue: string): Promise<void> {
     // Simulate storing encrypted API key
-    console.log(`Storing API key ${key.id} with encryption level ${key.encryptionLevel}`);
+    console.error(`Storing API key ${key.id} with encryption level ${key.encryptionLevel}`);
   }
 
   private async reencryptApiKey(keyId: string, newEncryptionLevel: string): Promise<void> {
     // Simulate re-encryption with new level
-    console.log(`Re-encrypting API key ${keyId} with ${newEncryptionLevel} encryption`);
+    console.error(`Re-encrypting API key ${keyId} with ${newEncryptionLevel} encryption`);
   }
 
   private async secureDeleteApiKey(keyId: string): Promise<void> {
     // Simulate secure deletion
-    console.log(`Securely deleting API key ${keyId}`);
+    console.error(`Securely deleting API key ${keyId}`);
   }
 
   private async logAuditEntry(entry: ApiKeyAuditEntry): Promise<void> {
     // Simulate audit logging
-    console.log(`Audit log: ${entry.action} on ${entry.keyId} by ${entry.user}`);
+    console.error(`Audit log: ${entry.action} on ${entry.keyId} by ${entry.user}`);
   }
 
   private sanitizeApiKey(key: ApiKey): Partial<ApiKey> {

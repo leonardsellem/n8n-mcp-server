@@ -47,9 +47,9 @@ export class CreateSmartWorkflowHandler extends BaseWorkflowToolHandler {
       if (description && (!nodes || nodes.length === 0) && useTemplate) {
         try {
           // First attempt: AI-powered generation
-          console.log('[CreateSmartWorkflow] Attempting AI-powered generation from description');
+          console.error('[CreateSmartWorkflow] Attempting AI-powered generation from description');
           const analysis = analyzeDescription(description);
-          console.log('[CreateSmartWorkflow] Analysis result:', {
+          console.error('[CreateSmartWorkflow] Analysis result:', {
             triggers: analysis.triggers,
             actions: analysis.actions,
             complexity: analysis.complexity
@@ -59,7 +59,7 @@ export class CreateSmartWorkflowHandler extends BaseWorkflowToolHandler {
           
           // Only use AI result if it generated meaningful nodes (more than just a trigger)
           if (aiWorkflow.nodes.length > 1) {
-            console.log(`[CreateSmartWorkflow] AI generation successful: ${aiWorkflow.nodes.length} nodes created`);
+            console.error(`[CreateSmartWorkflow] AI generation successful: ${aiWorkflow.nodes.length} nodes created`);
             workflowData.nodes = aiWorkflow.nodes;
             workflowData.connections = aiWorkflow.connections;
           } else {
@@ -67,14 +67,14 @@ export class CreateSmartWorkflowHandler extends BaseWorkflowToolHandler {
           }
         } catch (aiError) {
           // Fallback: Enhanced skeleton generation
-          console.log('[CreateSmartWorkflow] AI generation failed, falling back to enhanced skeleton:', aiError);
+          console.error('[CreateSmartWorkflow] AI generation failed, falling back to enhanced skeleton:', aiError);
           const skeleton = nodeDiscovery.generateWorkflowSkeleton(description);
           if (!skeleton.error && skeleton.nodes.length > 0) {
-            console.log(`[CreateSmartWorkflow] Enhanced skeleton generation successful: ${skeleton.nodes.length} nodes created`);
+            console.error(`[CreateSmartWorkflow] Enhanced skeleton generation successful: ${skeleton.nodes.length} nodes created`);
             workflowData.nodes = skeleton.nodes;
             workflowData.connections = skeleton.connections;
           } else {
-            console.log('[CreateSmartWorkflow] Both AI and skeleton generation failed, creating minimal workflow');
+            console.error('[CreateSmartWorkflow] Both AI and skeleton generation failed, creating minimal workflow');
             // Final fallback: Create minimal workflow with manual trigger and function node
             workflowData.nodes = [
               {

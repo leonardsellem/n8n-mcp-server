@@ -506,7 +506,7 @@ export class GenerateWorkflowDocumentationHandler extends DocumentationBaseHandl
   private async saveDocumentation(workflow: any, content: string, format: string, outputPath: string): Promise<void> {
     // Mock file saving
     const filename = `${workflow.name.replace(/[^a-zA-Z0-9]/g, '_')}_documentation.${format}`;
-    console.log(`Saving documentation to ${outputPath}/${filename}`);
+    console.error(`Saving documentation to ${outputPath}/${filename}`);
   }
 
   

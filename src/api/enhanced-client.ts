@@ -252,9 +252,9 @@ export class EnhancedN8nApiClient {
 
     for (const endpoint of credentialEndpoints) {
       try {
-        console.log(`[CREDENTIALS] Attempting to fetch credentials from: ${endpoint}`);
+        console.error(`[CREDENTIALS] Attempting to fetch credentials from: ${endpoint}`);
         const response = await this.axiosInstance.get(endpoint);
-        console.log(`[CREDENTIALS] Success! Found ${response.data?.data?.length || response.data?.length || 0} credentials at ${endpoint}`);
+        console.error(`[CREDENTIALS] Success! Found ${response.data?.data?.length || response.data?.length || 0} credentials at ${endpoint}`);
         
         // Handle different response formats
         if (response.data?.data && Array.isArray(response.data.data)) {
@@ -267,7 +267,7 @@ export class EnhancedN8nApiClient {
         
         return [];
       } catch (error: any) {
-        console.log(`[CREDENTIALS] Failed at ${endpoint}: ${error.response?.status || error.message}`);
+        console.error(`[CREDENTIALS] Failed at ${endpoint}: ${error.response?.status || error.message}`);
         // Continue to next endpoint
       }
     }
@@ -296,16 +296,16 @@ export class EnhancedN8nApiClient {
 
     for (const endpoint of createEndpoints) {
       try {
-        console.log(`[CREDENTIALS] Attempting to create credential at: ${endpoint.method} ${endpoint.url}`);
+        console.error(`[CREDENTIALS] Attempting to create credential at: ${endpoint.method} ${endpoint.url}`);
         const response = await this.axiosInstance.request({
           method: endpoint.method,
           url: endpoint.url,
           data: credential
         });
-        console.log(`[CREDENTIALS] Successfully created credential at ${endpoint.url}`);
+        console.error(`[CREDENTIALS] Successfully created credential at ${endpoint.url}`);
         return response.data;
       } catch (error: any) {
-        console.log(`[CREDENTIALS] Failed at ${endpoint.url}: ${error.response?.status || error.message}`);
+        console.error(`[CREDENTIALS] Failed at ${endpoint.url}: ${error.response?.status || error.message}`);
         // Continue to next endpoint
       }
     }
@@ -324,16 +324,16 @@ export class EnhancedN8nApiClient {
 
     for (const endpoint of updateEndpoints) {
       try {
-        console.log(`[CREDENTIALS] Attempting to update credential at: ${endpoint.method} ${endpoint.url}`);
+        console.error(`[CREDENTIALS] Attempting to update credential at: ${endpoint.method} ${endpoint.url}`);
         const response = await this.axiosInstance.request({
           method: endpoint.method,
           url: endpoint.url,
           data: credential
         });
-        console.log(`[CREDENTIALS] Successfully updated credential at ${endpoint.url}`);
+        console.error(`[CREDENTIALS] Successfully updated credential at ${endpoint.url}`);
         return response.data;
       } catch (error: any) {
-        console.log(`[CREDENTIALS] Failed at ${endpoint.url}: ${error.response?.status || error.message}`);
+        console.error(`[CREDENTIALS] Failed at ${endpoint.url}: ${error.response?.status || error.message}`);
         // Continue to next endpoint
       }
     }
@@ -350,12 +350,12 @@ export class EnhancedN8nApiClient {
 
     for (const endpoint of deleteEndpoints) {
       try {
-        console.log(`[CREDENTIALS] Attempting to delete credential at: DELETE ${endpoint}`);
+        console.error(`[CREDENTIALS] Attempting to delete credential at: DELETE ${endpoint}`);
         const response = await this.axiosInstance.delete(endpoint);
-        console.log(`[CREDENTIALS] Successfully deleted credential at ${endpoint}`);
+        console.error(`[CREDENTIALS] Successfully deleted credential at ${endpoint}`);
         return response.data;
       } catch (error: any) {
-        console.log(`[CREDENTIALS] Failed at ${endpoint}: ${error.response?.status || error.message}`);
+        console.error(`[CREDENTIALS] Failed at ${endpoint}: ${error.response?.status || error.message}`);
         // Continue to next endpoint
       }
     }
@@ -376,16 +376,16 @@ export class EnhancedN8nApiClient {
 
     for (const endpoint of testEndpoints) {
       try {
-        console.log(`[CREDENTIALS] Attempting to test credential at: ${endpoint.method} ${endpoint.url}`);
+        console.error(`[CREDENTIALS] Attempting to test credential at: ${endpoint.method} ${endpoint.url}`);
         const response = await this.axiosInstance.request({
           method: endpoint.method,
           url: endpoint.url,
           data: credential
         });
-        console.log(`[CREDENTIALS] Successfully tested credential at ${endpoint.url}`);
+        console.error(`[CREDENTIALS] Successfully tested credential at ${endpoint.url}`);
         return response.data;
       } catch (error: any) {
-        console.log(`[CREDENTIALS] Failed at ${endpoint.url}: ${error.response?.status || error.message}`);
+        console.error(`[CREDENTIALS] Failed at ${endpoint.url}: ${error.response?.status || error.message}`);
         // Continue to next endpoint
       }
     }
@@ -472,10 +472,10 @@ export class EnhancedN8nApiClient {
       try {
         await this.axiosInstance.get(`${endpoint}?limit=1`);
         results[endpoint] = true;
-        console.log(`[API-TEST] ✅ ${endpoint} - OK`);
+        console.error(`[API-TEST] ✅ ${endpoint} - OK`);
       } catch (error: any) {
         results[endpoint] = false;
-        console.log(`[API-TEST] ❌ ${endpoint} - ${error.response?.status || error.message}`);
+        console.error(`[API-TEST] ❌ ${endpoint} - ${error.response?.status || error.message}`);
       }
     }
     
@@ -494,7 +494,7 @@ export class EnhancedN8nApiClient {
 
     for (const endpoint of credentialTypeEndpoints) {
       try {
-        console.log(`[CREDENTIAL-TYPES] Attempting to fetch credential types from: ${endpoint}`);
+        console.error(`[CREDENTIAL-TYPES] Attempting to fetch credential types from: ${endpoint}`);
         const response = await this.axiosInstance.get(endpoint);
         
         // Handle different response formats
@@ -507,20 +507,20 @@ export class EnhancedN8nApiClient {
           credentialTypes = response.data.credentialTypes;
         }
         
-        console.log(`[CREDENTIAL-TYPES] Success! Found ${credentialTypes.length} credential types at ${endpoint}`);
+        console.error(`[CREDENTIAL-TYPES] Success! Found ${credentialTypes.length} credential types at ${endpoint}`);
         
         if (credentialTypes.length > 0) {
           return credentialTypes;
         }
       } catch (error: any) {
-        console.log(`[CREDENTIAL-TYPES] Failed at ${endpoint}: ${error.response?.status || error.message}`);
+        console.error(`[CREDENTIAL-TYPES] Failed at ${endpoint}: ${error.response?.status || error.message}`);
         // Continue to next endpoint
       }
     }
 
     // Fallback: Extract credential types from node types
     try {
-      console.log('[CREDENTIAL-TYPES] Attempting fallback: extracting from node types...');
+      console.error('[CREDENTIAL-TYPES] Attempting fallback: extracting from node types...');
       const nodeTypes = await this.getNodeTypes();
       const credentialTypes = new Set<string>();
       
@@ -543,7 +543,7 @@ export class EnhancedN8nApiClient {
         properties: []
       }));
       
-      console.log(`[CREDENTIAL-TYPES] Fallback successful! Extracted ${result.length} credential types from node types`);
+      console.error(`[CREDENTIAL-TYPES] Fallback successful! Extracted ${result.length} credential types from node types`);
       return result;
     } catch (error) {
       console.warn('[CREDENTIAL-TYPES] Fallback failed, returning empty array');

@@ -442,7 +442,7 @@ export class OptimizeWorkflowPerformanceHandler extends OptimizationBaseHandler 
     const optimizedWorkflow = { ...workflow };
     
     // This would contain actual optimization logic
-    console.log(`Applying optimization: ${optimization.type}`);
+    console.error(`Applying optimization: ${optimization.type}`);
     
     return optimizedWorkflow;
   }

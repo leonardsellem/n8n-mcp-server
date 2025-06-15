@@ -20,23 +20,23 @@ export class DiscoverNodesHandler extends BaseDiscoveryToolHandler {
       // Get fresh node types from API - this will include the massive registry
       let nodeTypes = await nodeDiscovery.getAllNodeTypes();
       
-      console.log(`[DiscoverNodesHandler] Starting with ${nodeTypes.length} total node types`);
+      console.error(`[DiscoverNodesHandler] Starting with ${nodeTypes.length} total node types`);
 
       // Filter by category if specified
       if (category) {
         nodeTypes = nodeDiscovery.getNodeTypesByCategory(category);
-        console.log(`[DiscoverNodesHandler] After category '${category}' filter: ${nodeTypes.length} nodes`);
+        console.error(`[DiscoverNodesHandler] After category '${category}' filter: ${nodeTypes.length} nodes`);
       }
 
       // Search if query provided
       if (search) {
         nodeTypes = nodeDiscovery.searchNodeTypes(search);
-        console.log(`[DiscoverNodesHandler] After search '${search}' filter: ${nodeTypes.length} nodes`);
+        console.error(`[DiscoverNodesHandler] After search '${search}' filter: ${nodeTypes.length} nodes`);
       }
 
       // Limit results
       const limitedResults = nodeTypes.slice(0, limit);
-      console.log(`[DiscoverNodesHandler] Returning ${limitedResults.length} of ${nodeTypes.length} nodes (limit: ${limit})`);
+      console.error(`[DiscoverNodesHandler] Returning ${limitedResults.length} of ${nodeTypes.length} nodes (limit: ${limit})`);
 
       const response = {
         nodes: limitedResults.map(node => ({

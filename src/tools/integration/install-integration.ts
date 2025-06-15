@@ -224,7 +224,7 @@ export class InstallIntegrationHandler extends IntegrationBaseHandler {
     // - Register new node types
     // - Update node registry
     // - Restart n8n if necessary
-    console.log(`Performing post-install setup for ${integrationId}`);
+    console.error(`Performing post-install setup for ${integrationId}`);
   }
 }
 
