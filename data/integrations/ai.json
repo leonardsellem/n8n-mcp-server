@@ -1,0 +1,332 @@
+{
+  "category": "AI",
+  "count": 7,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.openAi",
+      "name": "OpenAI",
+      "description": "GPT models, DALL-E, Whisper, and other OpenAI services",
+      "nodeType": "@n8n/n8n-nodes-langchain.openAi",
+      "credentials": [
+        "openAiApi"
+      ],
+      "tags": [
+        "ai",
+        "gpt",
+        "language-model",
+        "chat",
+        "image-generation"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.anthropic",
+      "name": "Anthropic Claude",
+      "description": "Claude AI models for text generation and analysis",
+      "nodeType": "@n8n/n8n-nodes-langchain.anthropic",
+      "credentials": [
+        "anthropicApi"
+      ],
+      "tags": [
+        "ai",
+        "claude",
+        "language-model",
+        "chat"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.huggingFace",
+      "name": "Hugging Face",
+      "description": "Open-source AI models and datasets",
+      "nodeType": "@n8n/n8n-nodes-langchain.huggingFace",
+      "credentials": [
+        "huggingFaceApi"
+      ],
+      "tags": [
+        "ai",
+        "ml",
+        "models",
+        "nlp",
+        "open-source"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.googleVertexAi",
+      "name": "Google Vertex AI",
+      "description": "Google Cloud AI and machine learning platform",
+      "nodeType": "@n8n/n8n-nodes-langchain.googleVertexAi",
+      "credentials": [
+        "googleVertexAi"
+      ],
+      "tags": [
+        "ai",
+        "google",
+        "cloud",
+        "ml",
+        "vertex"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.azureOpenAi",
+      "name": "Azure OpenAI",
+      "description": "OpenAI models hosted on Microsoft Azure",
+      "nodeType": "@n8n/n8n-nodes-langchain.azureOpenAi",
+      "credentials": [
+        "azureOpenAi"
+      ],
+      "tags": [
+        "ai",
+        "azure",
+        "microsoft",
+        "openai",
+        "enterprise"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.pinecone",
+      "name": "Pinecone",
+      "description": "Vector database for machine learning applications",
+      "nodeType": "@n8n/n8n-nodes-langchain.pinecone",
+      "credentials": [
+        "pineconeApi"
+      ],
+      "tags": [
+        "vector-db",
+        "ml",
+        "embeddings",
+        "search"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "@n8n/n8n-nodes-langchain.weaviate",
+      "name": "Weaviate",
+      "description": "Open-source vector database",
+      "nodeType": "@n8n/n8n-nodes-langchain.weaviate",
+      "credentials": [
+        "weaviateApi"
+      ],
+      "tags": [
+        "vector-db",
+        "open-source",
+        "ml",
+        "search"
+      ],
+      "category": "AI",
+      "properties": [
+        {
+          "name": "model",
+          "type": "options",
+          "required": true,
+          "description": "The AI model to use"
+        },
+        {
+          "name": "prompt",
+          "type": "string",
+          "required": false,
+          "description": "Input prompt or text"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

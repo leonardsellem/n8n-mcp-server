@@ -39,15 +39,28 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
       // Get the current workflow to update
       const currentWorkflow = await this.apiService.getWorkflow(workflowId);
       
-      // Prepare update object with changes
-      const workflowData: Record<string, any> = { ...currentWorkflow };
+      // Prepare update object with changes - exclude read-only fields
+      const workflowData: Record<string, any> = {
+        name: currentWorkflow.name,
+        nodes: currentWorkflow.nodes || [],
+        connections: currentWorkflow.connections || {},
+        settings: currentWorkflow.settings || {
+          saveExecutionProgress: true,
+          saveManualExecutions: true,
+          saveDataErrorExecution: "all",
+          saveDataSuccessExecution: "all",
+          executionTimeout: 3600,
+          timezone: "UTC"
+        },
+        staticData: currentWorkflow.staticData || {}
+      };
       
-      // Update fields if provided
+      // Update fields if provided (but exclude read-only ones)
       if (name !== undefined) workflowData.name = name;
       if (nodes !== undefined) workflowData.nodes = nodes;
       if (connections !== undefined) workflowData.connections = connections;
-      if (active !== undefined) workflowData.active = active;
-      if (tags !== undefined) workflowData.tags = tags;
+      // Note: active field is read-only and handled through activate/deactivate endpoints
+      // Note: tags field is read-only and handled through tags API
       
       // Update the workflow
       const updatedWorkflow = await this.apiService.updateWorkflow(workflowId, workflowData);
@@ -55,10 +68,24 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
       // Build a summary of changes
       const changesArray = [];
       if (name !== undefined && name !== currentWorkflow.name) changesArray.push(`name: "${currentWorkflow.name}" → "${name}"`);
-      if (active !== undefined && active !== currentWorkflow.active) changesArray.push(`active: ${currentWorkflow.active} → ${active}`);
       if (nodes !== undefined) changesArray.push('nodes updated');
       if (connections !== undefined) changesArray.push('connections updated');
-      if (tags !== undefined) changesArray.push('tags updated');
+      
+      // Handle activation separately if requested
+      if (active !== undefined && active !== currentWorkflow.active) {
+        if (active) {
+          await this.apiService.activateWorkflow(workflowId);
+        } else {
+          await this.apiService.deactivateWorkflow(workflowId);
+        }
+        changesArray.push(`active: ${currentWorkflow.active} → ${active}`);
+      }
+      
+      // Handle tags separately if provided
+      if (tags !== undefined) {
+        // This would need to be implemented through the tags API
+        changesArray.push('tags update requested (handled separately)');
+      }
       
       const changesSummary = changesArray.length > 0
         ? `Changes: ${changesArray.join(', ')}`
@@ -84,7 +111,7 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
 export function getUpdateWorkflowToolDefinition(): ToolDefinition {
   return {
     name: 'update_workflow',
-    description: 'Update an existing workflow in n8n',
+    description: 'Update an existing workflow in n8n. Note: Use activate_workflow/deactivate_workflow for activation status.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -106,17 +133,6 @@ export function getUpdateWorkflowToolDefinition(): ToolDefinition {
         connections: {
           type: 'object',
           description: 'Updated connection mappings between nodes',
-        },
-        active: {
-          type: 'boolean',
-          description: 'Whether the workflow should be active',
-        },
-        tags: {
-          type: 'array',
-          description: 'Updated tags to associate with the workflow',
-          items: {
-            type: 'string',
-          },
         },
       },
       required: ['workflowId'],

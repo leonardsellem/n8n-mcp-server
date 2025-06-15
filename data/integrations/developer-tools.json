@@ -1,0 +1,190 @@
+{
+  "category": "Developer Tools",
+  "count": 4,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.github",
+      "name": "GitHub",
+      "description": "Git repository hosting and collaboration",
+      "category": "Developer Tools",
+      "nodeType": "n8n-nodes-base.github",
+      "credentials": [
+        "githubOAuth2Api"
+      ],
+      "tags": [
+        "git",
+        "version-control",
+        "collaboration",
+        "development"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.gitlab",
+      "name": "GitLab",
+      "description": "DevOps platform with Git repository management",
+      "category": "Developer Tools",
+      "nodeType": "n8n-nodes-base.gitlab",
+      "credentials": [
+        "gitlabOAuth2Api"
+      ],
+      "tags": [
+        "git",
+        "devops",
+        "ci-cd",
+        "development"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.jira",
+      "name": "Jira",
+      "description": "Project management and issue tracking",
+      "category": "Developer Tools",
+      "nodeType": "n8n-nodes-base.jira",
+      "credentials": [
+        "jiraCloudApi"
+      ],
+      "tags": [
+        "project-management",
+        "issue-tracking",
+        "agile",
+        "atlassian"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.confluence",
+      "name": "Confluence",
+      "description": "Team collaboration and documentation",
+      "category": "Developer Tools",
+      "nodeType": "n8n-nodes-base.confluence",
+      "credentials": [
+        "confluenceCloudApi"
+      ],
+      "tags": [
+        "documentation",
+        "collaboration",
+        "wiki",
+        "atlassian"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

@@ -1,19 +1,23 @@
 /**
  * Base Workflow Tool Handler
- * 
+ *
  * This module provides a base handler for workflow-related tools.
  */
 
 import { ToolCallResult } from '../../types/index.js';
 import { N8nApiError } from '../../errors/index.js';
-import { createApiService } from '../../api/n8n-client.js';
+import { EnhancedN8nApiClient } from '../../api/enhanced-client.js';
 import { getEnvConfig } from '../../config/environment.js';
 
 /**
  * Base class for workflow tool handlers
  */
 export abstract class BaseWorkflowToolHandler {
-  protected apiService = createApiService(getEnvConfig());
+  protected apiService: EnhancedN8nApiClient;
+  
+  constructor() {
+    this.apiService = new EnhancedN8nApiClient(getEnvConfig());
+  }
   
   /**
    * Validate and execute the tool
@@ -31,15 +35,12 @@ export abstract class BaseWorkflowToolHandler {
    * @returns Formatted success response
    */
   protected formatSuccess(data: any, message?: string): ToolCallResult {
-    const formattedData = typeof data === 'object' 
-      ? JSON.stringify(data, null, 2)
-      : String(data);
-      
+    // Return structured data directly without string formatting to ensure valid JSON
     return {
       content: [
         {
           type: 'text',
-          text: message ? `${message}\n\n${formattedData}` : formattedData,
+          text: JSON.stringify(data, null, 2),
         },
       ],
     };
@@ -88,6 +89,20 @@ export abstract class BaseWorkflowToolHandler {
         : 'Unknown error occurred';
         
       return this.formatError(`Error executing workflow tool: ${errorMessage}`);
+    }
+  }
+  
+  /**
+   * Validate required parameters
+   *
+   * @param args Arguments to validate
+   * @param required Array of required parameter names
+   * @throws Error if required parameters are missing
+   */
+  protected validateRequiredParams(args: Record<string, any>, required: string[]): void {
+    const missing = required.filter(param => args[param] === undefined || args[param] === null);
+    if (missing.length > 0) {
+      throw new Error(`Missing required parameters: ${missing.join(', ')}`);
     }
   }
 }

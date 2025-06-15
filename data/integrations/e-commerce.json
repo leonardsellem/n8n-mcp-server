@@ -1,0 +1,144 @@
+{
+  "category": "E-commerce",
+  "count": 3,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.shopify",
+      "name": "Shopify",
+      "description": "E-commerce platform for online stores",
+      "category": "E-commerce",
+      "credentials": [
+        "shopifyApi"
+      ],
+      "tags": [
+        "ecommerce",
+        "online-store",
+        "retail",
+        "sales"
+      ],
+      "nodeType": "n8n-nodes-base.shopify",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.wooCommerce",
+      "name": "WooCommerce",
+      "description": "WordPress e-commerce plugin",
+      "category": "E-commerce",
+      "credentials": [
+        "wooCommerceApi"
+      ],
+      "tags": [
+        "ecommerce",
+        "wordpress",
+        "online-store",
+        "retail"
+      ],
+      "nodeType": "n8n-nodes-base.wooCommerce",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.magento",
+      "name": "Magento",
+      "description": "Open-source e-commerce platform",
+      "category": "E-commerce",
+      "credentials": [
+        "magentoApi"
+      ],
+      "tags": [
+        "ecommerce",
+        "open-source",
+        "enterprise",
+        "retail"
+      ],
+      "nodeType": "n8n-nodes-base.magento",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

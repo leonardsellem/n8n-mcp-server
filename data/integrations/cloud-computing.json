@@ -1,0 +1,144 @@
+{
+  "category": "Cloud Computing",
+  "count": 3,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.awsLambda",
+      "name": "AWS Lambda",
+      "description": "Serverless compute service",
+      "category": "Cloud Computing",
+      "nodeType": "n8n-nodes-base.awsLambda",
+      "credentials": [
+        "aws"
+      ],
+      "tags": [
+        "aws",
+        "serverless",
+        "compute",
+        "functions"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.awsSqs",
+      "name": "AWS SQS",
+      "description": "Simple Queue Service",
+      "category": "Cloud Computing",
+      "nodeType": "n8n-nodes-base.awsSqs",
+      "credentials": [
+        "aws"
+      ],
+      "tags": [
+        "aws",
+        "queue",
+        "messaging",
+        "sqs"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.digitalOcean",
+      "name": "DigitalOcean",
+      "description": "Cloud infrastructure provider",
+      "category": "Cloud Computing",
+      "nodeType": "n8n-nodes-base.digitalOcean",
+      "credentials": [
+        "digitalOceanApi"
+      ],
+      "tags": [
+        "cloud",
+        "infrastructure",
+        "droplets",
+        "hosting"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

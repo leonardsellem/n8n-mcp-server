@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc && chmod +x build/index.js",
+    "build:trace": "tsc --traceResolution && chmod +x build/index.js",
     "start": "node build/index.js",
     "dev": "tsc -w",
     "lint": "eslint --ext .ts src/",
