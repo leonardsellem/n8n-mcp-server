@@ -17,7 +17,7 @@ let sharedApiClient: EnhancedN8nApiClient | null = null;
 /**
  * Initialize the shared API client for discovery handlers
  */
-export function initializeDiscoveryApiClient(apiClient: EnhancedN8nApiClient): void {
+export function initializeDiscoveryApiClient(apiClient: EnhancedN8nApiClient | null): void {
   sharedApiClient = apiClient;
 }
 

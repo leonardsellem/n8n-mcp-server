@@ -1,0 +1,57 @@
+{
+  "timestamp": "2025-06-16T01:59:25.844Z",
+  "stats": {
+    "total": 5,
+    "successful": 5,
+    "failed": 0,
+    "aiToolCapable": 5
+  },
+  "errors": [],
+  "collectedNodes": [
+    {
+      "nodeType": "n8n-nodes-base.gmail",
+      "displayName": "Gmail",
+      "category": "communication",
+      "priority": "high",
+      "aiToolCapable": true,
+      "resourceCount": 4,
+      "operationCount": 25
+    },
+    {
+      "nodeType": "n8n-nodes-base.slack",
+      "displayName": "Slack",
+      "category": "communication",
+      "priority": "high",
+      "aiToolCapable": true,
+      "resourceCount": 6,
+      "operationCount": 35
+    },
+    {
+      "nodeType": "n8n-nodes-base.googleDrive",
+      "displayName": "Google Drive",
+      "category": "storage",
+      "priority": "high",
+      "aiToolCapable": true,
+      "resourceCount": 2,
+      "operationCount": 9
+    },
+    {
+      "nodeType": "n8n-nodes-base.microsoftOutlook",
+      "displayName": "Microsoft Outlook",
+      "category": "communication",
+      "priority": "high",
+      "aiToolCapable": true,
+      "resourceCount": 1,
+      "operationCount": 4
+    },
+    {
+      "nodeType": "n8n-nodes-base.salesforce",
+      "displayName": "Salesforce",
+      "category": "crm",
+      "priority": "high",
+      "aiToolCapable": true,
+      "resourceCount": 1,
+      "operationCount": 4
+    }
+  ]
+}

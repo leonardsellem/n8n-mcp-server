@@ -170,14 +170,14 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
     const nodes = [];
     const connections: any = {};
     let nodeIndex = 0;
-    let previousNodeName = '';
+    let previousNodeId = '';
 
     // Generate trigger nodes
     analysis.triggers.forEach((trigger: string, index: number) => {
       const node = this.createTriggerNode(trigger, nodeIndex);
       nodes.push(node);
       if (index === 0) {
-        previousNodeName = node.name;
+        previousNodeId = node.id;
       }
       nodeIndex++;
     });
@@ -187,19 +187,19 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
       const node = this.createActionNode(action, nodeIndex);
       nodes.push(node);
       
-      // Connect to previous node
-      if (previousNodeName) {
-        if (!connections[previousNodeName]) {
-          connections[previousNodeName] = { main: [[]] };
+      // Connect to previous node using proper ID-based connections
+      if (previousNodeId) {
+        if (!connections[previousNodeId]) {
+          connections[previousNodeId] = { main: [[]] };
         }
-        connections[previousNodeName].main[0].push({
-          node: node.name,
+        connections[previousNodeId].main[0].push({
+          node: node.id,
           type: 'main',
           index: 0
         });
       }
       
-      previousNodeName = node.name;
+      previousNodeId = node.id;
       nodeIndex++;
     });
 
@@ -208,12 +208,12 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
       const node = this.createActionNode('function', nodeIndex);
       nodes.push(node);
       
-      if (previousNodeName) {
-        if (!connections[previousNodeName]) {
-          connections[previousNodeName] = { main: [[]] };
+      if (previousNodeId) {
+        if (!connections[previousNodeId]) {
+          connections[previousNodeId] = { main: [[]] };
         }
-        connections[previousNodeName].main[0].push({
-          node: node.name,
+        connections[previousNodeId].main[0].push({
+          node: node.id,
           type: 'main',
           index: 0
         });
@@ -625,41 +625,49 @@ export function createTriggerNode(triggerType: string, index: number): any {
  * Create action node
  */
 export function createActionNode(actionType: string, index: number): any {
-  const basePosition = [240 + (index * 220), 300];
+  // Grid-based positioning with bounds checking for complex workflows
+  const basePosition = [
+    Math.min(240 + ((index % 5) * 300), 1800), // Max 5 nodes per row
+    300 + (Math.floor(index / 5) * 200)        // New row every 5 nodes
+  ];
+  
+  // Generate proper UUID for node ID
+  const nodeId = generateId();
   
   switch (actionType) {
     case 'emailSend':
       return {
-        id: `email_send_${index}`,
-        type: 'n8n-nodes-base.emailSend',
+        id: nodeId,
+        type: 'n8n-nodes-base.send-email', // Corrected node type
         name: `Send Email${index > 0 ? ` ${index + 1}` : ''}`,
         parameters: {
           subject: 'Workflow Notification',
           text: '={{ JSON.stringify($json, null, 2) }}',
-          toEmail: 'recipient@example.com'
+          toEmail: 'recipient@example.com',
+          options: {} // Required options object
         },
         position: basePosition
       };
 
     case 'httpRequest':
       return {
-        id: `http_request_${index}`,
+        id: nodeId,
         type: 'n8n-nodes-base.httpRequest',
         name: `HTTP Request${index > 0 ? ` ${index + 1}` : ''}`,
         parameters: {
           url: 'https://api.example.com/endpoint',
           method: 'POST',
-          body: {
-            mode: 'json',
-            json: '={{ $json }}'
-          }
+          sendBody: true,
+          bodyContentType: 'json',
+          jsonBody: '={{ $json }}',
+          options: {} // Required options object
         },
         position: basePosition
       };
 
     case 'function':
       return {
-        id: `function_${index}`,
+        id: nodeId,
         type: 'n8n-nodes-base.function',
         name: `Process Data${index > 0 ? ` ${index + 1}` : ''}`,
         parameters: {
@@ -677,12 +685,44 @@ export function createActionNode(actionType: string, index: number): any {
         position: basePosition
       };
 
+    case 'switch':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.switch',
+        name: `Switch${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          conditions: {
+            options: {
+              caseSensitive: true,
+              leftValue: '',
+              typeValidation: 'strict'
+            },
+            conditions: [
+              {
+                leftValue: '={{ $json.type }}',
+                rightValue: 'email',
+                operator: {
+                  type: 'string',
+                  operation: 'equals'
+                }
+              }
+            ]
+          },
+          fallbackOutput: 0 // Required fallbackOutput parameter
+        },
+        position: basePosition
+      };
+
     default:
       return {
-        id: `set_${index}`,
+        id: nodeId,
         type: 'n8n-nodes-base.set',
         name: `Set Data${index > 0 ? ` ${index + 1}` : ''}`,
         parameters: {
+          options: {
+            keepOnlySet: false,
+            dotNotation: false
+          }, // Required options object
           values: {
             string: [
               {

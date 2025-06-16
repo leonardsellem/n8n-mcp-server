@@ -53,7 +53,7 @@ export async function configureServer(): Promise<Server> {
   // Create enhanced n8n API client
   const apiClient = new EnhancedN8nApiClient(envConfig);
   
-  // Verify n8n API connectivity
+  // Verify n8n API connectivity (non-blocking)
   try {
     console.error('Verifying n8n API connectivity...');
     await apiClient.checkConnectivity();
@@ -70,8 +70,19 @@ export async function configureServer(): Promise<Server> {
     initializeCredentialsApiClient(apiClient);
     console.error('Shared API clients initialized successfully');
   } catch (error) {
-    console.error('ERROR: Failed to connect to n8n API:', error instanceof Error ? error.message : error);
-    throw error;
+    console.error('WARNING: Failed to connect to n8n API:', error instanceof Error ? error.message : error);
+    console.error('Server will continue in offline mode - tools will be available but may have limited functionality');
+    
+    // Initialize in offline mode
+    console.error('Initializing node discovery in offline mode...');
+    initializeNodeDiscovery(null);
+    console.error('Node discovery service initialized in offline mode');
+    
+    // Initialize shared API clients in offline mode
+    console.error('Initializing shared API clients in offline mode...');
+    initializeDiscoveryApiClient(null);
+    initializeCredentialsApiClient(null);
+    console.error('Shared API clients initialized in offline mode');
   }
 
   // Create server instance
@@ -160,7 +171,9 @@ function setupToolCallRequestHandler(server: Server): void {
         DeleteWorkflowHandler,
         ActivateWorkflowHandler,
         DeactivateWorkflowHandler,
-        ExecuteWorkflowHandler
+        ExecuteWorkflowHandler,
+        RepairWorkflowTriggersHandler,
+        RepairWorkflowHandler
       } = await import('../tools/workflow/index.js');
       
       const {
@@ -176,7 +189,13 @@ function setupToolCallRequestHandler(server: Server): void {
         SuggestNodesHandler,
         ValidateNodeHandler,
         GenerateWorkflowSkeletonHandler,
-        ValidateWorkflowHandler
+        ValidateWorkflowHandler,
+        // Phase 3 Universal Discovery Tools
+        DiscoverAvailableNodesHandler,
+        AdvancedNodeSearchHandler,
+        NodeCompatibilityAnalyzer,
+        WorkflowPatternSuggester,
+        NodeDocumentationHelper
       } = await import('../tools/discovery/index.js');
 
       const {
@@ -323,18 +342,7 @@ function setupToolCallRequestHandler(server: Server): void {
         GetWorkflowEssenceHandler,
       } = await import('../tools/ai-friendly/index.js');
 
-      // Import adaptive learning tool handlers
-      const {
-        LearnFromUsageHandler,
-        GetPersonalizedSuggestionsHandler,
-        OptimizeForAiPatternsHandler
-      } = await import('../tools/adaptive-learning/index.js');
-
-      // Import AI agent template tool handlers
-      const {
-        GetAiAgentTemplatesHandler,
-        CreateAiOptimizedWorkflowHandler
-      } = await import('../tools/ai-agent-templates/index.js');
+      // Phase 2 tools (adaptive-learning, ai-agent-templates) will be imported here when implemented
       
       // Route the tool call to the appropriate handler
       if (toolName === 'list_workflows') {
@@ -360,6 +368,12 @@ function setupToolCallRequestHandler(server: Server): void {
         result = await handler.execute(args);
       } else if (toolName === 'execute_workflow') {
         const handler = new ExecuteWorkflowHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'repair_workflow_triggers') {
+        const handler = new RepairWorkflowTriggersHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'repair_workflow') {
+        const handler = new RepairWorkflowHandler();
         result = await handler.execute(args);
       } else if (toolName === 'list_executions') {
         const handler = new ListExecutionsHandler();
@@ -406,6 +420,21 @@ function setupToolCallRequestHandler(server: Server): void {
         result = await handler.execute(args);
       } else if (toolName === 'validate_workflow') {
         const handler = new ValidateWorkflowHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'discover_available_nodes') {
+        const handler = new DiscoverAvailableNodesHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'search_nodes_advanced') {
+        const handler = new AdvancedNodeSearchHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'analyze_node_compatibility') {
+        const handler = new NodeCompatibilityAnalyzer();
+        result = await handler.execute(args);
+      } else if (toolName === 'suggest_workflow_patterns') {
+        const handler = new WorkflowPatternSuggester();
+        result = await handler.execute(args);
+      } else if (toolName === 'get_node_documentation') {
+        const handler = new NodeDocumentationHelper();
         result = await handler.execute(args);
       }
       // Credentials tools
@@ -675,25 +704,8 @@ function setupToolCallRequestHandler(server: Server): void {
         const handler = new GetWorkflowEssenceHandler();
         result = await handler.execute(args as any);
       }
-      // Adaptive Learning Tools
-      else if (toolName === 'learn_from_usage') {
-        const handler = new LearnFromUsageHandler();
-        result = await handler.execute(args);
-      } else if (toolName === 'get_personalized_suggestions') {
-        const handler = new GetPersonalizedSuggestionsHandler();
-        result = await handler.execute(args);
-      } else if (toolName === 'optimize_for_ai_patterns') {
-        const handler = new OptimizeForAiPatternsHandler();
-        result = await handler.execute(args);
-      }
-      // AI Agent Template Tools
-      else if (toolName === 'get_ai_agent_templates') {
-        const handler = new GetAiAgentTemplatesHandler();
-        result = await handler.execute(args);
-      } else if (toolName === 'create_ai_optimized_workflow') {
-        const handler = new CreateAiOptimizedWorkflowHandler();
-        result = await handler.execute(args);
-      } else {
+      // Phase 2 tool handlers (adaptive-learning, ai-agent-templates) will be added here when implemented
+      else {
         throw new Error(`Unknown tool: ${toolName}`);
       }
 

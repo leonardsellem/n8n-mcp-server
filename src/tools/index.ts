@@ -10,8 +10,10 @@ import { setupCredentialsTools } from './credentials/index.js';
 import { setupDiscoveryTools } from './discovery/index.js';
 import { setupAIFriendlyTools } from './ai-friendly/index.js';
 import { setupAIGenerationTools } from './ai-generation/index.js';
-import { setupAdaptiveLearningTools } from './adaptive-learning/index.js';
-import { setupAiAgentTemplateTools } from './ai-agent-templates/index.js';
+// Phase 2 Universal AI Agent Workflow Tools
+import { setupAIWorkflowTools } from './ai-workflow/index.js';
+// import { setupAdaptiveLearningTools } from './adaptive-learning/index.js';
+// import { setupAiAgentTemplateTools } from './ai-agent-templates/index.js';
 import { setupCollaborationTools } from './collaboration/index.js';
 import { setupDocumentationTools } from './documentation/index.js';
 import { setupEnvironmentTools } from './environment/index.js';
@@ -32,8 +34,10 @@ export async function getAllTools() {
     discoveryTools,
     aiFriendlyTools,
     aiGenerationTools,
-    adaptiveLearningTools,
-    aiAgentTemplateTools,
+    // Phase 2 Universal AI Agent Workflow Tools
+    aiWorkflowTools,
+    // adaptiveLearningTools,
+    // aiAgentTemplateTools,
     collaborationTools,
     documentationTools,
     environmentTools,
@@ -52,8 +56,10 @@ export async function getAllTools() {
     setupDiscoveryTools(),
     setupAIFriendlyTools(),
     setupAIGenerationTools(),
-    setupAdaptiveLearningTools(),
-    setupAiAgentTemplateTools(),
+    // Phase 2 Universal AI Agent Workflow Tools
+    setupAIWorkflowTools(),
+    // setupAdaptiveLearningTools(),
+    // setupAiAgentTemplateTools(),
     setupCollaborationTools(),
     setupDocumentationTools(),
     setupEnvironmentTools(),
@@ -79,8 +85,11 @@ export async function getAllTools() {
     // AI-optimized tools
     ...aiFriendlyTools,
     ...aiGenerationTools,
-    ...adaptiveLearningTools,
-    ...aiAgentTemplateTools,
+    
+    // Phase 2 Universal AI Agent Workflow Tools
+    ...aiWorkflowTools,
+    // ...adaptiveLearningTools,
+    // ...aiAgentTemplateTools,
     
     // Collaboration and documentation
     ...collaborationTools,

@@ -10,7 +10,6 @@
 import {
   ALL_MASSIVE_NODES,
   MASSIVE_REGISTRY_STATS,
-  REGISTRY_VERIFICATION,
   NodeTypeInfo,
   NodeProperty,
   PropertyOption,
@@ -19,7 +18,6 @@ import {
   NodeOutput,
   NodeExample
 } from '../data/accurate-massive-registry.js';
-import { getMassiveNodesByCategory, searchMassiveNodes, getMassiveCategories } from '../data/massive-node-registry.js';
 
 export interface ConnectionValidation {
   valid: boolean;
@@ -320,17 +318,17 @@ export class NodeDiscoveryService {
   }
 
   /**
-   * Initialize massive node registry as primary source
+   * Initialize verified node registry as primary source
    */
   private initializeMassiveRegistry(): void {
-    console.error('[NodeDiscovery] Initializing massive node registry with 1150+ integrations...');
+    console.error('[NodeDiscovery] Initializing verified node registry...');
 
     // Load all massive nodes from registry
     for (const nodeType of ALL_MASSIVE_NODES) {
       this.addNodeType(nodeType);
     }
 
-    console.error(`[NodeDiscovery] Initialized ${this.nodeTypes.size} node types from massive registry`);
+    console.error(`[NodeDiscovery] Initialized ${this.nodeTypes.size} node types from verified registry`);
     
     // Update categories
     this.updateCategories();

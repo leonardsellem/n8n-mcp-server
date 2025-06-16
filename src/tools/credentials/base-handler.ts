@@ -17,7 +17,7 @@ let sharedApiClient: EnhancedN8nApiClient | null = null;
 /**
  * Initialize the shared API client for credentials handlers
  */
-export function initializeCredentialsApiClient(apiClient: EnhancedN8nApiClient): void {
+export function initializeCredentialsApiClient(apiClient: EnhancedN8nApiClient | null): void {
   sharedApiClient = apiClient;
 }
 

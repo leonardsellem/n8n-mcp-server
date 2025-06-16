@@ -219,7 +219,7 @@ export class RepairWorkflowTriggersHandler extends BaseWorkflowToolHandler {
    * Update workflow with special handling for trigger registration
    */
   private async updateWorkflowWithTriggerFix(workflowId: string, repairedWorkflow: any): Promise<any> {
-    // Prepare the workflow data with all required fields for proper trigger detection
+    // Prepare the workflow data with only allowed fields for n8n API
     const workflowData: any = {
       name: repairedWorkflow.name,
       nodes: repairedWorkflow.nodes,
@@ -234,21 +234,11 @@ export class RepairWorkflowTriggersHandler extends BaseWorkflowToolHandler {
       },
       staticData: repairedWorkflow.staticData || {},
       meta: repairedWorkflow.meta || {},
-      // Include additional fields that might be needed for trigger registration
-      pinData: repairedWorkflow.pinData || {},
-      versionId: repairedWorkflow.versionId
+      pinData: repairedWorkflow.pinData || {}
     };
     
-    // Remove read-only fields but keep trigger-related metadata
-    delete workflowData.id;
-    delete workflowData.createdAt;
-    delete workflowData.updatedAt;
-    delete workflowData.active;
-    delete workflowData.triggerCount; // Let n8n recalculate this
-    
-    // Use direct API call to ensure all fields are preserved
-    const response = await this.apiService.getAxiosInstance().put(`/workflows/${workflowId}`, workflowData);
-    return response.data;
+    // Use the standard updateWorkflow method which handles field filtering
+    return await this.apiService.updateWorkflow(workflowId, workflowData);
   }
   
   /**
