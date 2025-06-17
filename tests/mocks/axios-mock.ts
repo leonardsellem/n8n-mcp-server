@@ -3,6 +3,7 @@
  */
 
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { jest } from '@jest/globals';
 
 export interface MockResponse {
   data: any;
@@ -29,7 +30,7 @@ export const createMockAxiosInstance = () => {
   const mockRequests: Record<string, any[]> = {};
   const mockResponses: Record<string, MockResponse[]> = {};
   
-  const mockInstance = {
+  const mockInstance: any = {
     get: jest.fn(),
     post: jest.fn(),
     put: jest.fn(),
