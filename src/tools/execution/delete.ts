@@ -29,15 +29,16 @@ export class DeleteExecutionHandler extends BaseExecutionToolHandler {
         );
       }
       
-      // Store execution ID for response message
-      const executionId = args.executionId;
+      // Convert execution ID to numeric format for validation, then back to string for API
+      const numericExecutionId = this.convertToNumericId(args.executionId);
+      const validatedExecutionId = numericExecutionId.toString();
       
       // Delete the execution
-      await this.apiService.deleteExecution(executionId);
+      await this.apiService.deleteExecution(validatedExecutionId);
       
       return this.formatSuccess(
-        { id: executionId, deleted: true },
-        `Successfully deleted execution with ID: ${executionId}`
+        { id: args.executionId, deleted: true },
+        `Successfully deleted execution with ID: ${args.executionId}`
       );
     }, args);
   }
@@ -56,8 +57,11 @@ export function getDeleteExecutionToolDefinition(): ToolDefinition {
       type: 'object',
       properties: {
         executionId: {
-          type: 'string',
-          description: 'ID of the execution to delete',
+          oneOf: [
+            { type: 'string' },
+            { type: 'number' }
+          ],
+          description: 'ID of the execution to delete. Accepts both string and numeric formats. String IDs will be validated and converted to numeric format.',
         },
       },
       required: ['executionId'],

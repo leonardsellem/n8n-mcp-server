@@ -38,11 +38,17 @@ async function main() {
     await server.connect(transport);
 
     console.error('n8n MCP Server running on stdio');
+    console.error('[DEBUG] Main function try block finished.');
   } catch (error) {
+    console.error('[DEBUG] Main function catch block entered.');
     console.error('Failed to start n8n MCP Server:', error);
     process.exit(1);
   }
 }
 
 // Start the server
-main().catch(console.error);
+main().catch(error => {
+  console.error('[DEBUG] Main function .catch() handler reached.');
+  console.error('Unhandled error in main:', error);
+  process.exit(1); // Ensure process exits on unhandled main promise rejection
+});

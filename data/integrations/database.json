@@ -1,0 +1,282 @@
+{
+  "category": "Database",
+  "count": 6,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.postgres",
+      "name": "PostgreSQL",
+      "description": "Advanced open-source relational database",
+      "nodeType": "n8n-nodes-base.postgres",
+      "credentials": [
+        "postgres"
+      ],
+      "tags": [
+        "database",
+        "sql",
+        "relational",
+        "postgresql"
+      ],
+      "category": "Database",
+      "properties": [
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "Database operation to perform"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": false,
+          "description": "SQL query or operation"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.mysql",
+      "name": "MySQL",
+      "description": "Popular open-source relational database",
+      "nodeType": "n8n-nodes-base.mysql",
+      "credentials": [
+        "mysql"
+      ],
+      "tags": [
+        "database",
+        "sql",
+        "relational",
+        "mysql"
+      ],
+      "category": "Database",
+      "properties": [
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "Database operation to perform"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": false,
+          "description": "SQL query or operation"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.mongodb",
+      "name": "MongoDB",
+      "description": "Document-oriented NoSQL database",
+      "nodeType": "n8n-nodes-base.mongodb",
+      "credentials": [
+        "mongoDb"
+      ],
+      "tags": [
+        "database",
+        "nosql",
+        "document",
+        "mongodb"
+      ],
+      "category": "Database",
+      "properties": [
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "Database operation to perform"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": false,
+          "description": "SQL query or operation"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.redis",
+      "name": "Redis",
+      "description": "In-memory data structure store",
+      "nodeType": "n8n-nodes-base.redis",
+      "credentials": [
+        "redis"
+      ],
+      "tags": [
+        "database",
+        "cache",
+        "in-memory",
+        "key-value"
+      ],
+      "category": "Database",
+      "properties": [
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "Database operation to perform"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": false,
+          "description": "SQL query or operation"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.supabase",
+      "name": "Supabase",
+      "description": "Open-source Firebase alternative",
+      "nodeType": "n8n-nodes-base.supabase",
+      "credentials": [
+        "supabaseApi"
+      ],
+      "tags": [
+        "database",
+        "backend",
+        "firebase-alternative",
+        "postgresql"
+      ],
+      "category": "Database",
+      "properties": [
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "Database operation to perform"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": false,
+          "description": "SQL query or operation"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.questDB",
+      "name": "QuestDB",
+      "description": "High-performance time-series database",
+      "nodeType": "n8n-nodes-base.questDB",
+      "credentials": [
+        "questDb"
+      ],
+      "tags": [
+        "database",
+        "time-series",
+        "analytics",
+        "performance"
+      ],
+      "category": "Database",
+      "properties": [
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "Database operation to perform"
+        },
+        {
+          "name": "query",
+          "type": "string",
+          "required": false,
+          "description": "SQL query or operation"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

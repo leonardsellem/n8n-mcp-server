@@ -1,0 +1,87 @@
+{
+  "scraping_session": {
+    "started_at": "2025-06-17T17:55:46.000Z",
+    "current_batch": 1,
+    "total_batches_planned": 15,
+    "nodes_per_batch": 25
+  },
+  "completed_categories": [],
+  "completed_nodes": ["Activation Trigger", "Code", "Aggregate", "AI Transform", "Compare Datasets", "Compression"],
+  "current_batch_status": {
+    "batch_number": 1,
+    "nodes_scraped": 6,
+    "nodes_added": 0,
+    "status": "formatting_scraped_data"
+  },
+  "scraping_targets": {
+    "main_page": "https://docs.n8n.io/integrations/builtin/node-types/",
+    "scraped": true,
+    "categories_found": ["core-nodes", "app-nodes", "trigger-nodes", "cluster-nodes"]
+  },
+  "current_batch_nodes": [
+    "Activation Trigger",
+    "Aggregate", 
+    "AI Transform",
+    "Code",
+    "Compare Datasets",
+    "Compression",
+    "Chat Trigger",
+    "Convert to File",
+    "Crypto",
+    "Date & Time",
+    "Debug Helper",
+    "Edit Fields (Set)",
+    "Edit Image",
+    "Email Trigger (IMAP)",
+    "Error Trigger",
+    "Evaluation",
+    "Evaluation Trigger",
+    "Execute Command",
+    "Execute Sub-workflow",
+    "Execute Sub-workflow Trigger",
+    "Execution Data",
+    "Extract From File",
+    "Filter",
+    "FTP",
+    "Git"
+  ],
+  "node_urls": {
+    "Activation Trigger": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.activationtrigger/",
+    "Aggregate": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.aggregate/",
+    "AI Transform": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.aitransform/",
+    "Code": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.code/",
+    "Compare Datasets": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.comparedatasets/",
+    "Compression": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.compression/",
+    "Chat Trigger": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.chattrigger/",
+    "Convert to File": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.converttofile/",
+    "Crypto": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.crypto/",
+    "Date & Time": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.datetime/",
+    "Debug Helper": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.debughelper/",
+    "Edit Fields (Set)": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set/",
+    "Edit Image": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.editimage/",
+    "Email Trigger (IMAP)": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.emailimap/",
+    "Error Trigger": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.errortrigger/",
+    "Evaluation": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.evaluation/",
+    "Evaluation Trigger": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.evaluationtrigger/",
+    "Execute Command": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executecommand/",
+    "Execute Sub-workflow": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflow/",
+    "Execute Sub-workflow Trigger": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflowtrigger/",
+    "Execution Data": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executiondata/",
+    "Extract From File": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.extractfromfile/",
+    "Filter": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.filter/",
+    "FTP": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.ftp/",
+    "Git": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.git/"
+  },
+  "next_steps": [
+    "Scrape first 5 core node documentation pages for detailed info",
+    "Extract operations, triggers, credentials, and properties",
+    "Format according to NodeInfo interface",
+    "Add to clean-node-catalog.ts"
+  ],
+  "context_management": {
+    "max_nodes_per_context": 25,
+    "checkpoint_frequency": "every_batch",
+    "continuation_ready": false,
+    "current_focus": "core_nodes_batch_1"
+  }
+}

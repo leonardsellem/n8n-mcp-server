@@ -39,7 +39,7 @@ const resource = await accessMcpResource('n8n-mcp-server', 'n8n://workflow/1234a
       {
         "id": "node1",
         "name": "Start",
-        "type": "n8n-nodes-base.start",
+        "type": "n8n-nodes-base.manualTrigger",
         "position": [100, 200],
         "parameters": {}
       },

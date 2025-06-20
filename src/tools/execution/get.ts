@@ -30,8 +30,12 @@ export class GetExecutionHandler extends BaseExecutionToolHandler {
         );
       }
       
+      // Convert execution ID to numeric format for validation, then back to string for API
+      const numericExecutionId = this.convertToNumericId(args.executionId);
+      const validatedExecutionId = numericExecutionId.toString();
+      
       // Get execution details
-      const execution = await this.apiService.getExecution(args.executionId);
+      const execution = await this.apiService.getExecution(validatedExecutionId);
       
       // Format the execution for display
       const formattedExecution = formatExecutionDetails(execution);
@@ -58,8 +62,11 @@ export function getGetExecutionToolDefinition(): ToolDefinition {
       type: 'object',
       properties: {
         executionId: {
-          type: 'string',
-          description: 'ID of the execution to retrieve',
+          oneOf: [
+            { type: 'string' },
+            { type: 'number' }
+          ],
+          description: 'ID of the execution to retrieve. Accepts both string and numeric formats. String IDs will be validated and converted to numeric format.',
         },
       },
       required: ['executionId'],

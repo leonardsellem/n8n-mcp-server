@@ -181,7 +181,7 @@ export class N8nApiClient {
       delete workflowToCreate.id; // Remove id property if it exists
       delete workflowToCreate.createdAt; // Remove createdAt property if it exists
       delete workflowToCreate.updatedAt; // Remove updatedAt property if it exists
-      delete workflowToCreate.tags; // Remove tags property as it's read-only
+      // Note: Keep tags for now but handle them properly
       
       // Log request for debugging
       console.error('[DEBUG] Creating workflow with data:', JSON.stringify(workflowToCreate, null, 2));
@@ -208,7 +208,8 @@ export class N8nApiClient {
       delete workflowToUpdate.id; // Remove id property as it's read-only
       delete workflowToUpdate.createdAt; // Remove createdAt property as it's read-only
       delete workflowToUpdate.updatedAt; // Remove updatedAt property as it's read-only
-      delete workflowToUpdate.tags; // Remove tags property as it's read-only
+      delete workflowToUpdate.active; // Remove active property as it's read-only
+      // Note: Keep tags for now but handle them properly
 
       // Log request for debugging
       if (this.config.debug) {
@@ -279,6 +280,165 @@ export class N8nApiClient {
       return response.data;
     } catch (error) {
       throw handleAxiosError(error, `Failed to delete execution ${id}`);
+    }
+  }
+
+  /**
+   * Get all credentials from n8n
+   *
+   * @returns Array of credential objects (without sensitive data)
+   */
+  async getCredentials(): Promise<any[]> {
+    try {
+      const response = await this.axiosInstance.get('/credentials');
+      return response.data.data || [];
+    } catch (error) {
+      throw handleAxiosError(error, 'Failed to fetch credentials');
+    }
+  }
+
+  /**
+   * Get a specific credential by ID
+   *
+   * @param id Credential ID
+   * @returns Credential object (without sensitive data)
+   */
+  async getCredential(id: string): Promise<any> {
+    try {
+      const response = await this.axiosInstance.get(`/credentials/${id}`);
+      return response.data;
+    } catch (error) {
+      throw handleAxiosError(error, `Failed to fetch credential ${id}`);
+    }
+  }
+
+  /**
+   * Create a new credential
+   *
+   * @param credential Credential object to create
+   * @returns Created credential
+   */
+  async createCredential(credential: Record<string, any>): Promise<any> {
+    try {
+      const response = await this.axiosInstance.post('/credentials', credential);
+      return response.data;
+    } catch (error) {
+      throw handleAxiosError(error, 'Failed to create credential');
+    }
+  }
+
+  /**
+   * Update an existing credential
+   *
+   * @param id Credential ID
+   * @param credential Updated credential object
+   * @returns Updated credential
+   */
+  async updateCredential(id: string, credential: Record<string, any>): Promise<any> {
+    try {
+      const response = await this.axiosInstance.put(`/credentials/${id}`, credential);
+      return response.data;
+    } catch (error) {
+      throw handleAxiosError(error, `Failed to update credential ${id}`);
+    }
+  }
+
+  /**
+   * Delete a credential
+   *
+   * @param id Credential ID
+   * @returns Deleted credential or success message
+   */
+  async deleteCredential(id: string): Promise<any> {
+    try {
+      const response = await this.axiosInstance.delete(`/credentials/${id}`);
+      return response.data;
+    } catch (error) {
+      throw handleAxiosError(error, `Failed to delete credential ${id}`);
+    }
+  }
+
+  /**
+   * Test credential configuration
+   *
+   * @param credential Credential data to test
+   * @returns Test result
+   */
+  async testCredential(credential: Record<string, any>): Promise<any> {
+    try {
+      const response = await this.axiosInstance.post('/credentials/test', credential);
+      return response.data;
+    } catch (error) {
+      throw handleAxiosError(error, 'Failed to test credential');
+    }
+  }
+
+  /**
+   * Get all available credential types
+   *
+   * @returns Array of credential type objects
+   */
+  async getCredentialTypes(): Promise<any[]> {
+    try {
+      const response = await this.axiosInstance.get('/credential-types');
+      return response.data.data || [];
+    } catch (error) {
+      throw handleAxiosError(error, 'Failed to fetch credential types');
+    }
+  }
+
+  /**
+   * Get all available node types from n8n
+   *
+   * @returns Array of node type objects
+   */
+  async getNodeTypes(): Promise<any[]> {
+    try {
+      const response = await this.axiosInstance.get('/node-types');
+      return response.data.data || [];
+    } catch (error) {
+      throw handleAxiosError(error, 'Failed to fetch node types');
+    }
+  }
+
+  /**
+   * Get workflows that can be used as templates
+   *
+   * @param options Query options for filtering templates
+   * @returns Array of template workflows
+   */
+  async getTemplates(options: { category?: string; search?: string } = {}): Promise<any[]> {
+    try {
+      // Try templates endpoint first, fallback to workflows if needed
+      let endpoint = '/templates';
+      const params = new URLSearchParams();
+      
+      if (options.category) params.append('category', options.category);
+      if (options.search) params.append('search', options.search);
+      
+      try {
+        const response = await this.axiosInstance.get(`${endpoint}?${params.toString()}`);
+        return response.data.data || [];
+      } catch (error: any) {
+        // If templates endpoint doesn't exist, fall back to workflows
+        if (error.response?.status === 404) {
+          const workflowResponse = await this.axiosInstance.get('/workflows');
+          const workflows = workflowResponse.data.data || [];
+          
+          // Filter workflows that could serve as templates
+          return workflows.filter((workflow: any) => {
+            if (options.search) {
+              const searchLower = options.search.toLowerCase();
+              return workflow.name?.toLowerCase().includes(searchLower) ||
+                     workflow.tags?.some((tag: any) => tag.name?.toLowerCase().includes(searchLower));
+            }
+            return true;
+          });
+        }
+        throw error;
+      }
+    } catch (error) {
+      throw handleAxiosError(error, 'Failed to fetch templates');
     }
   }
 }

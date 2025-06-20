@@ -19,8 +19,8 @@ export const createMockWorkflow = (overrides: Partial<Workflow> = {}): Workflow 
     nodes: overrides.nodes ?? [
       {
         id: 'start',
-        name: 'Start',
-        type: 'n8n-nodes-base.start',
+        name: 'Manual Trigger',
+        type: 'n8n-nodes-base.manualTrigger',
         parameters: {},
         position: [100, 300],
       },

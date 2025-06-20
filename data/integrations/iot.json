@@ -1,0 +1,93 @@
+{
+  "category": "IoT",
+  "count": 2,
+  "integrations": [
+    {
+      "official": false,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.homeAssistant",
+      "name": "Home Assistant",
+      "description": "Open-source home automation platform",
+      "category": "IoT",
+      "nodeType": "n8n-nodes-base.homeAssistant",
+      "community": true,
+      "tags": [
+        "iot",
+        "home-automation",
+        "smart-home"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": false,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.mqtt",
+      "name": "MQTT",
+      "description": "Message Queuing Telemetry Transport protocol",
+      "category": "IoT",
+      "nodeType": "n8n-nodes-base.mqtt",
+      "community": true,
+      "tags": [
+        "iot",
+        "messaging",
+        "mqtt",
+        "telemetry"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

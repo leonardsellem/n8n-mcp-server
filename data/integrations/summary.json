@@ -1,0 +1,20 @@
+{
+  "total": 47,
+  "byCategory": {
+    "Core": 3,
+    "Communication": 7,
+    "IoT": 2,
+    "AI": 7,
+    "Database": 6,
+    "Cloud Storage": 5,
+    "Cloud Computing": 3,
+    "CRM": 3,
+    "Productivity": 4,
+    "E-commerce": 3,
+    "Developer Tools": 4
+  },
+  "official": 45,
+  "community": 2,
+  "free": 47,
+  "triggerNodes": 3
+}

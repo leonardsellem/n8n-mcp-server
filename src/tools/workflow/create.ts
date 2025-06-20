@@ -36,16 +36,27 @@ export class CreateWorkflowHandler extends BaseWorkflowToolHandler {
         throw new N8nApiError('Parameter "connections" must be an object');
       }
       
-      // Prepare workflow object
+      // Prepare workflow object - exclude active field as it's read-only
       const workflowData: Record<string, any> = {
         name,
-        active: active === true,  // Default to false if not specified
+        nodes: nodes || [],
+        connections: connections || {},
+        settings: {
+          saveExecutionProgress: true,
+          saveManualExecutions: true,
+          saveDataErrorExecution: "all",
+          saveDataSuccessExecution: "all",
+          executionTimeout: 3600,
+          timezone: "UTC"
+        },
+        staticData: {}
       };
       
-      // Add optional fields if provided
-      if (nodes) workflowData.nodes = nodes;
-      if (connections) workflowData.connections = connections;
-      if (tags) workflowData.tags = tags;
+      // Add tags if provided (but handle them properly for n8n)
+      if (tags && tags.length > 0) {
+        // Tags need to be handled through the tags API after workflow creation
+        // For now, we'll skip them in creation and handle them in post-processing
+      }
       
       // Create the workflow
       const workflow = await this.apiService.createWorkflow(workflowData);
@@ -88,10 +99,6 @@ export function getCreateWorkflowToolDefinition(): ToolDefinition {
         connections: {
           type: 'object',
           description: 'Connection mappings between nodes',
-        },
-        active: {
-          type: 'boolean',
-          description: 'Whether the workflow should be active upon creation',
         },
         tags: {
           type: 'array',
