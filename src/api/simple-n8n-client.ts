@@ -5,7 +5,7 @@
  * HTTP calls to the n8n API.
  */
 
-import { NodeInfo } from '../data/clean-node-catalog.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 
 export interface N8nWorkflow {
   id?: string;
@@ -337,7 +337,7 @@ export class WorkflowBuilder {
    */
   static createBasicWorkflow(
     name: string,
-    nodeInfos: { nodeInfo: NodeInfo; parameters?: any }[]
+    nodeInfos: { nodeInfo: NodeTypeInfo; parameters?: any }[]
   ): N8nWorkflow {
     const nodes: N8nNode[] = [];
     const connections: N8nConnections = {};

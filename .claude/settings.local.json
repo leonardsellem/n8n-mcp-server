@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.n8n.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:n8n.io)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(find:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(rm:*)",
+      "Bash(npm run build:*)"
+    ],
+    "deny": []
+  }
+}

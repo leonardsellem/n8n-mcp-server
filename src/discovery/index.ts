@@ -62,7 +62,7 @@ import {
   NodeInput,
   NodeOutput,
   NodeExample
-} from '../data/accurate-massive-registry.js';
+} from '../data/node-types.js';
 
 // Re-export everything for external use
 export {

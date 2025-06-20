@@ -5,7 +5,7 @@
  * enabling AI agents to use optimized node configurations.
  */
 
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 
 /**
  * Extended node information with AI optimization metadata

@@ -1,4 +1,4 @@
-import { NodeTypeInfo } from '../accurate-massive-registry.js';
+import { NodeTypeInfo } from '../node-types.js';
 
 export const openaiNode: NodeTypeInfo = {
   name: 'n8n-nodes-langchain.openai',

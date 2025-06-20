@@ -7,7 +7,7 @@
 
 import { MainScraper } from './main-scraper.js';
 import { NodeValidator } from './validator.js';
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 
 /**
  * Test runner for the scraping system

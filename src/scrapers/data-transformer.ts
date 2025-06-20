@@ -5,7 +5,7 @@
  * used by the existing n8n MCP server.
  */
 
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 import { RawNodeData, TransformationResult, ValidationResult } from './interfaces.js';
 
 /**

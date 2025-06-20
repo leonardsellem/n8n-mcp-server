@@ -23,7 +23,7 @@ export * from './config.js';
 export * from './interfaces.js';
 
 // Re-export for convenience
-export { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+export { NodeTypeInfo } from '../data/node-types.js';
 
 /**
  * Quick Start Guide

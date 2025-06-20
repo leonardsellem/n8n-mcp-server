@@ -17,7 +17,7 @@ import {
   NodeInput,
   NodeOutput,
   NodeExample
-} from '../data/accurate-massive-registry.js';
+} from '../data/node-types.js';
 
 export interface ConnectionValidation {
   valid: boolean;

@@ -12,7 +12,7 @@ import {
   getMassiveNodesByCategory,
   getMassiveCategories,
   MASSIVE_REGISTRY_STATS
-} from '../../data/massive-node-registry.js';
+} from '../../data/final-complete-catalog.js';
 
 interface EnhancedBrowseArgs {
   category?: string;

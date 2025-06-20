@@ -11,7 +11,7 @@ import {
   searchMassiveNodes,
   ALL_MASSIVE_NODES,
   MASSIVE_REGISTRY_STATS
-} from '../../data/massive-node-registry.js';
+} from '../../data/final-complete-catalog.js';
 
 interface BrowseIntegrationsArgs {
   category?: string;

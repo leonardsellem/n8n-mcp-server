@@ -1,4 +1,4 @@
-import { NodeTypeInfo } from '../accurate-massive-registry.js';
+import { NodeTypeInfo } from '../node-types.js';
 
 export const rabbitmqNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.rabbitmq',

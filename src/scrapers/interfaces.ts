@@ -5,7 +5,7 @@
  * for raw data extraction and transformation pipeline.
  */
 
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 
 /**
  * Raw scraped data from n8n documentation before processing

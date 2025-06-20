@@ -5,7 +5,7 @@
  * enabling discovery of 1000+ n8n integrations organized by functional categories.
  */
 
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 import { 
   ALL_MASSIVE_NODES, 
   MASSIVE_AI_NODES, 
@@ -15,7 +15,7 @@ import {
   MASSIVE_CLOUD_NODES,
   MASSIVE_ECOMMERCE_NODES,
   MASSIVE_DEVELOPER_NODES
-} from '../data/massive-node-registry.js';
+} from '../data/final-complete-catalog.js';
 
 /**
  * Universal node catalog interface for AI agent integration

@@ -1,4 +1,4 @@
-import { NodeTypeInfo } from '../accurate-massive-registry.js';
+import { NodeTypeInfo } from '../node-types.js';
 
 export const quickbaseNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.quickbase',

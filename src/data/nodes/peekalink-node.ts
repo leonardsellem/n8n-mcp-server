@@ -1,4 +1,4 @@
-import { NodeTypeInfo } from '../accurate-massive-registry.js';
+import { NodeTypeInfo } from '../node-types.js';
 
 export const peekalinkNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.peekalink',

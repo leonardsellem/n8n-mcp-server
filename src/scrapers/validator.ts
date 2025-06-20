@@ -5,7 +5,7 @@
  * existing patterns from the project.
  */
 
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 import { RawNodeData, ValidationResult } from './interfaces.js';
 import { QUALITY_THRESHOLDS, VALIDATION_RULES } from './config.js';
 

@@ -1,4 +1,4 @@
-import { NodeTypeInfo } from '../accurate-massive-registry.js';
+import { NodeTypeInfo } from '../node-types.js';
 
 export const airtableNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.airtable',

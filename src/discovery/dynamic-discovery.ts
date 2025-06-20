@@ -5,7 +5,7 @@
  * for optimal node selection and workflow creation.
  */
 
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 import { ToolNodeInfo } from './dual-architecture.js';
 import { universalNodeCatalog } from './live-node-catalog.js';
 import { dualNodeArchitecture } from './dual-architecture.js';

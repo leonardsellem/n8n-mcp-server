@@ -8,7 +8,7 @@
 import { NodeListScraper } from './node-list-scraper.js';
 import { NodeDetailScraper } from './node-detail-scraper.js';
 import { DataTransformer } from './data-transformer.js';
-import { NodeTypeInfo } from '../data/accurate-massive-registry.js';
+import { NodeTypeInfo } from '../data/node-types.js';
 import { 
   NodeReference, 
   RawNodeData, 
