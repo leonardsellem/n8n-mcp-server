@@ -10,7 +10,8 @@
       "Bash(find:*)",
       "Bash(git check-ignore:*)",
       "Bash(rm:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

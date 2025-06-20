@@ -119,7 +119,7 @@ export class OptimizeWorkflowPerformanceHandler extends OptimizationBaseHandler 
       id: workflowId,
       name: 'Sample Workflow',
       nodes: [
-        { name: 'Start', type: 'n8n-nodes-base.start', position: [100, 100] },
+        { name: 'Manual Trigger', type: 'n8n-nodes-base.manualTrigger', position: [100, 100] },
         { name: 'HTTP Request 1', type: 'n8n-nodes-base.httpRequest', position: [300, 100] },
         { name: 'HTTP Request 2', type: 'n8n-nodes-base.httpRequest', position: [500, 100] },
         { name: 'Function', type: 'n8n-nodes-base.function', position: [700, 100] },
@@ -253,7 +253,7 @@ export class OptimizeWorkflowPerformanceHandler extends OptimizationBaseHandler 
   private getNodeExecutionTime(nodeType: string): number {
     // Estimated execution times in milliseconds
     const executionTimes: Record<string, number> = {
-      'n8n-nodes-base.start': 10,
+      'n8n-nodes-base.manualTrigger': 10,
       'n8n-nodes-base.httpRequest': 500,
       'n8n-nodes-base.function': 100,
       'n8n-nodes-base.set': 20,

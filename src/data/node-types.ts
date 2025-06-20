@@ -20,6 +20,7 @@ export interface NodeTypeInfo {
   regularNode?: boolean;
   codeable?: boolean;
   polling?: boolean;
+  langChainNode?: boolean;
   examples?: NodeExample[];
   
   // Additional n8n-specific properties
@@ -29,6 +30,11 @@ export interface NodeTypeInfo {
   aliases?: string[];
   group?: string[];
   icon?: string | { light: string; dark: string };
+  
+  // AI-specific metadata
+  aiMetadata?: AIMetadata;
+  usageNotes?: string;
+  integrationGuide?: string;
 }
 
 export interface NodeProperty {
@@ -57,6 +63,9 @@ export interface PropertyOption {
   default?: any;
   typeOptions?: TypeOptions;
   options?: PropertyOption[];
+  placeholder?: string;
+  displayOptions?: DisplayOptions;
+  required?: boolean;
 }
 
 export interface PropertyValidation {
@@ -87,6 +96,12 @@ export interface TypeOptions {
   searchListMethod?: string;
   minValue?: number;
   maxValue?: number;
+  numberPrecision?: number;
+  codeAutocomplete?: string;
+  filter?: {
+    supportedTypes?: string[];
+    supportedOperators?: string[];
+  };
 }
 
 export interface ResourceLocatorMode {
@@ -94,6 +109,7 @@ export interface ResourceLocatorMode {
   name: string;
   type: string;
   placeholder?: string;
+  hint?: string;
   typeOptions?: TypeOptions;
   validation?: PropertyValidation[];
 }
@@ -115,13 +131,36 @@ export interface CredentialInfo {
   name: string;
   required: boolean;
   displayOptions?: DisplayOptions;
+  types?: string[];
+  description?: string;
+  documentationUrl?: string;
 }
 
 export interface NodeExample {
   name: string;
   description: string;
+  complexity?: 'beginner' | 'intermediate' | 'advanced';
+  category?: string;
+  useCase?: string;
   workflow: {
     nodes: WorkflowNode[];
+  };
+}
+
+export interface AIMetadata {
+  aiOptimized?: boolean;
+  rateLimits?: {
+    requests: number;
+    window: string;
+    unit?: string;
+  };
+  commonPatterns?: string[];
+  integrationComplexity?: 'low' | 'medium' | 'high';
+  prerequisites?: string[];
+  errorHandling?: {
+    retryableErrors?: string[];
+    nonRetryableErrors?: string[];
+    documentation?: string;
   };
 }
 

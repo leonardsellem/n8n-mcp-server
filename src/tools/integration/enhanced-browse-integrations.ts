@@ -7,11 +7,10 @@
 import { IntegrationBaseHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
 import {
-  ALL_MASSIVE_NODES,
-  searchMassiveNodes,
-  getMassiveNodesByCategory,
-  getMassiveCategories,
-  MASSIVE_REGISTRY_STATS
+  ALL_COMPLETE_NODES,
+  searchNodes,
+  getNodesByCategory,
+  completeN8NCatalog
 } from '../../data/final-complete-catalog.js';
 
 interface EnhancedBrowseArgs {
@@ -70,12 +69,14 @@ export class EnhancedBrowseIntegrationsHandler extends IntegrationBaseHandler {
 
       // Apply category filter
       if (category) {
-        nodes = getMassiveNodesByCategory(category);
+        const categoriesMap = getNodesByCategory();
+        nodes = categoriesMap.get(category) || [];
       }
 
       // Apply search filter
       if (search) {
-        nodes = searchMassiveNodes(search);
+        const searchResults = searchNodes(search);
+        nodes = searchResults.map((result: any) => result.node);
       }
 
       // Apply additional filters
@@ -175,20 +176,12 @@ export class EnhancedBrowseIntegrationsHandler extends IntegrationBaseHandler {
             withWebhooks: paginatedNodes.filter(n => n.webhookSupport).length
           }
         },
-        availableCategories: getMassiveCategories(),
+        availableCategories: Array.from(getNodesByCategory().keys()),
         registryInfo: {
           version: '1.0.0',
           lastUpdated: new Date().toISOString(),
-          totalNodes: MASSIVE_REGISTRY_STATS.total,
-          coverage: {
-            ai: MASSIVE_REGISTRY_STATS.ai,
-            communication: MASSIVE_REGISTRY_STATS.communication,
-            database: MASSIVE_REGISTRY_STATS.database,
-            business: MASSIVE_REGISTRY_STATS.business,
-            cloud: MASSIVE_REGISTRY_STATS.cloud,
-            ecommerce: MASSIVE_REGISTRY_STATS.ecommerce,
-            developer: MASSIVE_REGISTRY_STATS.developer
-          }
+          totalNodes: completeN8NCatalog.getStats().totalNodes,
+          coverage: completeN8NCatalog.getStats().nodesByCategory
         }
       };
 

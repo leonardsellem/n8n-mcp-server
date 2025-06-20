@@ -343,7 +343,7 @@ export const n8nNode: NodeTypeInfo = {
               operation: 'updateWorkflow',
               workflowId: 'workflow-123',
               workflowName: 'Updated Workflow Name',
-              workflowData: '{"nodes": [{"name": "Start", "type": "n8n-nodes-base.start"}], "connections": {}}'
+              workflowData: '{"nodes": [{"name": "Manual Trigger", "type": "n8n-nodes-base.manualTrigger"}], "connections": {}}'
             }
           }
         ]

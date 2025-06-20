@@ -7,10 +7,10 @@
 import { IntegrationBaseHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
 import {
-  getMassiveNodesByCategory,
-  searchMassiveNodes,
-  ALL_MASSIVE_NODES,
-  MASSIVE_REGISTRY_STATS
+  getNodesByCategory,
+  searchNodes,
+  ALL_COMPLETE_NODES,
+  completeN8NCatalog
 } from '../../data/final-complete-catalog.js';
 
 interface BrowseIntegrationsArgs {
@@ -88,22 +88,24 @@ export class BrowseIntegrationsHandler extends IntegrationBaseHandler {
 
       if (category) {
         // Get nodes by specific category
-        const categoryNodes = getMassiveNodesByCategory(category);
-        availableIntegrations = categoryNodes.map(node =>
+        const categoriesMap = getNodesByCategory();
+        const categoryNodes = categoriesMap.get(category) || [];
+        availableIntegrations = categoryNodes.map((node: any) =>
           this.convertNodeToIntegration(node, category)
         );
       } else if (search) {
         // Search across all nodes
-        const searchResults = searchMassiveNodes(search);
-        availableIntegrations = searchResults.map(node =>
-          this.convertNodeToIntegration(node, node.category)
+        const searchResults = searchNodes(search);
+        availableIntegrations = searchResults.map((result: any) =>
+          this.convertNodeToIntegration(result.node, result.node.category)
         );
       } else {
         // Get all nodes from all categories
         const allCategories = ['AI', 'Communication', 'Business', 'Database', 'Cloud Services', 'E-commerce', 'Developer Tools'];
         for (const cat of allCategories) {
-          const categoryNodes = getMassiveNodesByCategory(cat);
-          const categoryIntegrations = categoryNodes.map(node =>
+          const categoriesMap = getNodesByCategory();
+          const categoryNodes = categoriesMap.get(cat) || [];
+          const categoryIntegrations = categoryNodes.map((node: any) =>
             this.convertNodeToIntegration(node, cat)
           );
           availableIntegrations.push(...categoryIntegrations);

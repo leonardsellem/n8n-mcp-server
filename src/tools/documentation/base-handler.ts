@@ -90,7 +90,7 @@ export abstract class DocumentationBaseHandler extends BaseWorkflowToolHandler {
       'n8n-nodes-base.webhook',
       'n8n-nodes-base.cron',
       'n8n-nodes-base.trigger',
-      'n8n-nodes-base.start'
+      'n8n-nodes-base.manualTrigger'
     ];
 
     return workflow.nodes.filter((node: any) => 

@@ -646,7 +646,7 @@ export class MergeWorkflowChangesHandler extends BaseCollaborationToolHandler {
       id: 'workflow_1',
       name: 'Main Workflow',
       nodes: [
-        { id: 'node1', name: 'Start', type: 'n8n-nodes-base.start' },
+        { id: 'node1', name: 'Manual Trigger', type: 'n8n-nodes-base.manualTrigger' },
         { id: 'node2', name: 'HTTP Request', type: 'n8n-nodes-base.httpRequest' }
       ],
       connections: { node1: { main: [{ node: 'node2', type: 'main', index: 0 }] } },

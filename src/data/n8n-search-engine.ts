@@ -376,7 +376,7 @@ export class N8NSearchEngine {
       }
     });
 
-    return [...new Set(reasons)]; // Remove duplicates
+    return Array.from(new Set(reasons)); // Remove duplicates
   }
 
   /**

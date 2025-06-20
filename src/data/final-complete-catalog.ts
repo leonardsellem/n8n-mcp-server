@@ -15,8 +15,13 @@ import { N8NSearchEngine, createN8NSearchEngine } from './n8n-search-engine.js';
 import { httpRequestNodeComplete } from './nodes/enhanced-http-request-node.js';
 import { githubNodeComplete } from './nodes/enhanced-github-node.js';
 
-// Import existing nodes (keeping the working ones)
-import { slackNode } from './nodes/slack-node.js';
+// Import AI-optimized enhanced nodes
+import { slackNodeEnhanced } from './nodes/enhanced-slack-node.js';
+import { openaiNodeEnhanced } from './nodes/enhanced-openai-node.js';
+import { githubNodeEnhancedV2 } from './nodes/enhanced-github-v2-node.js';
+
+// Import real structured nodes (updated to match actual n8n structure)
+import { slackNode } from './nodes/slack-node-real.js';
 import { openaiNodes } from './nodes/openai-node.js';
 import { codeNode } from './nodes/code-node.js';
 import { webhookNode } from './nodes/webhook-node.js';
@@ -26,6 +31,20 @@ import { clickupNode } from './nodes/clickup-node.js';
 import { scheduleNodes } from './nodes/schedule-trigger-node.js';
 import { claudeNode } from './nodes/claude-node.js';
 import { facebookNode } from './nodes/facebook-node.js';
+import { gmailNode } from './nodes/gmail-node-real.js';
+
+// Import real core utility nodes (updated to match actual n8n structure)
+import { ifNode } from './nodes/if-node-real.js';
+import { setNode } from './nodes/set-node-real.js';
+import { mergeNode } from './nodes/merge-node.js';
+import { functionNode } from './nodes/function-node.js';
+import { switchNode } from './nodes/switch-node.js';
+
+// Import LangChain nodes
+import { langchainOpenAINode } from './nodes/langchain-openai-node.js';
+import { langchainChainLlmNode } from './nodes/langchain-chain-llm-node.js';
+import { langchainOutputParserNode } from './nodes/langchain-output-parser-node.js';
+import { langchainTextClassifierNode } from './nodes/langchain-text-classifier-node.js';
 
 // Core nodes with proper n8n structure
 export const ENHANCED_CORE_NODES: NodeTypeInfo[] = [
@@ -33,6 +52,19 @@ export const ENHANCED_CORE_NODES: NodeTypeInfo[] = [
   codeNode,
   webhookNode,
   ...scheduleNodes,
+  
+  // Enhanced core utility nodes
+  ifNode,
+  setNode,
+  mergeNode,
+  functionNode,
+  switchNode,
+  
+  // LangChain nodes for AI workflows
+  langchainOpenAINode,
+  langchainChainLlmNode,
+  langchainOutputParserNode,
+  langchainTextClassifierNode,
   
   // Manual Trigger (properly structured)
   {
@@ -79,278 +111,29 @@ export const ENHANCED_CORE_NODES: NodeTypeInfo[] = [
         }
       }
     ]
-  },
-
-  // Set Node (properly structured)
-  {
-    name: 'n8n-nodes-base.set',
-    displayName: 'Edit Fields (Set)',
-    description: 'Add, remove, and edit the data',
-    category: 'Core',
-    subcategory: 'Data Transformation',
-    properties: [
-      {
-        name: 'mode',
-        displayName: 'Mode',
-        type: 'options',
-        required: true,
-        default: 'manual',
-        description: 'How to set the data',
-        options: [
-          {
-            name: 'Manual',
-            value: 'manual',
-            description: 'Set fields manually'
-          },
-          {
-            name: 'Expression',
-            value: 'expression',
-            description: 'Set fields using expressions'
-          }
-        ]
-      },
-      {
-        name: 'fields',
-        displayName: 'Fields',
-        type: 'fixedCollection',
-        required: false,
-        placeholder: 'Add Field',
-        default: { values: [] },
-        description: 'Fields to set',
-        displayOptions: {
-          show: {
-            mode: ['manual']
-          }
-        },
-        typeOptions: {
-          multipleValues: true,
-          sortable: true
-        },
-        options: [
-          {
-            name: 'values',
-            displayName: 'Values',
-            value: 'values',
-            values: [
-              {
-                name: 'name',
-                displayName: 'Name',
-                type: 'string',
-                required: true,
-                default: '',
-                description: 'Name of the field to set'
-              },
-              {
-                name: 'type',
-                displayName: 'Type',
-                type: 'options',
-                required: true,
-                default: 'stringValue',
-                description: 'Type of data to set',
-                options: [
-                  {
-                    name: 'String',
-                    value: 'stringValue'
-                  },
-                  {
-                    name: 'Number',
-                    value: 'numberValue'
-                  },
-                  {
-                    name: 'Boolean',
-                    value: 'booleanValue'
-                  },
-                  {
-                    name: 'Array',
-                    value: 'arrayValue'
-                  },
-                  {
-                    name: 'Object',
-                    value: 'objectValue'
-                  }
-                ]
-              },
-              {
-                name: 'stringValue',
-                displayName: 'Value',
-                type: 'string',
-                required: false,
-                default: '',
-                description: 'String value to set',
-                displayOptions: {
-                  show: {
-                    type: ['stringValue']
-                  }
-                }
-              },
-              {
-                name: 'numberValue',
-                displayName: 'Value',
-                type: 'number',
-                required: false,
-                default: 0,
-                description: 'Number value to set',
-                displayOptions: {
-                  show: {
-                    type: ['numberValue']
-                  }
-                }
-              },
-              {
-                name: 'booleanValue',
-                displayName: 'Value',
-                type: 'boolean',
-                required: false,
-                default: false,
-                description: 'Boolean value to set',
-                displayOptions: {
-                  show: {
-                    type: ['booleanValue']
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    inputs: [
-      {
-        type: 'main',
-        displayName: 'Input',
-        required: false
-      }
-    ],
-    outputs: [
-      {
-        type: 'main',
-        displayName: 'Output',
-        description: 'Modified data'
-      }
-    ],
-    regularNode: true,
-    version: [1, 2, 3],
-    defaults: { name: 'Edit Fields' },
-    aliases: ['set', 'edit', 'modify', 'fields', 'data'],
-    subtitle: '={{$parameter["mode"] === "manual" ? $parameter["fields"]["values"].length + " field(s)" : "expression"}}',
-    examples: [
-      {
-        name: 'Add Fields',
-        description: 'Add new fields to your data',
-        workflow: {
-          nodes: [
-            {
-              name: 'Edit Fields',
-              type: 'n8n-nodes-base.set',
-              parameters: {
-                mode: 'manual',
-                fields: {
-                  values: [
-                    {
-                      name: 'timestamp',
-                      type: 'stringValue',
-                      stringValue: '={{$now}}'
-                    },
-                    {
-                      name: 'processed',
-                      type: 'booleanValue',
-                      booleanValue: true
-                    }
-                  ]
-                }
-              }
-            }
-          ]
-        }
-      }
-    ]
-  },
-
-  // IF Node (properly structured)
-  {
-    name: 'n8n-nodes-base.if',
-    displayName: 'IF',
-    description: 'Route data to different branches based on comparison operations',
-    category: 'Core',
-    subcategory: 'Flow Control',
-    properties: [
-      {
-        name: 'conditions',
-        displayName: 'Conditions',
-        type: 'filter',
-        required: true,
-        default: {},
-        description: 'Conditions to check'
-      }
-    ],
-    inputs: [
-      {
-        type: 'main',
-        displayName: 'Input',
-        required: true
-      }
-    ],
-    outputs: [
-      {
-        type: 'main',
-        displayName: 'True',
-        description: 'Items that match conditions'
-      },
-      {
-        type: 'main',
-        displayName: 'False',
-        description: 'Items that don\'t match conditions'
-      }
-    ],
-    regularNode: true,
-    version: [1, 2],
-    defaults: { name: 'IF' },
-    aliases: ['if', 'condition', 'branch', 'route', 'filter'],
-    subtitle: '={{$parameter["conditions"]["conditions"] ? $parameter["conditions"]["conditions"].length + " condition(s)" : "no conditions"}}',
-    examples: [
-      {
-        name: 'Route Based on Value',
-        description: 'Route data based on field values',
-        workflow: {
-          nodes: [
-            {
-              name: 'IF',
-              type: 'n8n-nodes-base.if',
-              parameters: {
-                conditions: {
-                  conditions: [
-                    {
-                      leftValue: '={{$json.status}}',
-                      rightValue: 'active',
-                      operator: {
-                        type: 'string',
-                        operation: 'equals'
-                      }
-                    }
-                  ],
-                  combinator: 'and'
-                }
-              }
-            }
-          ]
-        }
-      }
-    ]
   }
 ];
 
 // Enhanced app integration nodes (properly structured)  
 export const ENHANCED_APP_NODES: NodeTypeInfo[] = [
-  githubNodeComplete, // Use the enhanced version
-  slackNode,
+  // AI-optimized enhanced nodes (preferred for AI agents)
+  slackNodeEnhanced,
+  openaiNodeEnhanced,
+  githubNodeEnhancedV2,
+  
+  // Original enhanced nodes
+  githubNodeComplete,
+  
+  // Other working nodes
   twitterNode,
   youtubeNode,
   facebookNode,
   clickupNode,
+  claudeNode,
+  gmailNode,
   
-  // Keep other working nodes that export arrays
-  ...openaiNodes,
-  claudeNode
+  // Keep legacy nodes that export arrays
+  ...openaiNodes
 ];
 
 // All enhanced nodes combined

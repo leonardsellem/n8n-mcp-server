@@ -201,7 +201,7 @@ export class IdentifyUnusedWorkflowsHandler extends OptimizationBaseHandler {
         lastAccessed: '2024-01-10T15:30:00Z',
         createdBy: 'tester',
         nodes: [
-          { type: 'n8n-nodes-base.start' },
+          { type: 'n8n-nodes-base.manualTrigger' },
           { type: 'n8n-nodes-base.set' }
         ],
         credentials: [],
@@ -239,7 +239,7 @@ export class IdentifyUnusedWorkflowsHandler extends OptimizationBaseHandler {
         lastAccessed: '2024-01-05T10:00:00Z',
         createdBy: 'admin',
         nodes: [
-          { type: 'n8n-nodes-base.start' },
+          { type: 'n8n-nodes-base.manualTrigger' },
           { type: 'n8n-nodes-base.emailSend' }
         ],
         credentials: ['smtp'],

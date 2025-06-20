@@ -7,14 +7,9 @@
 
 import { NodeTypeInfo } from '../data/node-types.js';
 import { 
-  ALL_MASSIVE_NODES, 
-  MASSIVE_AI_NODES, 
-  MASSIVE_COMMUNICATION_NODES,
-  MASSIVE_BUSINESS_NODES,
-  MASSIVE_DATABASE_NODES,
-  MASSIVE_CLOUD_NODES,
-  MASSIVE_ECOMMERCE_NODES,
-  MASSIVE_DEVELOPER_NODES
+  ALL_COMPLETE_NODES,
+  getNodesByCategory,
+  completeN8NCatalog
 } from '../data/final-complete-catalog.js';
 
 /**
