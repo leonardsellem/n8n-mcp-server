@@ -34,9 +34,11 @@ import { setupFolderTools } from '../tools/folders/index.js';
 // import { setupAiAgentTemplateTools } from '../tools/ai-agent-templates/index.js';
 import { setupResourceHandlers } from '../resources/index.js';
 import { EnhancedN8nApiClient } from '../api/enhanced-client.js';
+import { ResilientN8nApiClient, createResilientApiClient } from '../api/resilient-client.js';
+import { getApiRecoveryManager } from '../utils/api-recovery.js';
 import { initializeNodeDiscovery } from '../helpers/node-discovery.js';
 import { initializeDiscoveryApiClient } from '../tools/discovery/base-handler.js';
-import { initializeCredentialsApiClient } from '../tools/credentials/base-handler.js';
+import { getAllAvailableNodes } from '../discovery/enhanced-discovery.js';
 
 // Import types
 import { ToolCallResult } from '../types/index.js';
@@ -50,39 +52,85 @@ export async function configureServer(): Promise<Server> {
   // Get validated environment configuration
   const envConfig = getEnvConfig();
   
-  // Create enhanced n8n API client
-  const apiClient = new EnhancedN8nApiClient(envConfig);
+  // Create resilient n8n API client with recovery capabilities
+  const apiClient = createResilientApiClient(envConfig);
   
-  // Verify n8n API connectivity (non-blocking)
+  // Initialize API recovery manager
+  const recoveryManager = getApiRecoveryManager(envConfig);
+  
+  // Verify n8n API connectivity with resilient diagnostics
   try {
-    console.error('Verifying n8n API connectivity...');
-    await apiClient.checkConnectivity();
-    console.error(`Successfully connected to n8n API at ${envConfig.n8nApiUrl}`);
+    console.error('Verifying n8n API connectivity with resilient client...');
+    const connectivityCheck = await apiClient.checkConnectivityDetailed();
     
-    // Initialize node discovery service with API client
-    console.error('Initializing node discovery with live API data...');
+    if (connectivityCheck.connected) {
+      console.error(`Successfully connected to n8n API at ${envConfig.n8nApiUrl} (latency: ${connectivityCheck.latency}ms)`);
+      
+      // Preload critical data for offline fallbacks
+      await recoveryManager.preloadCache([
+        { 
+          operation: 'getWorkflows', 
+          executor: () => apiClient.getWorkflows({ limit: 50 }),
+          args: { limit: 50 }
+        },
+        { 
+          operation: 'getNodeTypes', 
+          executor: () => apiClient.getNodeTypes() 
+        },
+        { 
+          operation: 'getCredentialTypes', 
+          executor: () => apiClient.getCredentialTypes() 
+        }
+      ]);
+      
+      console.error('Critical data preloaded for offline fallbacks');
+    } else {
+      console.warn('API connectivity check failed, but resilient client is configured for fallbacks');
+    }
+    
+    // Initialize node discovery service with resilient API client
+    console.error('Initializing node discovery with resilient API client...');
     initializeNodeDiscovery(apiClient);
-    console.error('Node discovery service initialized successfully');
+    
+    // Get enhanced discovery stats with recovery support
+    const enhancedNodes = await recoveryManager.executeWithFallback(
+      'getAllAvailableNodes',
+      async () => await getAllAvailableNodes(),
+      {},
+      { cacheResult: true, cacheTtl: 10 * 60 * 1000 } // 10 minutes cache
+    ) as any[];
+    console.error(`Node discovery service initialized with ${enhancedNodes.length} nodes (resilient discovery enabled)`);
     
     // Initialize shared API clients for all tool handlers
-    console.error('Initializing shared API clients for tool handlers...');
-    initializeDiscoveryApiClient(apiClient);
-    initializeCredentialsApiClient(apiClient);
-    console.error('Shared API clients initialized successfully');
-  } catch (error) {
-    console.error('WARNING: Failed to connect to n8n API:', error instanceof Error ? error.message : error);
-    console.error('Server will continue in offline mode - tools will be available but may have limited functionality');
+    console.error('Initializing shared API clients with resilient capabilities...');
+    initializeDiscoveryApiClient(apiClient as any);
+    console.error('Shared API clients initialized with resilient capabilities');
     
-    // Initialize in offline mode
-    console.error('Initializing node discovery in offline mode...');
+    // Log resilient client health stats
+    const healthStats = apiClient.getHealthStats();
+    console.error(`API Client Health: ${healthStats.successRate.toFixed(1)}% success rate, ${healthStats.averageLatency.toFixed(0)}ms avg latency`);
+    
+  } catch (error) {
+    console.error('WARNING: Failed to initialize resilient API client:', error instanceof Error ? error.message : error);
+    console.error('Server will continue with enhanced offline mode and fallback capabilities');
+    
+    // Initialize in enhanced offline mode with recovery support
+    console.error('Initializing enhanced offline mode with recovery manager...');
     initializeNodeDiscovery(null);
-    console.error('Node discovery service initialized in offline mode');
+    
+    // Get enhanced discovery stats with fallbacks
+    const enhancedNodes = await recoveryManager.executeWithFallback(
+      'getAllAvailableNodes',
+      async () => await getAllAvailableNodes(),
+      {},
+      { cacheResult: true }
+    ) as any[];
+    console.error(`Enhanced offline mode initialized with ${enhancedNodes.length} nodes and recovery fallbacks`);
     
     // Initialize shared API clients in offline mode
-    console.error('Initializing shared API clients in offline mode...');
+    console.error('Initializing shared API clients in enhanced offline mode...');
     initializeDiscoveryApiClient(null);
-    initializeCredentialsApiClient(null);
-    console.error('Shared API clients initialized in offline mode');
+    console.error('Enhanced offline mode fully configured with recovery capabilities');
   }
 
   // Create server instance

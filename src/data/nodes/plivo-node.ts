@@ -102,8 +102,7 @@ export const plivoNode: NodeTypeInfo = {
       displayName: 'Time Limit',
       type: 'number',
       required: false,
-      default: 14400,
-      description: 'Maximum call duration in seconds (default: 14400, max: 28800)'
+      default: 14400,description: 'Maximum call duration in seconds ( max: 28800)'
     },
     {
       name: 'timeout',

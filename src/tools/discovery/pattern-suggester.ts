@@ -7,7 +7,7 @@
 
 import { BaseDiscoveryToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
 
@@ -172,14 +172,7 @@ export class WorkflowPatternSuggester extends BaseDiscoveryToolHandler {
     // Use Phase 1 Universal Node Catalog for intent-based pattern discovery
     try {
       const intentNodes = await universalNodeCatalog.discoverByIntent(description);
-      const chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions({
-        intent: description,
-        preferences: {
-          reliability: request.preferences?.reliability || 'high',
-          speed: request.preferences?.performance || 'balanced',
-          cost: 'medium'
-        }
-      });
+      const chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(description);
 
       // Add patterns based on chain suggestions
       for (const chainSuggestion of chainSuggestions.slice(0, 2)) {

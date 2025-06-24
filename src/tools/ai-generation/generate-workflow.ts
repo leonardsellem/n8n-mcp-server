@@ -6,6 +6,7 @@
 
 import { ToolDefinition, ToolCallResult } from '../../types/index.js';
 import { BaseTemplateToolHandler } from '../templates/base-handler.js';
+import { getAllAvailableNodes, searchNodes } from '../../discovery/enhanced-discovery.js';
 
 /**
  * Analysis result from description parsing
@@ -41,7 +42,7 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
 
       try {
         // Analyze the description to determine workflow requirements
-        const analysis = this.analyzeDescription(description);
+        const analysis = await this.analyzeDescription(description);
         
         // Generate workflow based on analysis
         const workflow = this.generateWorkflowFromAnalysis(analysis, name);
@@ -71,7 +72,7 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
   /**
    * Analyze description to determine workflow requirements
    */
-  private analyzeDescription(description: string): any {
+  private async analyzeDescription(description: string): Promise<any> {
     const descLower = description.toLowerCase();
     
     // Detect triggers
@@ -115,8 +116,8 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
       actions.push('fileWrite');
     }
 
-    // Determine node types
-    const nodeTypes = this.mapToNodeTypes(triggers, actions);
+    // Determine node types using verified nodes
+    const nodeTypes = await this.mapToNodeTypes(triggers, actions);
 
     // Determine complexity
     const complexity = triggers.length + actions.length > 3 ? 'complex' : 
@@ -132,35 +133,48 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
   }
 
   /**
-   * Map triggers and actions to n8n node types
+   * Map triggers and actions to verified n8n node types from discovery system
    */
-  private mapToNodeTypes(triggers: string[], actions: string[]): string[] {
-    const nodeTypeMap: Record<string, string> = {
-      webhook: 'n8n-nodes-base.webhook',
-      schedule: 'n8n-nodes-base.scheduleTrigger',
-      emailTrigger: 'n8n-nodes-base.emailReadImap',
-      fileTrigger: 'n8n-nodes-base.localFileTrigger',
-      emailSend: 'n8n-nodes-base.emailSend',
-      chat: 'n8n-nodes-base.slack',
-      database: 'n8n-nodes-base.postgres',
-      httpRequest: 'n8n-nodes-base.httpRequest',
-      function: 'n8n-nodes-base.function',
-      fileWrite: 'n8n-nodes-base.writeFile'
+  private async mapToNodeTypes(triggers: string[], actions: string[]): Promise<string[]> {
+    const allNodes = await getAllAvailableNodes();
+    const nodeTypes: string[] = [];
+    
+    // Enhanced mapping using verified nodes
+    const enhancedNodeTypeMap: Record<string, string[]> = {
+      webhook: ['webhook', 'http-request', 'trigger'],
+      schedule: ['schedule', 'cron', 'timer'],
+      emailTrigger: ['email', 'imap', 'mail-trigger'],
+      fileTrigger: ['file', 'watch', 'monitor'],
+      emailSend: ['email', 'send-email', 'smtp'],
+      chat: ['slack', 'discord', 'teams', 'telegram'],
+      database: ['postgres', 'mysql', 'mongodb', 'sql'],
+      httpRequest: ['http', 'api', 'request', 'rest'],
+      function: ['function', 'code', 'javascript'],
+      fileWrite: ['file', 'write', 'save']
     };
 
-    const nodeTypes: string[] = [];
-    triggers.forEach(trigger => {
-      if (nodeTypeMap[trigger]) {
-        nodeTypes.push(nodeTypeMap[trigger]);
+    // Find best matching verified nodes
+    for (const [category, keywords] of Object.entries(enhancedNodeTypeMap)) {
+      if (triggers.includes(category) || actions.includes(category)) {
+        // Search for nodes matching these keywords
+        for (const keyword of keywords) {
+          const matchingNodes = await searchNodes(keyword, { limit: 3 });
+          nodeTypes.push(...matchingNodes.slice(0, 1).map(node => node.name));
+        }
       }
-    });
-    actions.forEach(action => {
-      if (nodeTypeMap[action]) {
-        nodeTypes.push(nodeTypeMap[action]);
-      }
-    });
+    }
 
-    return nodeTypes;
+    // Fallback to basic verified nodes if no specific matches
+    if (nodeTypes.length === 0) {
+      const basicNodes = allNodes.filter(node => 
+        ['webhook', 'function', 'set'].some(basic => 
+          node.name.toLowerCase().includes(basic)
+        )
+      ).slice(0, 3);
+      nodeTypes.push(...basicNodes.map(node => node.name));
+    }
+
+    return [...new Set(nodeTypes)]; // Remove duplicates
   }
 
   /**
@@ -388,9 +402,9 @@ export class GenerateWorkflowFromDescriptionHandler extends BaseTemplateToolHand
  */
 
 /**
- * Analyze description to determine workflow requirements
+ * Analyze description to determine workflow requirements with enhanced pattern detection
  */
-export function analyzeDescription(description: string): DescriptionAnalysis {
+export async function analyzeDescription(description: string): Promise<DescriptionAnalysis> {
   const descLower = description.toLowerCase();
   
   // Detect triggers
@@ -413,8 +427,10 @@ export function analyzeDescription(description: string): DescriptionAnalysis {
     triggers.push('webhook');
   }
 
-  // Detect actions
+  // Detect actions with enhanced complexity patterns
   const actions = [];
+  
+  // Basic actions
   if (descLower.includes('email') && (descLower.includes('send') || descLower.includes('notify'))) {
     actions.push('emailSend');
   }
@@ -437,12 +453,45 @@ export function analyzeDescription(description: string): DescriptionAnalysis {
     actions.push('httpRequest');
   }
 
-  // Determine node types
-  const nodeTypes = mapToNodeTypes(triggers, actions);
+  // Complex workflow patterns
+  if (descLower.includes('condition') || descLower.includes('if') || descLower.includes('depending') || descLower.includes('route') || descLower.includes('based on')) {
+    actions.push('switch');
+  }
+  if (descLower.includes('validate') || descLower.includes('check') || descLower.includes('verify')) {
+    actions.push('validation');
+  }
+  if (descLower.includes('error') || descLower.includes('fail') || descLower.includes('catch') || descLower.includes('handle error')) {
+    actions.push('errorHandler');
+  }
+  if (descLower.includes('wait') || descLower.includes('delay') || descLower.includes('pause')) {
+    actions.push('wait');
+  }
+  if (descLower.includes('loop') || descLower.includes('iterate') || descLower.includes('each') || descLower.includes('repeat')) {
+    actions.push('itemLists');
+  }
+  if (descLower.includes('merge') || descLower.includes('combine') || descLower.includes('join')) {
+    actions.push('merge');
+  }
+  if (descLower.includes('filter') || descLower.includes('select') || descLower.includes('where')) {
+    actions.push('filter');
+  }
 
-  // Determine complexity
-  const complexity = triggers.length + actions.length > 3 ? 'complex' :
-                    triggers.length + actions.length > 1 ? 'medium' : 'simple';
+  // Determine node types using verified nodes
+  const nodeTypes = await mapToNodeTypes(triggers, actions);
+
+  // Enhanced complexity calculation
+  let complexityScore = triggers.length + actions.length;
+  
+  // Add complexity points for advanced patterns
+  if (actions.includes('switch') || actions.includes('validation') || actions.includes('errorHandler')) {
+    complexityScore += 2;
+  }
+  if (actions.includes('itemLists') || actions.includes('merge') || actions.includes('filter')) {
+    complexityScore += 1;
+  }
+  
+  const complexity = complexityScore > 5 ? 'complex' :
+                    complexityScore > 2 ? 'medium' : 'simple';
 
   return {
     triggers,
@@ -454,42 +503,55 @@ export function analyzeDescription(description: string): DescriptionAnalysis {
 }
 
 /**
- * Map triggers and actions to n8n node types
+ * Map triggers and actions to verified n8n node types from discovery system
  */
-export function mapToNodeTypes(triggers: string[], actions: string[]): string[] {
-  const nodeTypeMap: Record<string, string> = {
-    webhook: 'n8n-nodes-base.webhook',
-    schedule: 'n8n-nodes-base.scheduleTrigger',
-    emailTrigger: 'n8n-nodes-base.emailReadImap',
-    fileTrigger: 'n8n-nodes-base.localFileTrigger',
-    emailSend: 'n8n-nodes-base.send-email',
-    chat: 'n8n-nodes-base.slack',
-    database: 'n8n-nodes-base.postgres',
-    httpRequest: 'n8n-nodes-base.httpRequest',
-    function: 'n8n-nodes-base.function',
-    fileWrite: 'n8n-nodes-base.writeFile'
+export async function mapToNodeTypes(triggers: string[], actions: string[]): Promise<string[]> {
+  const allNodes = await getAllAvailableNodes();
+  const nodeTypes: string[] = [];
+  
+  // Enhanced mapping using verified nodes
+  const enhancedNodeTypeMap: Record<string, string[]> = {
+    webhook: ['webhook', 'http-request', 'trigger'],
+    schedule: ['schedule', 'cron', 'timer'],
+    emailTrigger: ['email', 'imap', 'mail-trigger'],
+    fileTrigger: ['file', 'watch', 'monitor'],
+    emailSend: ['email', 'send-email', 'smtp'],
+    chat: ['slack', 'discord', 'teams', 'telegram'],
+    database: ['postgres', 'mysql', 'mongodb', 'sql'],
+    httpRequest: ['http', 'api', 'request', 'rest'],
+    function: ['function', 'code', 'javascript'],
+    fileWrite: ['file', 'write', 'save']
   };
 
-  const nodeTypes: string[] = [];
-  triggers.forEach(trigger => {
-    if (nodeTypeMap[trigger]) {
-      nodeTypes.push(nodeTypeMap[trigger]);
+  // Find best matching verified nodes
+  for (const [category, keywords] of Object.entries(enhancedNodeTypeMap)) {
+    if (triggers.includes(category) || actions.includes(category)) {
+      // Search for nodes matching these keywords
+      for (const keyword of keywords) {
+        const matchingNodes = await searchNodes(keyword, { limit: 3 });
+        nodeTypes.push(...matchingNodes.slice(0, 1).map(node => node.name));
+      }
     }
-  });
-  actions.forEach(action => {
-    if (nodeTypeMap[action]) {
-      nodeTypes.push(nodeTypeMap[action]);
-    }
-  });
+  }
 
-  return nodeTypes;
+  // Fallback to basic verified nodes if no specific matches
+  if (nodeTypes.length === 0) {
+    const basicNodes = allNodes.filter(node => 
+      ['webhook', 'function', 'set'].some(basic => 
+        node.name.toLowerCase().includes(basic)
+      )
+    ).slice(0, 3);
+    nodeTypes.push(...basicNodes.map(node => node.name));
+  }
+
+  return [...new Set(nodeTypes)]; // Remove duplicates
 }
 
 /**
- * Generate workflow from analysis
+ * Generate workflow from analysis with enhanced complexity and branching
  */
 export function generateWorkflowFromAnalysis(analysis: DescriptionAnalysis, name?: string): GeneratedWorkflow {
-  const nodes = [];
+  const nodes: any[] = [];
   const connections: any = {};
   let nodeIndex = 0;
   let previousNodeName = '';
@@ -504,58 +566,185 @@ export function generateWorkflowFromAnalysis(analysis: DescriptionAnalysis, name
     nodeIndex++;
   });
 
-  // Generate action nodes
-  analysis.actions.forEach((action: string) => {
-    const node = createActionNode(action, nodeIndex);
-    nodes.push(node);
-    
-    // Connect to previous node
-    if (previousNodeName) {
-      if (!connections[previousNodeName]) {
-        connections[previousNodeName] = { main: [[]] };
+  // Enhanced workflow generation with branching logic
+  if (analysis.complexity === 'complex') {
+    // For complex workflows, create branching patterns
+    const branchingWorkflow = generateComplexBranchingWorkflow(analysis, nodes, connections, previousNodeName, nodeIndex);
+    return {
+      name: name || `Complex AI Workflow - ${new Date().toISOString().split('T')[0]}`,
+      nodes: branchingWorkflow.nodes,
+      connections: branchingWorkflow.connections,
+      settings: {
+        saveExecutionProgress: true,
+        saveManualExecutions: true,
+        saveDataErrorExecution: "all",
+        saveDataSuccessExecution: "all",
+        executionTimeout: 3600,
+        timezone: "UTC"
+      },
+      staticData: {}
+    };
+  } else {
+    // Generate standard linear workflow for simple/medium complexity
+    analysis.actions.forEach((action: string) => {
+      const node = createActionNode(action, nodeIndex);
+      nodes.push(node);
+      
+      // Connect to previous node
+      if (previousNodeName) {
+        if (!connections[previousNodeName]) {
+          connections[previousNodeName] = { main: [[]] };
+        }
+        connections[previousNodeName].main[0].push({
+          node: node.name,
+          type: 'main',
+          index: 0
+        });
       }
-      connections[previousNodeName].main[0].push({
-        node: node.name,
-        type: 'main',
-        index: 0
-      });
-    }
-    
-    previousNodeName = node.name;
-    nodeIndex++;
-  });
+      
+      previousNodeName = node.name;
+      nodeIndex++;
+    });
 
-  // If no actions detected, add a basic function node
-  if (analysis.actions.length === 0) {
-    const node = createActionNode('function', nodeIndex);
-    nodes.push(node);
+    // If no actions detected, add a basic function node
+    if (analysis.actions.length === 0) {
+      const node = createActionNode('function', nodeIndex);
+      nodes.push(node);
+      
+      if (previousNodeName) {
+        if (!connections[previousNodeName]) {
+          connections[previousNodeName] = { main: [[]] };
+        }
+        connections[previousNodeName].main[0].push({
+          node: node.name,
+          type: 'main',
+          index: 0
+        });
+      }
+    }
+
+    return {
+      name: name || `AI Generated Workflow - ${new Date().toISOString().split('T')[0]}`,
+      nodes,
+      connections,
+      settings: {
+        saveExecutionProgress: true,
+        saveManualExecutions: true,
+        saveDataErrorExecution: "all",
+        saveDataSuccessExecution: "all",
+        executionTimeout: 3600,
+        timezone: "UTC"
+      },
+      staticData: {}
+    };
+  }
+}
+
+/**
+ * Generate complex branching workflow with conditional logic
+ */
+function generateComplexBranchingWorkflow(
+  analysis: DescriptionAnalysis, 
+  nodes: any[], 
+  connections: any, 
+  previousNodeName: string, 
+  startIndex: number
+): { nodes: any[], connections: any } {
+  let nodeIndex = startIndex;
+  
+  // Add validation node if needed
+  if (analysis.actions.includes('validation')) {
+    const validationNode = createActionNode('validation', nodeIndex++);
+    nodes.push(validationNode);
     
     if (previousNodeName) {
-      if (!connections[previousNodeName]) {
-        connections[previousNodeName] = { main: [[]] };
-      }
-      connections[previousNodeName].main[0].push({
-        node: node.name,
-        type: 'main',
-        index: 0
-      });
+      connections[previousNodeName] = { main: [[{ node: validationNode.name, type: 'main', index: 0 }]] };
     }
+    previousNodeName = validationNode.name;
   }
 
-  return {
-    name: name || `AI Generated Workflow - ${new Date().toISOString().split('T')[0]}`,
-    nodes,
-    connections,
-    settings: {
-      saveExecutionProgress: true,
-      saveManualExecutions: true,
-      saveDataErrorExecution: "all",
-      saveDataSuccessExecution: "all",
-      executionTimeout: 3600,
-      timezone: "UTC"
-    },
-    staticData: {}
-  };
+  // Add switch node for conditional logic
+  if (analysis.actions.includes('switch')) {
+    const switchNode = createActionNode('switch', nodeIndex++);
+    nodes.push(switchNode);
+    
+    if (previousNodeName) {
+      connections[previousNodeName] = { main: [[{ node: switchNode.name, type: 'main', index: 0 }]] };
+    }
+
+    // Create multiple branch paths
+    const emailBranch = createActionNode('emailSend', nodeIndex++);
+    const apiBranch = createActionNode('httpRequest', nodeIndex++);
+    const processBranch = createActionNode('function', nodeIndex++);
+    
+    nodes.push(emailBranch, apiBranch, processBranch);
+    
+    // Connect switch outputs to different branches
+    connections[switchNode.name] = {
+      main: [
+        [{ node: emailBranch.name, type: 'main', index: 0 }],  // Output 0: email path
+        [{ node: apiBranch.name, type: 'main', index: 0 }],    // Output 1: API path  
+        [{ node: processBranch.name, type: 'main', index: 0 }] // Output 2: process path
+      ]
+    };
+
+    // Add merge node to combine branches
+    const mergeNode = createActionNode('merge', nodeIndex++);
+    nodes.push(mergeNode);
+    
+    // Connect all branches to merge
+    connections[emailBranch.name] = { main: [[{ node: mergeNode.name, type: 'main', index: 0 }]] };
+    connections[apiBranch.name] = { main: [[{ node: mergeNode.name, type: 'main', index: 0 }]] };
+    connections[processBranch.name] = { main: [[{ node: mergeNode.name, type: 'main', index: 0 }]] };
+    
+    previousNodeName = mergeNode.name;
+  }
+
+  // Add error handling wrapper
+  if (analysis.actions.includes('errorHandler')) {
+    const errorHandlerNode = createActionNode('errorHandler', nodeIndex++);
+    nodes.push(errorHandlerNode);
+    
+    if (previousNodeName) {
+      connections[previousNodeName] = { main: [[{ node: errorHandlerNode.name, type: 'main', index: 0 }]] };
+    }
+    previousNodeName = errorHandlerNode.name;
+  }
+
+  // Add item processing if needed
+  if (analysis.actions.includes('itemLists')) {
+    const itemListsNode = createActionNode('itemLists', nodeIndex++);
+    nodes.push(itemListsNode);
+    
+    if (previousNodeName) {
+      connections[previousNodeName] = { main: [[{ node: itemListsNode.name, type: 'main', index: 0 }]] };
+    }
+    previousNodeName = itemListsNode.name;
+  }
+
+  // Add remaining actions that aren't handled by branching logic
+  const remainingActions = analysis.actions.filter(action => 
+    !['switch', 'validation', 'errorHandler', 'itemLists'].includes(action)
+  );
+  
+  remainingActions.forEach((action: string) => {
+    const node = createActionNode(action, nodeIndex++);
+    nodes.push(node);
+    
+    if (previousNodeName) {
+      if (!connections[previousNodeName]) {
+        connections[previousNodeName] = { main: [[]] };
+      }
+      connections[previousNodeName].main[0].push({
+        node: node.name,
+        type: 'main',
+        index: 0
+      });
+    }
+    previousNodeName = node.name;
+  });
+
+  return { nodes, connections };
 }
 
 /**
@@ -709,6 +898,128 @@ export function createActionNode(actionType: string, index: number): any {
             ]
           },
           fallbackOutput: 0 // Required fallbackOutput parameter
+        },
+        position: basePosition
+      };
+
+    case 'validation':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.function',
+        name: `Validate Data${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          functionCode: `
+            // Validate incoming data
+            const errors = [];
+            const data = $input.first().json;
+            
+            // Check required fields
+            if (!data.id) errors.push('Missing required field: id');
+            if (!data.email || !data.email.includes('@')) errors.push('Invalid email address');
+            
+            if (errors.length > 0) {
+              throw new Error('Validation failed: ' + errors.join(', '));
+            }
+            
+            return [{
+              ...data,
+              validated: true,
+              validatedAt: new Date().toISOString()
+            }];
+          `
+        },
+        position: basePosition
+      };
+
+    case 'errorHandler':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.function',
+        name: `Error Handler${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          functionCode: `
+            // Handle errors gracefully
+            try {
+              const data = $input.first().json;
+              
+              return [{
+                success: true,
+                data: data,
+                processedAt: new Date().toISOString()
+              }];
+            } catch (error) {
+              return [{
+                success: false,
+                error: error.message,
+                timestamp: new Date().toISOString(),
+                retryRecommended: true
+              }];
+            }
+          `
+        },
+        position: basePosition
+      };
+
+    case 'wait':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.wait',
+        name: `Wait${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          amount: 5,
+          unit: 'seconds'
+        },
+        position: basePosition
+      };
+
+    case 'itemLists':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.itemLists',
+        name: `Process Items${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          operation: 'splitOutItems',
+          fieldName: 'items'
+        },
+        position: basePosition
+      };
+
+    case 'merge':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.merge',
+        name: `Merge Data${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          mode: 'combine',
+          combineBy: 'combineByPosition',
+          options: {}
+        },
+        position: basePosition
+      };
+
+    case 'filter':
+      return {
+        id: nodeId,
+        type: 'n8n-nodes-base.filter',
+        name: `Filter Data${index > 0 ? ` ${index + 1}` : ''}`,
+        parameters: {
+          conditions: {
+            options: {
+              caseSensitive: true,
+              leftValue: '',
+              typeValidation: 'strict'
+            },
+            conditions: [
+              {
+                leftValue: '={{ $json.status }}',
+                rightValue: 'active',
+                operator: {
+                  type: 'string',
+                  operation: 'equals'
+                }
+              }
+            ]
+          }
         },
         position: basePosition
       };

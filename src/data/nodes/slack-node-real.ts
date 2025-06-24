@@ -140,7 +140,7 @@ export const slackNode: NodeTypeInfo = {
             {
               type: 'regex',
               properties: {
-                regex: '^[CD][A-Z0-9]{8,}$',
+                regex: '^[CD][A-Z0-9]{8}$',
                 errorMessage: 'Channel ID must start with C or D followed by at least 8 alphanumeric characters'
               }
             }
@@ -190,7 +190,7 @@ export const slackNode: NodeTypeInfo = {
             {
               type: 'regex',
               properties: {
-                regex: '^[UW][A-Z0-9]{8,}$',
+                regex: '^[UW][A-Z0-9]{8}$',
                 errorMessage: 'User ID must start with U or W followed by at least 8 alphanumeric characters'
               }
             }
@@ -239,80 +239,91 @@ export const slackNode: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'as_user',
-          displayName: 'Send as User',
-          type: 'boolean',
-          default: false,
+      name: 'as_user',
+      displayName: 'Send as User',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Send the message as the authenticated user'
-        },
+    },
         {
-          name: 'username',
-          displayName: 'Username',
-          type: 'string',
-          default: '',
+      name: 'username',
+      displayName: 'Username',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Username for the bot (if not sending as user)'
-        },
+    },
         {
-          name: 'icon_emoji',
-          displayName: 'Icon Emoji',
-          type: 'string',
-          default: '',
+      name: 'icon_emoji',
+      displayName: 'Icon Emoji',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Emoji to use as the icon for the bot',
           placeholder: ':robot_face:'
-        },
+    },
         {
-          name: 'icon_url',
-          displayName: 'Icon URL',
-          type: 'string',
-          default: '',
+      name: 'icon_url',
+      displayName: 'Icon URL',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'URL to an image to use as icon for the bot'
-        },
+    },
         {
-          name: 'link_names',
-          displayName: 'Link Names',
-          type: 'boolean',
-          default: true,
+      name: 'link_names',
+      displayName: 'Link Names',
+      type: 'boolean',
+      required: false,
+      default: true,
           description: 'Find and link user groups and channel names'
-        },
+    },
         {
-          name: 'thread_ts',
-          displayName: 'Thread Timestamp',
-          type: 'string',
-          default: '',
+      name: 'thread_ts',
+      displayName: 'Thread Timestamp',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Timestamp of parent message to reply in thread'
-        },
+    },
         {
-          name: 'reply_broadcast',
-          displayName: 'Reply Broadcast',
-          type: 'boolean',
-          default: false,
+      name: 'reply_broadcast',
+      displayName: 'Reply Broadcast',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Broadcast thread reply to channel'
-        },
+    },
         {
-          name: 'parse',
-          displayName: 'Parse',
-          type: 'options',
-          default: 'none',
+      name: 'parse',
+      displayName: 'Parse',
+      type: 'options',
+      required: false,
+      default: 'none',
           description: 'Change how messages are treated',
           options: [
-            { name: 'None', value: 'none' },
+            { name: 'None', value: 'none'
+    },
             { name: 'Full', value: 'full' }
           ]
         },
         {
-          name: 'unfurl_links',
-          displayName: 'Unfurl Links',
-          type: 'boolean',
-          default: true,
+      name: 'unfurl_links',
+      displayName: 'Unfurl Links',
+      type: 'boolean',
+      required: false,
+      default: true,
           description: 'Unfurl primarily text-based content'
-        },
+    },
         {
-          name: 'unfurl_media',
-          displayName: 'Unfurl Media',
-          type: 'boolean',
-          default: true,
+      name: 'unfurl_media',
+      displayName: 'Unfurl Media',
+      type: 'boolean',
+      required: false,
+      default: true,
           description: 'Unfurl media content'
-        }
+    }
       ]
     },
     // Blocks UI for Rich Formatting
@@ -335,40 +346,44 @@ export const slackNode: NodeTypeInfo = {
           displayName: 'Block',
           values: [
             {
-              name: 'type',
-              displayName: 'Type',
-              type: 'options',
-              default: 'section',
+      name: 'type',
+      displayName: 'Type',
+      type: 'options',
+      required: false,
+      default: 'section',
               description: 'Block type',
               options: [
-                { name: 'Section', value: 'section' },
+                { name: 'Section', value: 'section'
+    },
                 { name: 'Divider', value: 'divider' },
                 { name: 'Header', value: 'header' },
                 { name: 'Context', value: 'context' }
               ]
             },
             {
-              name: 'text',
-              displayName: 'Text',
-              type: 'string',
-              default: '',
+      name: 'text',
+      displayName: 'Text',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Block text content',
               displayOptions: {
                 show: {
                   type: ['section', 'header', 'context']
-                }
+    }
               }
             },
             {
-              name: 'text_type',
-              displayName: 'Text Type',
-              type: 'options',
-              default: 'mrkdwn',
+      name: 'text_type',
+      displayName: 'Text Type',
+      type: 'options',
+      required: false,
+      default: 'mrkdwn',
               description: 'Text formatting type',
               displayOptions: {
                 show: {
                   type: ['section', 'context']
-                }
+    }
               },
               options: [
                 { name: 'Markdown', value: 'mrkdwn' },
@@ -399,54 +414,61 @@ export const slackNode: NodeTypeInfo = {
           displayName: 'Attachment',
           values: [
             {
-              name: 'color',
-              displayName: 'Color',
-              type: 'string',
-              default: '',
+      name: 'color',
+      displayName: 'Color',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Color of the attachment (hex color or good/warning/danger)'
-            },
+    },
             {
-              name: 'pretext',
-              displayName: 'Pretext',
-              type: 'string',
-              default: '',
+      name: 'pretext',
+      displayName: 'Pretext',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Text that appears before the attachment'
-            },
+    },
             {
-              name: 'title',
-              displayName: 'Title',
-              type: 'string',
-              default: '',
+      name: 'title',
+      displayName: 'Title',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Title of the attachment'
-            },
+    },
             {
-              name: 'title_link',
-              displayName: 'Title Link',
-              type: 'string',
-              default: '',
+      name: 'title_link',
+      displayName: 'Title Link',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'URL to link the title to'
-            },
+    },
             {
-              name: 'text',
-              displayName: 'Text',
-              type: 'string',
-              default: '',
+      name: 'text',
+      displayName: 'Text',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Main text of the attachment'
-            },
+    },
             {
-              name: 'fallback',
-              displayName: 'Fallback',
-              type: 'string',
-              default: '',
+      name: 'fallback',
+      displayName: 'Fallback',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Fallback text for clients that cannot display attachments'
-            },
+    },
             {
-              name: 'footer',
-              displayName: 'Footer',
-              type: 'string',
-              default: '',
+      name: 'footer',
+      displayName: 'Footer',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Footer text'
-            }
+    }
           ]
         }
       ]

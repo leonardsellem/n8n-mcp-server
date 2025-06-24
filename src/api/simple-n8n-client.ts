@@ -80,6 +80,7 @@ export interface N8nCredential {
 export interface N8nCredentialType {
   name: string;
   displayName: string;
+  description?: string;
   documentationUrl?: string;
   properties: Array<{
     displayName: string;
@@ -143,9 +144,12 @@ export class SimpleN8nClient {
   private async makeRequest<T>(
     endpoint: string, 
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
-    body?: any
+    body?: any,
+    useRest: boolean = false
   ): Promise<T> {
-    const url = `${this.baseUrl}/api/v1${endpoint}`;
+    // Use /rest for most endpoints, /api/v1 for workflows/executions
+    const apiBase = useRest ? '/rest' : '/api/v1';
+    const url = `${this.baseUrl}${apiBase}${endpoint}`;
     
     const headers: { [key: string]: string } = {
       'Content-Type': 'application/json',
@@ -234,8 +238,24 @@ export class SimpleN8nClient {
   // Node Types (Discovery)
   async getNodeTypes(): Promise<N8nNodeType[]> {
     try {
-      const response = await this.makeRequest<N8nNodeType[]>('/node-types');
-      return Array.isArray(response) ? response : [];
+      // Try REST endpoints for node types
+      const endpoints = [
+        '/node-types',
+        '/types/nodes',
+        '/nodes/types'
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const response = await this.makeRequest<N8nNodeType[]>(endpoint, 'GET', undefined, true);
+          return Array.isArray(response) ? response : [];
+        } catch (error) {
+          console.error(`Failed to fetch node types from ${endpoint}:`, error);
+          continue;
+        }
+      }
+      
+      return [];
     } catch (error) {
       console.error('Failed to fetch node types from n8n API:', error);
       return [];
@@ -244,7 +264,7 @@ export class SimpleN8nClient {
 
   async getNodeType(nodeTypeName: string): Promise<N8nNodeType | null> {
     try {
-      return await this.makeRequest<N8nNodeType>(`/node-types/${encodeURIComponent(nodeTypeName)}`);
+      return await this.makeRequest<N8nNodeType>(`/node-types/${encodeURIComponent(nodeTypeName)}`, 'GET', undefined, true);
     } catch (error) {
       console.error(`Failed to fetch node type ${nodeTypeName}:`, error);
       return null;
@@ -254,8 +274,45 @@ export class SimpleN8nClient {
   // Credential Types
   async getCredentialTypes(): Promise<N8nCredentialType[]> {
     try {
-      const response = await this.makeRequest<N8nCredentialType[]>('/credential-types');
-      return Array.isArray(response) ? response : [];
+      // Try multiple possible endpoints for credential types
+      const endpoints = [
+        '/credential-types',
+        '/credentials/types', 
+        '/types'
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const response = await this.makeRequest<N8nCredentialType[]>(endpoint, 'GET', undefined, true);
+          return Array.isArray(response) ? response : [];
+        } catch (error) {
+          console.error(`Failed to fetch credential types from ${endpoint}:`, error);
+          continue;
+        }
+      }
+      
+      // If all REST endpoints fail, try to extract from node types
+      console.log('[CREDENTIAL-TYPES] Attempting fallback: extracting from node types...');
+      const nodeTypes = await this.getNodeTypes();
+      const extractedTypes: N8nCredentialType[] = [];
+      
+      nodeTypes.forEach(nodeType => {
+        if (nodeType.credentials) {
+          nodeType.credentials.forEach(cred => {
+            if (!extractedTypes.find(t => t.name === cred.name)) {
+              extractedTypes.push({
+                name: cred.name,
+                displayName: cred.name,
+                properties: []
+              });
+            }
+          });
+        }
+      });
+      
+      console.log(`[CREDENTIAL-TYPES] Fallback successful! Extracted ${extractedTypes.length} credential types from node types`);
+      return extractedTypes;
+      
     } catch (error) {
       console.error('Failed to fetch credential types from n8n API:', error);
       return [];
@@ -264,29 +321,34 @@ export class SimpleN8nClient {
 
   // Credentials Management
   async getCredentials(): Promise<N8nCredential[]> {
-    const response = await this.makeRequest<{ data: N8nCredential[] }>('/credentials');
-    return response.data || [];
+    try {
+      const response = await this.makeRequest<{ data: N8nCredential[] }>('/credentials', 'GET', undefined, true);
+      return response.data || [];
+    } catch (error) {
+      console.error('Failed to fetch credentials:', error);
+      return [];
+    }
   }
 
   async getCredential(id: string): Promise<N8nCredential> {
-    return await this.makeRequest<N8nCredential>(`/credentials/${id}`);
+    return await this.makeRequest<N8nCredential>(`/credentials/${id}`, 'GET', undefined, true);
   }
 
   async createCredential(credential: Omit<N8nCredential, 'id'>): Promise<N8nCredential> {
-    return await this.makeRequest<N8nCredential>('/credentials', 'POST', credential);
+    return await this.makeRequest<N8nCredential>('/credentials', 'POST', credential, true);
   }
 
   async updateCredential(id: string, credential: Partial<N8nCredential>): Promise<N8nCredential> {
-    return await this.makeRequest<N8nCredential>(`/credentials/${id}`, 'PUT', credential);
+    return await this.makeRequest<N8nCredential>(`/credentials/${id}`, 'PUT', credential, true);
   }
 
   async deleteCredential(id: string): Promise<void> {
-    await this.makeRequest(`/credentials/${id}`, 'DELETE');
+    await this.makeRequest(`/credentials/${id}`, 'DELETE', undefined, true);
   }
 
   async testCredential(type: string, data: any): Promise<{ status: 'success' | 'error'; message?: string }> {
     try {
-      await this.makeRequest('/credentials/test', 'POST', { type, data });
+      await this.makeRequest('/credentials/test', 'POST', { type, data }, true);
       return { status: 'success' };
     } catch (error: any) {
       return { status: 'error', message: error.message };

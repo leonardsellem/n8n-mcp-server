@@ -62,24 +62,25 @@ export const ifNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional options for the conditional logic',
+      default: {},description: 'Additional options for the conditional logic',
       options: [
         {
-          name: 'looseTypeValidation',
-          displayName: 'Loose Type Validation',
-          type: 'boolean',
-          default: false,
+      name: 'looseTypeValidation',
+      displayName: 'Loose Type Validation',
+      type: 'boolean',
+      required: false,
           description: 'When enabled, type validation will be less strict'
-        },
+    },
         {
-          name: 'fallbackOutput',
-          displayName: 'Fallback Output',
-          type: 'options',
-          default: 'noData',
+      name: 'fallbackOutput',
+      displayName: 'Fallback Output',
+      type: 'options',
+      required: false,
+      default: 'noData',
           description: 'What to output when condition is false',
           options: [
-            { name: 'No Data', value: 'noData' },
+            { name: 'No Data', value: 'noData'
+    },
             { name: 'Input Data', value: 'inputData' },
             { name: 'Empty Object', value: 'emptyObject' }
           ]

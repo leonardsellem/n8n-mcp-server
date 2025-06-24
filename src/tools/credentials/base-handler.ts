@@ -6,30 +6,17 @@
 
 import { ToolCallResult } from '../../types/index.js';
 import { N8nApiError } from '../../errors/index.js';
-import { EnhancedN8nApiClient } from '../../api/enhanced-client.js';
-import { getEnvConfig } from '../../config/environment.js';
-
-/**
- * Shared API client instance for all credentials handlers
- */
-let sharedApiClient: EnhancedN8nApiClient | null = null;
-
-/**
- * Initialize the shared API client for credentials handlers
- */
-export function initializeCredentialsApiClient(apiClient: EnhancedN8nApiClient | null): void {
-  sharedApiClient = apiClient;
-}
+import { SimpleN8nClient, n8nClient } from '../../api/simple-n8n-client.js';
 
 /**
  * Base class for credentials tool handlers
  */
 export abstract class BaseCredentialsToolHandler {
-  protected apiClient: EnhancedN8nApiClient;
+  protected apiClient: SimpleN8nClient;
   
   constructor() {
-    // Use shared API client if available, otherwise create new one
-    this.apiClient = sharedApiClient || new EnhancedN8nApiClient(getEnvConfig());
+    // Use the default simple n8n client
+    this.apiClient = n8nClient;
   }
   
   /**

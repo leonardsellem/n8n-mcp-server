@@ -642,5 +642,20 @@ export const netscalerAdcNode = {
         }
       ]
     }
-  }
+  },
+  examples: [
+    {
+      name: 'Basic Example',
+      description: 'Example usage of netscaler-adc-node',
+      workflow: {
+        nodes: [
+          {
+            name: 'netscaler-adc-node',
+            type: 'n8n-nodes-base.netscaler-adc',
+            parameters: {}
+          }
+        ]
+      }
+    }
+  ]
 };

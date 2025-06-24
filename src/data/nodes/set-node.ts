@@ -46,29 +46,33 @@ export const setNode: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'values',
-          displayName: 'Values',
-          type: 'fixedCollection',
-          description: 'The fields to set',
-          default: {},
-          options: [
+      name: 'values',
+
+      displayName: 'Values',
+      type: 'fixedCollection',
+      required: false,
+      description: 'The fields to set',
+          default: {},options: [
             {
               name: 'string',
               displayName: 'String',
               values: [
                 {
-                  name: 'name',
-                  displayName: 'Name',
-                  type: 'string',
-                  default: '',
+      name: 'name',
+
+      displayName: 'Name',
+      type: 'string',
+      required: false,
                   description: 'Name of the field to set',
                   placeholder: 'propertyName'
-                },
+    },
                 {
-                  name: 'value',
-                  displayName: 'Value',
-                  type: 'string',
-                  default: '',
+      name: 'value',
+
+      displayName: 'Value',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'Value to set for the field',
                   placeholder: '={{$json.originalField}}'
                 }
@@ -79,19 +83,23 @@ export const setNode: NodeTypeInfo = {
               displayName: 'Number',
               values: [
                 {
-                  name: 'name',
-                  displayName: 'Name',
-                  type: 'string',
-                  default: '',
+      name: 'name',
+
+      displayName: 'Name',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'Name of the field to set'
-                },
+    },
                 {
-                  name: 'value',
-                  displayName: 'Value',
-                  type: 'number',
-                  default: 0,
+      name: 'value',
+
+      displayName: 'Value',
+      type: 'number',
+      required: false,
+      default: 0,
                   description: 'Number value to set'
-                }
+    }
               ]
             },
             {
@@ -99,19 +107,23 @@ export const setNode: NodeTypeInfo = {
               displayName: 'Boolean',
               values: [
                 {
-                  name: 'name',
-                  displayName: 'Name',
-                  type: 'string',
-                  default: '',
+      name: 'name',
+
+      displayName: 'Name',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'Name of the field to set'
-                },
+    },
                 {
-                  name: 'value',
-                  displayName: 'Value',
-                  type: 'boolean',
-                  default: false,
+      name: 'value',
+
+      displayName: 'Value',
+      type: 'boolean',
+      required: false,
+      default: false,
                   description: 'Boolean value to set'
-                }
+    }
               ]
             }
           ]
@@ -139,23 +151,25 @@ export const setNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional options',
+      default: {},description: 'Additional options',
       options: [
         {
-          name: 'dotNotation',
-          displayName: 'Dot Notation',
-          type: 'boolean',
-          default: true,
+      name: 'dotNotation',
+
+      displayName: 'Dot Notation',
+      type: 'boolean',
+      required: false,
           description: 'Use dot notation for nested fields (e.g., user.name)'
-        },
+    },
         {
-          name: 'ignoreConversionErrors',
-          displayName: 'Ignore Conversion Errors',
-          type: 'boolean',
-          default: false,
+      name: 'ignoreConversionErrors',
+
+      displayName: 'Ignore Conversion Errors',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Continue processing even if value conversion fails'
-        }
+    }
       ]
     }
   ],

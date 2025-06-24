@@ -16,29 +16,34 @@ export const ifNode: NodeTypeInfo = {
       description: 'Define the conditions to evaluate',
       options: [
         {
-          name: 'conditions',
-          displayName: 'Conditions',
-          type: 'fixedCollection',
-          description: 'The conditions to check',
-          default: {},
+      name: 'conditions',
+
+      displayName: 'Conditions',
+      type: 'fixedCollection',
+      required: false,
+      description: 'The conditions to check',
           options: [
             {
               name: 'and',
               displayName: 'AND',
               values: [
                 {
-                  name: 'leftValue',
-                  displayName: 'Left Value',
-                  type: 'string',
-                  default: '',
+      name: 'leftValue',
+
+      displayName: 'Left Value',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'The left value to compare',
                   placeholder: '={{$json.status}}'
                 },
                 {
-                  name: 'operation',
-                  displayName: 'Operation',
-                  type: 'options',
-                  default: 'equal',
+      name: 'operation',
+
+      displayName: 'Operation',
+      type: 'options',
+      required: false,
+      default: 'equal',
                   options: [
                     { name: 'Equal', value: 'equal' },
                     { name: 'Not Equal', value: 'notEqual' },
@@ -56,13 +61,15 @@ export const ifNode: NodeTypeInfo = {
                   ]
                 },
                 {
-                  name: 'rightValue',
-                  displayName: 'Right Value',
-                  type: 'string',
-                  default: '',
+      name: 'rightValue',
+
+      displayName: 'Right Value',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'The right value to compare against',
                   placeholder: 'success'
-                }
+    }
               ]
             }
           ]

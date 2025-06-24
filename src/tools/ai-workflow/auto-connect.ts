@@ -8,7 +8,7 @@
 
 import { ToolCallResult } from '../../types/index.js';
 import { BaseAIWorkflowHandler } from './base-handler.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
 

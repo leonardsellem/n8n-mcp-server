@@ -176,30 +176,30 @@ export class AdvancedAIAssistant {
     switch (request.type) {
       case 'workflow_creation':
         const creationResult = await this.assistWorkflowCreation(request);
-        recommendations = creationResult.recommendations;
-        explanations = creationResult.explanations;
-        codeSuggestions = creationResult.code_suggestions;
-        nextSteps = creationResult.next_steps;
+        recommendations = creationResult.recommendations || [];
+        explanations = creationResult.explanations || [];
+        codeSuggestions = creationResult.code_suggestions || [];
+        nextSteps = creationResult.next_steps || [];
         break;
 
       case 'optimization':
         const optimizationResult = await this.assistWorkflowOptimization(request);
-        recommendations = optimizationResult.recommendations;
-        explanations = optimizationResult.explanations;
-        codeSuggestions = optimizationResult.code_suggestions;
+        recommendations = optimizationResult.recommendations || [];
+        explanations = optimizationResult.explanations || [];
+        codeSuggestions = optimizationResult.code_suggestions || [];
         break;
 
       case 'debugging':
         const debugResult = await this.assistDebugging(request);
-        recommendations = debugResult.recommendations;
-        explanations = debugResult.explanations;
-        codeSuggestions = debugResult.code_suggestions;
+        recommendations = debugResult.recommendations || [];
+        explanations = debugResult.explanations || [];
+        codeSuggestions = debugResult.code_suggestions || [];
         break;
 
       case 'explanation':
         const explanationResult = await this.provideExplanation(request);
-        explanations = explanationResult.explanations;
-        learningResources = explanationResult.learning_resources;
+        explanations = explanationResult.explanations || [];
+        learningResources = explanationResult.learning_resources || [];
         break;
 
       case 'recommendation':
@@ -208,8 +208,8 @@ export class AdvancedAIAssistant {
 
       case 'migration':
         const migrationResult = await this.assistMigration(request);
-        recommendations = migrationResult.recommendations;
-        codeSuggestions = migrationResult.code_suggestions;
+        recommendations = migrationResult.recommendations || [];
+        codeSuggestions = migrationResult.code_suggestions || [];
         break;
     }
 
@@ -605,8 +605,8 @@ export class AdvancedAIAssistant {
       title: opportunity.description,
       description: `Optimize ${opportunity.affected_nodes.length} node(s) for ${opportunity.type}`,
       impact: {
-        performance_improvement: opportunity.impact === 'performance' ? '25%' : undefined,
-        reliability_improvement: opportunity.impact === 'error_handling' ? '40%' : undefined
+        performance_improvement: opportunity.type === 'performance' ? '25%' : undefined,
+        reliability_improvement: opportunity.type === 'error_handling' ? '40%' : undefined
       },
       implementation: {
         difficulty: 'moderate',

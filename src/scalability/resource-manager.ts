@@ -832,7 +832,7 @@ export class ResourceManager {
   private isCircuitBreakerOpen(lb: LoadBalancer): boolean { return false; }
   private checkRateLimit(lb: LoadBalancer, data: any): boolean { return true; }
   private async selectTargetInstance(lb: LoadBalancer, data: any): Promise<string> { return 'instance_123'; }
-  private async isInstanceHealthy(instanceId: string): boolean { return true; }
+  private async isInstanceHealthy(instanceId: string): Promise<boolean> { return true; }
   private async selectFallbackInstance(lb: LoadBalancer, excludeId: string): Promise<string | null> { return 'fallback_instance'; }
   private async analyzePoolUtilization(pool: ResourcePool): Promise<any> { return {}; }
   private identifyOptimizationOpportunities(analysis: any): any[] { return []; }

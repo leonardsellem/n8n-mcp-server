@@ -48,7 +48,7 @@ export class CreateSmartWorkflowHandler extends BaseWorkflowToolHandler {
         try {
           // First attempt: AI-powered generation
           console.error('[CreateSmartWorkflow] Attempting AI-powered generation from description');
-          const analysis = analyzeDescription(description);
+          const analysis = await analyzeDescription(description);
           console.error('[CreateSmartWorkflow] Analysis result:', {
             triggers: analysis.triggers,
             actions: analysis.actions,
@@ -137,13 +137,13 @@ export class CreateSmartWorkflowHandler extends BaseWorkflowToolHandler {
           // Auto-create connections if not specified
           if (i > 0 && !node.skipAutoConnect) {
             const previousNode = processedNodes[i - 1];
-            const previousNodeType = nodeDiscovery.getNodeType(previousNode.type);
-            const currentNodeType = nodeDiscovery.getNodeType(processedNode.type);
+            const previousNodeType = await nodeDiscovery.getNodeType(previousNode.type);
+            const currentNodeType = await nodeDiscovery.getNodeType(processedNode.type);
 
             // Check if connection is valid
             if (previousNodeType && currentNodeType && 
-                previousNodeType.outputs.length > 0 && 
-                currentNodeType.inputs.length > 0 &&
+                previousNodeType.outputs && previousNodeType.outputs.length > 0 && 
+                currentNodeType.inputs && currentNodeType.inputs.length > 0 &&
                 !currentNodeType.triggerNode) {
               
               if (!connections[previousNode.name]) {
@@ -332,13 +332,13 @@ export class OptimizeWorkflowHandler extends BaseWorkflowToolHandler {
           const currentNode = workflow.nodes[i];
           const nextNode = workflow.nodes[i + 1];
           
-          const currentNodeType = nodeDiscovery.getNodeType(currentNode.type);
-          const nextNodeType = nodeDiscovery.getNodeType(nextNode.type);
+          const currentNodeType = await nodeDiscovery.getNodeType(currentNode.type);
+          const nextNodeType = await nodeDiscovery.getNodeType(nextNode.type);
 
           // Check if they should be connected but aren't
           if (currentNodeType && nextNodeType && 
-              currentNodeType.outputs.length > 0 && 
-              nextNodeType.inputs.length > 0 &&
+              currentNodeType.outputs && currentNodeType.outputs.length > 0 && 
+              nextNodeType.inputs && nextNodeType.inputs.length > 0 &&
               !nextNodeType.triggerNode) {
             
             // Check if connection exists

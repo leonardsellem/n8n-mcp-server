@@ -34,26 +34,26 @@ return items;`,
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional function options',
+      default: {},description: 'Additional function options',
       options: [
         {
-          name: 'continueOnFail',
-          displayName: 'Continue on Fail',
-          type: 'boolean',
-          default: false,
+      name: 'continueOnFail',
+      displayName: 'Continue on Fail',
+      type: 'boolean',
+      required: false,
           description: 'Continue workflow even if function throws an error'
-        },
+    },
         {
-          name: 'timeout',
-          displayName: 'Timeout (seconds)',
-          type: 'number',
-          default: 10,
+      name: 'timeout',
+      displayName: 'Timeout (seconds)',
+      type: 'number',
+      required: false,
+      default: 10,
           description: 'Maximum execution time for the function',
           typeOptions: {
             minValue: 1,
             maxValue: 300
-          }
+    }
         }
       ]
     }

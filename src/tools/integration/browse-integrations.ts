@@ -88,8 +88,7 @@ export class BrowseIntegrationsHandler extends IntegrationBaseHandler {
 
       if (category) {
         // Get nodes by specific category
-        const categoriesMap = getNodesByCategory();
-        const categoryNodes = categoriesMap.get(category) || [];
+        const categoryNodes = getNodesByCategory(category);
         availableIntegrations = categoryNodes.map((node: any) =>
           this.convertNodeToIntegration(node, category)
         );
@@ -103,8 +102,7 @@ export class BrowseIntegrationsHandler extends IntegrationBaseHandler {
         // Get all nodes from all categories
         const allCategories = ['AI', 'Communication', 'Business', 'Database', 'Cloud Services', 'E-commerce', 'Developer Tools'];
         for (const cat of allCategories) {
-          const categoriesMap = getNodesByCategory();
-          const categoryNodes = categoriesMap.get(cat) || [];
+          const categoryNodes = getNodesByCategory(cat);
           const categoryIntegrations = categoryNodes.map((node: any) =>
             this.convertNodeToIntegration(node, cat)
           );

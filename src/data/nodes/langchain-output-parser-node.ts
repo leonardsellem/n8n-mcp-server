@@ -36,50 +36,54 @@ export const langchainOutputParserNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Parser configuration options',
+      default: {},description: 'Parser configuration options',
       options: [
         {
-          name: 'strictMode',
-          displayName: 'Strict Mode',
-          type: 'boolean',
-          default: true,
+      name: 'strictMode',
+      displayName: 'Strict Mode',
+      type: 'boolean',
+      required: false,
           description: 'Enforce strict schema validation'
-        },
+    },
         {
-          name: 'fallbackBehavior',
-          displayName: 'Fallback Behavior',
-          type: 'options',
-          default: 'error',
+      name: 'fallbackBehavior',
+      displayName: 'Fallback Behavior',
+      type: 'options',
+      required: false,
+      default: 'error',
           description: 'What to do when parsing fails',
           options: [
-            { name: 'Throw Error', value: 'error' },
+            { name: 'Throw Error', value: 'error'
+    },
             { name: 'Return Raw Text', value: 'raw' },
             { name: 'Return Empty Object', value: 'empty' },
             { name: 'Return Default Values', value: 'default' }
           ]
         },
         {
-          name: 'includeRawOutput',
-          displayName: 'Include Raw Output',
-          type: 'boolean',
-          default: false,
+      name: 'includeRawOutput',
+      displayName: 'Include Raw Output',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Include the original raw text in the output'
-        },
+    },
         {
-          name: 'trimWhitespace',
-          displayName: 'Trim Whitespace',
-          type: 'boolean',
-          default: true,
+      name: 'trimWhitespace',
+      displayName: 'Trim Whitespace',
+      type: 'boolean',
+      required: false,
+      default: true,
           description: 'Remove leading/trailing whitespace from output'
-        },
+    },
         {
-          name: 'fixJsonErrors',
-          displayName: 'Auto-fix JSON Errors',
-          type: 'boolean',
-          default: true,
+      name: 'fixJsonErrors',
+      displayName: 'Auto-fix JSON Errors',
+      type: 'boolean',
+      required: false,
+      default: true,
           description: 'Attempt to automatically fix common JSON formatting errors'
-        }
+    }
       ]
     }
   ],

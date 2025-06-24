@@ -290,41 +290,46 @@ export const slackNodeEnhanced: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'username',
-          displayName: 'Bot Username',
-          type: 'string',
-          default: '',
+      name: 'username',
+      displayName: 'Bot Username',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Override the bot\'s display name for this message'
-        },
+    },
         {
-          name: 'icon_emoji',
-          displayName: 'Bot Icon (Emoji)',
-          type: 'string',
-          default: '',
+      name: 'icon_emoji',
+      displayName: 'Bot Icon (Emoji)',
+      type: 'string',
+      required: false,
+      default: '',
           placeholder: ':robot_face:',
           description: 'Emoji to use as bot icon (e.g., :robot_face:)'
-        },
+    },
         {
-          name: 'thread_ts',
-          displayName: 'Thread Timestamp',
-          type: 'string',
-          default: '',
+      name: 'thread_ts',
+      displayName: 'Thread Timestamp',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Reply to a specific message thread by providing the parent message timestamp'
-        },
+    },
         {
-          name: 'link_names',
-          displayName: 'Link Names',
-          type: 'boolean',
-          default: false,
+      name: 'link_names',
+      displayName: 'Link Names',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Auto-link @mentions and #channels in message text'
-        },
+    },
         {
-          name: 'unfurl_links',
-          displayName: 'Unfurl Links',
-          type: 'boolean',
-          default: true,
+      name: 'unfurl_links',
+      displayName: 'Unfurl Links',
+      type: 'boolean',
+      required: false,
+      default: true,
           description: 'Enable automatic link previews in messages'
-        }
+    }
       ]
     }
   ],

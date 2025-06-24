@@ -105,9 +105,9 @@ export interface GeneratedWorkflow {
  * Natural Language Processor for Workflow Creation
  */
 export class NaturalLanguageWorkflowProcessor {
-  private intentPatterns: Map<string, RegExp[]>;
-  private nodeKeywords: Map<string, string[]>;
-  private actionMappings: Map<string, NodeActionMapping>;
+  private intentPatterns: Map<string, RegExp[]> = new Map();
+  private nodeKeywords: Map<string, string[]> = new Map();
+  private actionMappings: Map<string, NodeActionMapping> = new Map();
 
   constructor() {
     this.initializePatterns();

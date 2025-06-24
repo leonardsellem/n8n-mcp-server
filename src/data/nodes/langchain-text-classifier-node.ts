@@ -122,52 +122,55 @@ export const langchainTextClassifierNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional classification options',
+      default: {},description: 'Additional classification options',
       options: [
         {
-          name: 'includeConfidence',
-          displayName: 'Include Confidence Score',
-          type: 'boolean',
-          default: true,
+      name: 'includeConfidence',
+      displayName: 'Include Confidence Score',
+      type: 'boolean',
+      required: false,
           description: 'Include confidence score in the output'
-        },
+    },
         {
-          name: 'confidenceThreshold',
-          displayName: 'Confidence Threshold',
-          type: 'number',
-          default: 0.5,
+      name: 'confidenceThreshold',
+      displayName: 'Confidence Threshold',
+      type: 'number',
+      required: false,
+      default: 0.5,
           description: 'Minimum confidence score to accept classification',
           typeOptions: {
             minValue: 0,
             maxValue: 1,
             numberPrecision: 2
-          }
+    }
         },
         {
-          name: 'fallbackCategory',
-          displayName: 'Fallback Category',
-          type: 'string',
-          default: 'unknown',
+      name: 'fallbackCategory',
+      displayName: 'Fallback Category',
+      type: 'string',
+      required: false,
+      default: 'unknown',
           description: 'Category to use when confidence is below threshold'
-        },
+    },
         {
-          name: 'multiLabel',
-          displayName: 'Multi-label Classification',
-          type: 'boolean',
-          default: false,
+      name: 'multiLabel',
+      displayName: 'Multi-label Classification',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Allow multiple categories per text'
-        },
+    },
         {
-          name: 'maxCategories',
-          displayName: 'Max Categories',
-          type: 'number',
-          default: 3,
+      name: 'maxCategories',
+      displayName: 'Max Categories',
+      type: 'number',
+      required: false,
+      default: 3,
           description: 'Maximum number of categories to return (multi-label mode)',
           displayOptions: {
             show: {
               multiLabel: [true]
-            }
+    }
           },
           typeOptions: {
             minValue: 1,
@@ -175,21 +178,23 @@ export const langchainTextClassifierNode: NodeTypeInfo = {
           }
         },
         {
-          name: 'includeReasons',
-          displayName: 'Include Reasoning',
-          type: 'boolean',
-          default: false,
+      name: 'includeReasons',
+      displayName: 'Include Reasoning',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Include explanation for the classification'
-        },
+    },
         {
-          name: 'customPrompt',
-          displayName: 'Custom Prompt',
-          type: 'string',
-          default: '',
+      name: 'customPrompt',
+      displayName: 'Custom Prompt',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Custom prompt template for classification',
           typeOptions: {
             rows: 3
-          }
+    }
         }
       ]
     }

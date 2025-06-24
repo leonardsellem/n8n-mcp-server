@@ -47,47 +47,53 @@ export const switchNode: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'rules',
-          displayName: 'Rules',
-          type: 'fixedCollection',
-          description: 'Routing rules to evaluate',
-          default: {},
-          options: [
+      name: 'rules',
+
+      displayName: 'Rules',
+      type: 'fixedCollection',
+      required: false,
+      description: 'Routing rules to evaluate',
+          default: {},options: [
             {
               name: 'rule',
               displayName: 'Rule',
               values: [
                 {
-                  name: 'output',
-                  displayName: 'Output',
-                  type: 'number',
-                  default: 0,
+      name: 'output',
+
+      displayName: 'Output',
+      type: 'number',
+      required: false,
                   description: 'Output index (0, 1, 2, etc.)'
-                },
+    },
                 {
-                  name: 'conditions',
-                  displayName: 'Conditions',
-                  type: 'fixedCollection',
-                  description: 'Conditions for this rule',
-                  default: {},
-                  options: [
+      name: 'conditions',
+
+      displayName: 'Conditions',
+      type: 'fixedCollection',
+      required: false,
+      description: 'Conditions for this rule',
+                  default: {},options: [
                     {
                       name: 'condition',
                       displayName: 'Condition',
                       values: [
                         {
-                          name: 'leftValue',
-                          displayName: 'Left Value',
-                          type: 'string',
-                          default: '',
+      name: 'leftValue',
+
+      displayName: 'Left Value',
+      type: 'string',
+      required: false,
                           description: 'Value to compare',
                           placeholder: '={{$json.status}}'
                         },
                         {
-                          name: 'operation',
-                          displayName: 'Operation',
-                          type: 'options',
-                          default: 'equal',
+      name: 'operation',
+
+      displayName: 'Operation',
+      type: 'options',
+      required: false,
+      default: 'equal',
                           options: [
                             { name: 'Equal', value: 'equal' },
                             { name: 'Not Equal', value: 'notEqual' },
@@ -100,12 +106,14 @@ export const switchNode: NodeTypeInfo = {
                           ]
                         },
                         {
-                          name: 'rightValue',
-                          displayName: 'Right Value',
-                          type: 'string',
-                          default: '',
+      name: 'rightValue',
+
+      displayName: 'Right Value',
+      type: 'string',
+      required: false,
+      default: '',
                           description: 'Value to compare against'
-                        }
+    }
                       ]
                     }
                   ]
@@ -121,26 +129,28 @@ export const switchNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional switch options',
+      default: {},description: 'Additional switch options',
       options: [
         {
-          name: 'fallbackOutput',
-          displayName: 'Fallback Output',
-          type: 'number',
-          default: -1,
+      name: 'fallbackOutput',
+
+      displayName: 'Fallback Output',
+      type: 'number',
+      required: false,
           description: 'Output to use when no rules match (-1 for no output)',
           typeOptions: {
             minValue: -1
-          }
+    }
         },
         {
-          name: 'allMatchingOutputs',
-          displayName: 'All Matching Outputs',
-          type: 'boolean',
-          default: false,
+      name: 'allMatchingOutputs',
+
+      displayName: 'All Matching Outputs',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Send data to all matching outputs, not just the first'
-        }
+    }
       ]
     }
   ],

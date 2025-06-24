@@ -7,7 +7,7 @@
 
 import { BaseDiscoveryToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
 
@@ -194,7 +194,7 @@ export class NodeDocumentationHelper extends BaseDiscoveryToolHandler {
   private async resolveNodeInformation(nodeType: string): Promise<any> {
     try {
       const allNodes = await universalNodeCatalog.getAllAvailableNodes();
-      const nodeInfo = allNodes.find(node => 
+      const nodeInfo = allNodes.find((node: any) => 
         node.name === nodeType || 
         node.displayName === nodeType ||
         node.name.toLowerCase() === nodeType.toLowerCase()
@@ -202,7 +202,7 @@ export class NodeDocumentationHelper extends BaseDiscoveryToolHandler {
 
       if (!nodeInfo) {
         // Try searching for partial matches
-        const partialMatches = allNodes.filter(node =>
+        const partialMatches = allNodes.filter((node: any) =>
           node.name.toLowerCase().includes(nodeType.toLowerCase()) ||
           node.displayName.toLowerCase().includes(nodeType.toLowerCase())
         );
@@ -326,9 +326,9 @@ export class NodeDocumentationHelper extends BaseDiscoveryToolHandler {
         }
       };
 
-      const chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(workflowDescription);
+      const chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(nodeInfo.name || nodeInfo.displayName);
       
-      return chainSuggestions.slice(0, 3).map(suggestion => ({
+      return chainSuggestions.slice(0, 3).map((suggestion: any) => ({
         pattern: suggestion.reasoning || 'Common Integration Pattern',
         description: `Integration pattern using ${nodeInfo.displayName} with other nodes`,
         commonNodes: suggestion.chain?.map((node: any) => node.displayName) || [],
@@ -799,12 +799,12 @@ export class NodeDocumentationHelper extends BaseDiscoveryToolHandler {
     try {
       const allNodes = await universalNodeCatalog.getAllAvailableNodes();
       return allNodes
-        .filter(node => 
+        .filter((node: any) => 
           node.category === nodeInfo.category && 
           node.name !== nodeInfo.name
         )
         .slice(0, 5)
-        .map(node => node.displayName);
+        .map((node: any) => node.displayName);
     } catch (error) {
       return [];
     }

@@ -23,54 +23,58 @@ export const langchainChainLlmNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional chain configuration options',
+      default: {},description: 'Additional chain configuration options',
       options: [
         {
-          name: 'humanMessageKey',
-          displayName: 'Human Message Key',
-          type: 'string',
-          default: 'input',
+      name: 'humanMessageKey',
+      displayName: 'Human Message Key',
+      type: 'string',
+      required: false,
           description: 'Key for the human message in the prompt template'
-        },
+    },
         {
-          name: 'systemMessageKey',
-          displayName: 'System Message Key',
-          type: 'string',
-          default: 'system',
+      name: 'systemMessageKey',
+      displayName: 'System Message Key',
+      type: 'string',
+      required: false,
+      default: 'system',
           description: 'Key for the system message in the prompt template'
-        },
+    },
         {
-          name: 'outputKey',
-          displayName: 'Output Key',
-          type: 'string',
-          default: 'response',
+      name: 'outputKey',
+      displayName: 'Output Key',
+      type: 'string',
+      required: false,
+      default: 'response',
           description: 'Key for the output in the result'
-        },
+    },
         {
-          name: 'verbose',
-          displayName: 'Verbose',
-          type: 'boolean',
-          default: false,
+      name: 'verbose',
+      displayName: 'Verbose',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Enable verbose logging for debugging'
-        },
+    },
         {
-          name: 'memory',
-          displayName: 'Use Memory',
-          type: 'boolean',
-          default: false,
+      name: 'memory',
+      displayName: 'Use Memory',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Enable conversation memory'
-        },
+    },
         {
-          name: 'memoryKey',
-          displayName: 'Memory Key',
-          type: 'string',
-          default: 'chat_history',
+      name: 'memoryKey',
+      displayName: 'Memory Key',
+      type: 'string',
+      required: false,
+      default: 'chat_history',
           description: 'Key for storing conversation history',
           displayOptions: {
             show: {
               memory: [true]
-            }
+    }
           }
         }
       ]

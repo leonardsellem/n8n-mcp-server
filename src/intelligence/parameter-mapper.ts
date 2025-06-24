@@ -6,7 +6,7 @@
  * and AI agent platforms.
  */
 
-import { universalNodeCatalog } from '../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../discovery/index.js';
 import { dualNodeArchitecture } from '../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../discovery/dynamic-discovery.js';
 
@@ -170,8 +170,8 @@ export class UniversalParameterMapper {
       
       // Get node information from Universal Node Catalog
       const allNodes = await universalNodeCatalog.getAllAvailableNodes();
-      const sourceNodeInfo = allNodes.find(n => n.name === sourceNode.type);
-      const targetNodeInfo = allNodes.find(n => n.name === targetNode.type);
+      const sourceNodeInfo = allNodes.find((n: any) => n.name === sourceNode.type);
+      const targetNodeInfo = allNodes.find((n: any) => n.name === targetNode.type);
       
       if (!sourceNodeInfo || !targetNodeInfo) {
         console.error(`[UniversalParameterMapper] Node information not found for mapping`);

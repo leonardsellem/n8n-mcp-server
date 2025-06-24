@@ -309,37 +309,40 @@ export const githubNodeComplete: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'assignees',
-          displayName: 'Assignees',
-          type: 'multiOptions',
-          default: [],
+      name: 'assignees',
+      displayName: 'Assignees',
+      type: 'multiOptions',
+      required: false,
+      default: [],
           description: 'Users to assign the issue to',
           typeOptions: {
             loadOptionsMethod: 'getAssignees',
             loadOptionsDependsOn: ['repository']
-          }
+    }
         },
         {
-          name: 'labels',
-          displayName: 'Labels',
-          type: 'multiOptions',
-          default: [],
+      name: 'labels',
+      displayName: 'Labels',
+      type: 'multiOptions',
+      required: false,
+      default: [],
           description: 'Labels to apply to the issue',
           typeOptions: {
             loadOptionsMethod: 'getLabels',
             loadOptionsDependsOn: ['repository']
-          }
+    }
         },
         {
-          name: 'milestone',
-          displayName: 'Milestone',
-          type: 'options',
-          default: '',
+      name: 'milestone',
+      displayName: 'Milestone',
+      type: 'options',
+      required: false,
+      default: '',
           description: 'Milestone to associate with the issue',
           typeOptions: {
             loadOptionsMethod: 'getMilestones',
             loadOptionsDependsOn: ['repository']
-          }
+    }
         }
       ]
     },

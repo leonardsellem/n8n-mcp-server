@@ -7,7 +7,7 @@
 
 import { ToolCallResult } from '../../types/index.js';
 import { BaseWorkflowToolHandler } from '../workflow/base-handler.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
 
@@ -91,7 +91,7 @@ export abstract class BaseAIWorkflowHandler extends BaseWorkflowToolHandler {
       );
       
       // Get suggested nodes from intent discovery
-      const suggestedNodes = intentBasedNodes.slice(0, 10).map(node => node.name);
+      const suggestedNodes = intentBasedNodes.slice(0, 10).map((node: any) => node.name);
       
       // Detect workflow patterns
       const workflowPatterns = this.detectWorkflowPatterns(descLower);
@@ -154,7 +154,7 @@ export abstract class BaseAIWorkflowHandler extends BaseWorkflowToolHandler {
       
       // Combine with Universal Node Catalog suggestions
       const allNodes = await universalNodeCatalog.getAllAvailableNodes();
-      const matchingNodes = allNodes.filter(node => 
+      const matchingNodes = allNodes.filter((node: any) => 
         intent.suggested_nodes.includes(node.name) ||
         this.nodeMatchesIntent(node, intent)
       );

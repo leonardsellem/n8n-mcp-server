@@ -383,46 +383,51 @@ export const githubNodeEnhancedV2: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'labels',
-          displayName: 'Labels',
-          type: 'multiOptions',
-          default: [],
+      name: 'labels',
+      displayName: 'Labels',
+      type: 'multiOptions',
+      required: false,
+      default: [],
           description: 'Categorize with labels (bug, enhancement, documentation, etc.)',
           typeOptions: {
             loadOptionsMethod: 'getLabels',
             loadOptionsDependsOn: ['repository']
-          }
+    }
         },
         {
-          name: 'assignees',
-          displayName: 'Assignees',
-          type: 'multiOptions',
-          default: [],
+      name: 'assignees',
+      displayName: 'Assignees',
+      type: 'multiOptions',
+      required: false,
+      default: [],
           description: 'Team members responsible for this issue/PR',
           typeOptions: {
             loadOptionsMethod: 'getAssignees',
             loadOptionsDependsOn: ['repository']
-          }
+    }
         },
         {
-          name: 'milestone',
-          displayName: 'Milestone',
-          type: 'options',
-          default: '',
+      name: 'milestone',
+      displayName: 'Milestone',
+      type: 'options',
+      required: false,
+      default: '',
           description: 'Project milestone or version this belongs to',
           typeOptions: {
             loadOptionsMethod: 'getMilestones',
             loadOptionsDependsOn: ['repository']
-          }
+    }
         },
         {
-          name: 'priority',
-          displayName: 'Priority',
-          type: 'options',
-          default: 'medium',
+      name: 'priority',
+      displayName: 'Priority',
+      type: 'options',
+      required: false,
+      default: 'medium',
           description: 'Issue priority level for team triage',
           options: [
-            { name: 'Low', value: 'low' },
+            { name: 'Low', value: 'low'
+    },
             { name: 'Medium', value: 'medium' },
             { name: 'High', value: 'high' },
             { name: 'Critical', value: 'critical' }

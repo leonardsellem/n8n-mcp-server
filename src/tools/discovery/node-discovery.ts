@@ -8,10 +8,12 @@
 
 import { BaseDiscoveryToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
+import { NodeTypeInfo } from '../../data/node-types.js';
 import { nodeDiscovery } from '../../helpers/node-discovery.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
+import { nodeParameterValidator } from '../../validation/node-parameter-validator.js';
 
 /**
  * Handler for discovering node types
@@ -23,11 +25,14 @@ export class DiscoverNodesHandler extends BaseDiscoveryToolHandler {
 
       console.error(`[DiscoverNodesHandler] Using Phase 1 Enhanced Discovery - Universal Node Catalog`);
 
-      let nodeTypes;
+      let nodeTypes: NodeTypeInfo[] = [];
       
       // Use Phase 1 Universal Node Catalog for enhanced discovery
       if (category) {
-        nodeTypes = await universalNodeCatalog.discoverByCategory(category);
+        const categoryResult = await universalNodeCatalog.discoverByCategory(category);
+        nodeTypes = Array.isArray(categoryResult) 
+          ? categoryResult.map((item: any) => item.node || item).filter((node: any) => node && node.name)
+          : [];
         console.error(`[DiscoverNodesHandler] Found ${nodeTypes.length} nodes in category '${category}'`);
       } else if (search) {
         const searchResult = await universalNodeCatalog.searchNodes(search, {
@@ -35,12 +40,25 @@ export class DiscoverNodesHandler extends BaseDiscoveryToolHandler {
           includeAiOptimized,
           fuzzySearch: true
         });
-        nodeTypes = searchResult.nodes;
+        // Handle different return formats from search
+        try {
+          const searchData = searchResult as any;
+          if (searchData && searchData.nodes && Array.isArray(searchData.nodes)) {
+            nodeTypes = searchData.nodes.map((item: any) => item.node || item).filter((node: any) => node && node.name);
+          } else if (Array.isArray(searchData)) {
+            nodeTypes = searchData.map((item: any) => item.node || item).filter((node: any) => node && node.name);
+          } else {
+            nodeTypes = [];
+          }
+        } catch (error) {
+          console.error('[DiscoverNodesHandler] Error processing search results:', error);
+          nodeTypes = [];
+        }
         console.error(`[DiscoverNodesHandler] Search '${search}' found ${nodeTypes.length} nodes with AI optimization`);
         
         // Include enhanced search metadata
         const enhancedResponse = {
-          nodes: nodeTypes.map(node => ({
+          nodes: nodeTypes.map((node: NodeTypeInfo) => ({
             name: node.name,
             displayName: node.displayName,
             description: node.description,
@@ -54,11 +72,11 @@ export class DiscoverNodesHandler extends BaseDiscoveryToolHandler {
             inputCount: node.inputs?.length || 0,
             outputCount: node.outputs?.length || 0
           })),
-          totalFound: searchResult.totalCount,
-          categories: searchResult.categories,
-          suggestions: searchResult.suggestions,
-          relatedNodes: searchResult.relatedNodes?.slice(0, 3).map(node => node.displayName),
-          aiOptimizedVariants: searchResult.aiOptimizedVariants?.length || 0,
+          totalFound: (searchResult as any)?.totalCount || nodeTypes.length,
+          categories: (searchResult as any)?.categories || [],
+          suggestions: (searchResult as any)?.suggestions || [],
+          relatedNodes: (searchResult as any)?.relatedNodes?.slice(0, 3).map((node: any) => node.displayName) || [],
+          aiOptimizedVariants: (searchResult as any)?.aiOptimizedVariants?.length || 0,
           statistics: universalNodeCatalog.getNodeStatistics()
         };
 
@@ -263,7 +281,8 @@ export class SuggestNodesHandler extends BaseDiscoveryToolHandler {
       console.error(`[SuggestNodesHandler] Using Phase 1 Enhanced Discovery for intent: "${description}"`);
 
       // Use Phase 1 Universal Node Catalog for intent-based discovery
-      const intentBasedSuggestions = await universalNodeCatalog.discoverByIntent(description);
+      const intentBasedSuggestions: NodeTypeInfo[] = (await universalNodeCatalog.discoverByIntent(description))
+        .map((item: any) => item.node || item).filter((node: any) => node && node.name);
       console.error(`[SuggestNodesHandler] Intent discovery found ${intentBasedSuggestions.length} nodes`);
 
       // Get node chain suggestions using Universal Node Catalog
@@ -281,7 +300,7 @@ export class SuggestNodesHandler extends BaseDiscoveryToolHandler {
               cost: 'medium' as const
             }
           };
-          chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(workflowDescription);
+          chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(description || 'general');
           console.error(`[SuggestNodesHandler] Found ${chainSuggestions.length} workflow chain suggestions`);
         } catch (error) {
           console.error(`[SuggestNodesHandler] Chain suggestions failed:`, error);
@@ -293,12 +312,12 @@ export class SuggestNodesHandler extends BaseDiscoveryToolHandler {
       if (includeOptimalVariants) {
         try {
           for (const node of intentBasedSuggestions.slice(0, maxSuggestions)) {
-            const toolVariant = await dualNodeArchitecture.getToolVariant(node);
+            const toolVariant = await dualNodeArchitecture.getToolVariant(node as NodeTypeInfo);
             if (toolVariant) {
               optimizedSuggestions.push({
                 base: node,
                 optimized: toolVariant,
-                parameterSuggestions: await dualNodeArchitecture.suggestParameterValues(node.name, { intent: description })
+                parameterSuggestions: await dualNodeArchitecture.suggestParameterValues((node as NodeTypeInfo).name, { intent: description })
               });
             }
           }
@@ -337,13 +356,13 @@ export class SuggestNodesHandler extends BaseDiscoveryToolHandler {
 
       const enhancedResponse = {
         // Primary suggestions from intent discovery
-        suggestions: limitedSuggestions.map(node => ({
+        suggestions: limitedSuggestions.map((node: NodeTypeInfo) => ({
           name: node.name,
           displayName: node.displayName,
           description: node.description,
           category: node.category,
           subcategory: node.subcategory,
-          relevantProperties: node.properties?.slice(0, 3).map(prop => ({
+          relevantProperties: node.properties?.slice(0, 3).map((prop: any) => ({
             name: prop.name,
             displayName: prop.displayName,
             type: prop.type,
@@ -407,7 +426,7 @@ export class SuggestNodesHandler extends BaseDiscoveryToolHandler {
 }
 
 /**
- * Handler for validating node configuration with AI optimization analysis
+ * Handler for validating node configuration with comprehensive parameter analysis
  */
 export class ValidateNodeHandler extends BaseDiscoveryToolHandler {
   async execute(args: Record<string, any>): Promise<ToolCallResult> {
@@ -418,9 +437,12 @@ export class ValidateNodeHandler extends BaseDiscoveryToolHandler {
         throw new Error('Missing required parameter: nodeType');
       }
 
-      console.error(`[ValidateNodeHandler] Using Phase 1 Enhanced Discovery for: ${nodeType}`);
+      console.error(`[ValidateNodeHandler] Using comprehensive parameter validation for: ${nodeType}`);
 
-      // Basic validation using legacy system
+      // Comprehensive parameter validation
+      const comprehensiveValidation = await nodeParameterValidator.validateNodeParameters(nodeType, parameters);
+      
+      // Basic validation using legacy system for backward compatibility
       const basicValidation = nodeDiscovery.validateNode(nodeType, parameters);
 
       // Enhanced validation using Dual Architecture
@@ -467,7 +489,25 @@ export class ValidateNodeHandler extends BaseDiscoveryToolHandler {
       }
 
       const enhancedResponse = {
-        // Basic validation results
+        // Comprehensive validation results (PRIMARY)
+        comprehensive: {
+          valid: comprehensiveValidation.valid,
+          score: comprehensiveValidation.score,
+          errors: comprehensiveValidation.errors.map(err => ({
+            parameter: err.parameter,
+            message: err.message,
+            severity: err.severity,
+            suggestion: err.suggestion
+          })),
+          warnings: comprehensiveValidation.warnings.map(warn => ({
+            parameter: warn.parameter,
+            message: warn.message,
+            recommendation: warn.recommendation
+          })),
+          suggestions: comprehensiveValidation.suggestions
+        },
+
+        // Basic validation results (backward compatibility)
         basic: {
           valid: basicValidation.valid,
           errors: basicValidation.errors,
@@ -518,17 +558,19 @@ export class ValidateNodeHandler extends BaseDiscoveryToolHandler {
           nodeType,
           originalParameters: parameters,
           validationTimestamp: new Date().toISOString(),
+          comprehensiveAnalysisPerformed: true,
           enhancedAnalysisPerformed: !!enhancedValidation,
-          aiOptimizationsAvailable: aiParameters.length > 0
+          aiOptimizationsAvailable: aiParameters.length > 0,
+          validationMethod: 'comprehensive-parameter-analysis'
         }
       };
 
-      const isValid = basicValidation.valid && (!enhancedValidation || enhancedValidation.valid);
-      const score = enhancedValidation?.score || (basicValidation.valid ? 85 : 40);
+      const isValid = comprehensiveValidation.valid && basicValidation.valid && (!enhancedValidation || enhancedValidation.valid);
+      const score = comprehensiveValidation.score;
 
       return this.formatSuccess(
         enhancedResponse,
-        `Enhanced validation: ${isValid ? 'Valid' : 'Invalid'} (Score: ${score}/100) - ${aiParameters.length} AI optimizations available`
+        `Comprehensive validation: ${isValid ? 'Valid' : 'Invalid'} (Score: ${score}/100) - ${comprehensiveValidation.errors.length} errors, ${comprehensiveValidation.warnings.length} warnings`
       );
     }, args);
   }
@@ -603,7 +645,7 @@ export class GenerateWorkflowSkeletonHandler extends BaseDiscoveryToolHandler {
             cost: 'medium' as const
           }
         };
-        chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(workflowDescription);
+        chainSuggestions = await universalNodeCatalog.getNodeChainSuggestions(description || 'workflow');
         console.error(`[GenerateWorkflowSkeletonHandler] Found ${chainSuggestions.length} chain suggestions`);
       } catch (error) {
         console.error(`[GenerateWorkflowSkeletonHandler] Chain suggestions failed:`, error);
@@ -738,8 +780,7 @@ export class ValidateWorkflowHandler extends BaseDiscoveryToolHandler {
           nodeCount: workflow.nodes?.length || 0,
           connectionCount: workflow.connections ? Object.keys(workflow.connections).length : 0,
           triggerNodes: workflow.nodes?.filter((node: any) => {
-            const nodeType = nodeDiscovery.getNodeType(node.type);
-            return nodeType?.triggerNode;
+            return node.type?.toLowerCase().includes('trigger');
           }).length || 0
         }
       };

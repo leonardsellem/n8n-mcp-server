@@ -7,7 +7,7 @@
 
 import { BaseDiscoveryToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
 
@@ -158,7 +158,7 @@ export class AdvancedNodeSearchHandler extends BaseDiscoveryToolHandler {
       const allNodes = await universalNodeCatalog.getAllAvailableNodes();
       
       if (criteria.capabilities && criteria.capabilities.length > 0) {
-        return allNodes.filter(node => {
+        return allNodes.filter((node: any) => {
           const nodeCapabilities = this.extractNodeCapabilities(node);
           return criteria.capabilities!.some(cap => 
             nodeCapabilities.some(nodeCap => 
@@ -186,7 +186,7 @@ export class AdvancedNodeSearchHandler extends BaseDiscoveryToolHandler {
         includeAiOptimized: criteria.aiOptimization?.includeAiOptimized !== false
       });
 
-      return searchResult.nodes;
+      return searchResult;
     } catch (error) {
       console.error(`[AdvancedNodeSearchHandler] Semantic search failed:`, error);
       return [];

@@ -335,59 +335,64 @@ export const openaiNodeEnhanced: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'temperature',
-          displayName: 'Temperature',
-          type: 'number',
-          default: 0.7,
+      name: 'temperature',
+      displayName: 'Temperature',
+      type: 'number',
+      required: false,
+      default: 0.7,
           description: 'Creativity level (0.0 = deterministic, 1.0 = very creative)',
           typeOptions: {
             minValue: 0,
             maxValue: 2
-          }
+    }
         },
         {
-          name: 'max_tokens',
-          displayName: 'Max Tokens',
-          type: 'number',
-          default: 1000,
+      name: 'max_tokens',
+      displayName: 'Max Tokens',
+      type: 'number',
+      required: false,
+      default: 1000,
           description: 'Maximum tokens in response (affects cost and response length)',
           typeOptions: {
             minValue: 1,
             maxValue: 4096
-          }
+    }
         },
         {
-          name: 'top_p',
-          displayName: 'Top P',
-          type: 'number',
-          default: 1,
+      name: 'top_p',
+      displayName: 'Top P',
+      type: 'number',
+      required: false,
+      default: 1,
           description: 'Nucleus sampling parameter (alternative to temperature)',
           typeOptions: {
             minValue: 0,
             maxValue: 1
-          }
+    }
         },
         {
-          name: 'frequency_penalty',
-          displayName: 'Frequency Penalty',
-          type: 'number',
-          default: 0,
+      name: 'frequency_penalty',
+      displayName: 'Frequency Penalty',
+      type: 'number',
+      required: false,
+      default: 0,
           description: 'Reduce repetition (0.0 to 2.0)',
           typeOptions: {
             minValue: -2,
             maxValue: 2
-          }
+    }
         },
         {
-          name: 'presence_penalty',
-          displayName: 'Presence Penalty',
-          type: 'number',
-          default: 0,
+      name: 'presence_penalty',
+      displayName: 'Presence Penalty',
+      type: 'number',
+      required: false,
+      default: 0,
           description: 'Encourage new topics (0.0 to 2.0)',
           typeOptions: {
             minValue: -2,
             maxValue: 2
-          }
+    }
         }
       ]
     }

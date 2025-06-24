@@ -142,19 +142,21 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           displayName: 'Parameter',
           values: [
             {
-              name: 'name',
-              displayName: 'Name',
-              type: 'string',
-              default: '',
+      name: 'name',
+      displayName: 'Name',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Parameter name'
-            },
+    },
             {
-              name: 'value',
-              displayName: 'Value',
-              type: 'string',
-              default: '',
+      name: 'value',
+      displayName: 'Value',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Parameter value'
-            }
+    }
           ]
         }
       ]
@@ -189,19 +191,21 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           displayName: 'Header',
           values: [
             {
-              name: 'name',
-              displayName: 'Name',
-              type: 'string',
-              default: '',
+      name: 'name',
+      displayName: 'Name',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Header name'
-            },
+    },
             {
-              name: 'value',
-              displayName: 'Value',
-              type: 'string',
-              default: '',
+      name: 'value',
+      displayName: 'Value',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Header value'
-            }
+    }
           ]
         }
       ]
@@ -308,19 +312,21 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           displayName: 'Parameter',
           values: [
             {
-              name: 'name',
-              displayName: 'Name',
-              type: 'string',
-              default: '',
+      name: 'name',
+      displayName: 'Name',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Parameter name'
-            },
+    },
             {
-              name: 'value',
-              displayName: 'Value',
-              type: 'string',
-              default: '',
+      name: 'value',
+      displayName: 'Value',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Parameter value'
-            }
+    }
           ]
         }
       ]
@@ -331,21 +337,20 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
       type: 'collection',
       required: false,
       placeholder: 'Add Option',
-      default: {},
-      description: 'Additional options',
+      default: {},description: 'Additional options',
       options: [
         {
-          name: 'redirect',
-          displayName: 'Redirect',
-          type: 'options',
-          default: 'follow',
+      name: 'redirect',
+      displayName: 'Redirect',
+      type: 'options',
+      required: false,
           description: 'How to handle redirects',
           options: [
             {
               name: 'Follow Redirect',
               value: 'follow',
               description: 'Follow redirects automatically'
-            },
+    },
             {
               name: 'Reject',
               value: 'error',
@@ -359,17 +364,18 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           ]
         },
         {
-          name: 'response',
-          displayName: 'Response',
-          type: 'options',
-          default: 'autodetect',
+      name: 'response',
+      displayName: 'Response',
+      type: 'options',
+      required: false,
+      default: 'autodetect',
           description: 'How to handle the response',
           options: [
             {
               name: 'Autodetect',
               value: 'autodetect',
               description: 'Autodetect response format'
-            },
+    },
             {
               name: 'File',
               value: 'file',
@@ -388,17 +394,18 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           ]
         },
         {
-          name: 'responseFormat',
-          displayName: 'Response Format',
-          type: 'options',
-          default: 'autodetect',
+      name: 'responseFormat',
+      displayName: 'Response Format',
+      type: 'options',
+      required: false,
+      default: 'autodetect',
           description: 'Format for the response data',
           options: [
             {
               name: 'Autodetect',
               value: 'autodetect',
               description: 'Autodetect response format'
-            },
+    },
             {
               name: 'JSON',
               value: 'json',
@@ -412,34 +419,37 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           ]
         },
         {
-          name: 'timeout',
-          displayName: 'Timeout',
-          type: 'number',
-          default: 10000,
+      name: 'timeout',
+      displayName: 'Timeout',
+      type: 'number',
+      required: false,
+      default: 10000,
           description: 'Time in ms to wait for the request before timing out',
           typeOptions: {
             minValue: 1
-          }
+    }
         },
         {
-          name: 'allowUnauthorizedCerts',
-          displayName: 'Allow Unauthorized Certificates',
-          type: 'boolean',
-          default: false,
+      name: 'allowUnauthorizedCerts',
+      displayName: 'Allow Unauthorized Certificates',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Allow requests to servers with invalid or unauthorized certificates'
-        },
+    },
         {
-          name: 'queryParameterArrays',
-          displayName: 'Query Parameter Arrays',
-          type: 'options',
-          default: 'indices',
+      name: 'queryParameterArrays',
+      displayName: 'Query Parameter Arrays',
+      type: 'options',
+      required: false,
+      default: 'indices',
           description: 'How to send arrays in query parameters',
           options: [
             {
               name: 'As Separate Values',
               value: 'repeat',
               description: 'Send arrays as separate values (key=value1&key=value2)'
-            },
+    },
             {
               name: 'With Brackets',
               value: 'brackets',
@@ -453,40 +463,45 @@ export const httpRequestNodeComplete: NodeTypeInfo = {
           ]
         },
         {
-          name: 'fullResponse',
-          displayName: 'Full Response',
-          type: 'boolean',
-          default: false,
+      name: 'fullResponse',
+      displayName: 'Full Response',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Include response status code, headers, etc.'
-        },
+    },
         {
-          name: 'neverError',
-          displayName: 'Never Error',
-          type: 'boolean',
-          default: false,
+      name: 'neverError',
+      displayName: 'Never Error',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Never return an error, even if the response status indicates an error'
-        },
+    },
         {
-          name: 'splitIntoItems',
-          displayName: 'Split Into Items',
-          type: 'boolean',
-          default: false,
+      name: 'splitIntoItems',
+      displayName: 'Split Into Items',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Split response array into separate items'
-        },
+    },
         {
-          name: 'binaryPropertyName',
-          displayName: 'Binary Property Name',
-          type: 'string',
-          default: 'data',
+      name: 'binaryPropertyName',
+      displayName: 'Binary Property Name',
+      type: 'string',
+      required: false,
+      default: 'data',
           description: 'Name of the binary property to store the file in'
-        },
+    },
         {
-          name: 'useQuerystring',
-          displayName: 'Use Querystring',
-          type: 'boolean',
-          default: false,
+      name: 'useQuerystring',
+      displayName: 'Use Querystring',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Use the legacy querystring module instead of URLSearchParams'
-        }
+    }
       ]
     }
   ],

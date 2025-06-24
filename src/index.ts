@@ -9,6 +9,7 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { loadEnvironmentVariables } from './config/environment.js';
 import { configureServer } from './config/server.js';
+import { performanceMonitor } from './monitoring/performance-monitor.js';
 
 // Load environment variables
 loadEnvironmentVariables();
@@ -19,6 +20,9 @@ loadEnvironmentVariables();
 async function main() {
   try {
     console.error('Starting n8n MCP Server...');
+    
+    // Initialize performance monitoring
+    const startupTimer = performanceMonitor.createTimer('server-startup');
 
     // Create and configure the MCP server
     const server = await configureServer();
@@ -37,8 +41,17 @@ async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
 
+    // Mark startup as complete
+    startupTimer();
+    performanceMonitor.markStartupComplete();
+
     console.error('n8n MCP Server running on stdio');
     console.error('[DEBUG] Main function try block finished.');
+    
+    // Log initial performance report
+    setTimeout(() => {
+      console.error(performanceMonitor.getFormattedReport());
+    }, 2000);
   } catch (error) {
     console.error('[DEBUG] Main function catch block entered.');
     console.error('Failed to start n8n MCP Server:', error);

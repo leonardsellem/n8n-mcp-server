@@ -11,7 +11,22 @@
       "Bash(git check-ignore:*)",
       "Bash(rm:*)",
       "Bash(npm run build:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test)",
+      "Bash(timeout 10s npm start)",
+      "Bash(npm run:*)",
+      "Bash(pkill:*)",
+      "Bash(timeout 15s npm start)",
+      "Bash(npm start:*)",
+      "Bash(curl:*)",
+      "Bash(timeout:*)",
+      "Bash(true)",
+      "Bash(taskkill:*)",
+      "Bash(killall:*)",
+      "Bash(npx:*)",
+      "Bash(npm search:*)"
     ],
     "deny": []
   }

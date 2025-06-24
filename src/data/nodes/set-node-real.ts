@@ -54,10 +54,12 @@ export const setNode: NodeTypeInfo = {
           displayName: 'Assignment',
           values: [
             {
-              name: 'id',
-              displayName: 'ID',
-              type: 'string',
-              default: '={{$randomString(8)}}',
+      name: 'id',
+
+      displayName: 'ID',
+      type: 'string',
+      required: false,
+      default: '={{$randomString(8)}}',
               description: 'Unique ID for this assignment'
             },
             {
@@ -202,30 +204,34 @@ return inputData.map(item => ({
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional options',
+      default: {},description: 'Additional options',
       options: [
         {
-          name: 'dotNotation',
-          displayName: 'Dot Notation',
-          type: 'boolean',
-          default: true,
+      name: 'dotNotation',
+
+      displayName: 'Dot Notation',
+      type: 'boolean',
+      required: false,
           description: 'Use dot notation for nested fields (e.g., user.name)'
-        },
+    },
         {
-          name: 'ignoreConversionErrors',
-          displayName: 'Ignore Conversion Errors',
-          type: 'boolean',
-          default: false,
+      name: 'ignoreConversionErrors',
+
+      displayName: 'Ignore Conversion Errors',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Continue processing even if value conversion fails'
-        },
+    },
         {
-          name: 'outputKey',
-          displayName: 'Output Key',
-          type: 'string',
-          default: '',
+      name: 'outputKey',
+
+      displayName: 'Output Key',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Key to wrap the output data in (leave empty for no wrapping)'
-        }
+    }
       ]
     }
   ],

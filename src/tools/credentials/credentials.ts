@@ -127,21 +127,16 @@ export class TestCredentialHandler extends BaseCredentialsToolHandler {
       
       const { type, data, nodeType } = args;
 
-      const testData = {
-        type,
-        data,
-        nodeType: nodeType || undefined
-      };
-
-      const result = await this.apiClient.testCredential(testData);
+      const result = await this.apiClient.testCredential(type, data);
 
       return this.formatSuccess(
         {
-          success: result.success || true,
+          success: result.status === 'success',
           message: result.message || 'Credential test completed',
-          nodeType
+          nodeType,
+          status: result.status
         },
-        result.success !== false ? 'Credential test passed' : 'Credential test failed'
+        result.status === 'success' ? 'Credential test passed' : 'Credential test failed'
       );
     }, args);
   }

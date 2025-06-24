@@ -91,36 +91,38 @@ export const mergeNode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional merge options',
+      default: {},description: 'Additional merge options',
       options: [
         {
-          name: 'clashHandling',
-          displayName: 'Property Name Clash',
-          type: 'options',
-          default: 'input1',
+      name: 'clashHandling',
+      displayName: 'Property Name Clash',
+      type: 'options',
+      required: false,
           description: 'How to handle properties with the same name',
           options: [
-            { name: 'Prefer Input 1', value: 'input1' },
+            { name: 'Prefer Input 1', value: 'input1'
+    },
             { name: 'Prefer Input 2', value: 'input2' },
             { name: 'Prefix Input 1', value: 'prefixInput1' },
             { name: 'Prefix Input 2', value: 'prefixInput2' }
           ]
         },
         {
-          name: 'includeUnmatched',
-          displayName: 'Include Unmatched',
-          type: 'boolean',
-          default: false,
+      name: 'includeUnmatched',
+      displayName: 'Include Unmatched',
+      type: 'boolean',
+      required: false,
+      default: false,
           description: 'Include items without matches (only for merge by key)'
-        },
+    },
         {
-          name: 'waitTimeoutMs',
-          displayName: 'Wait Timeout (ms)',
-          type: 'number',
-          default: 3000,
+      name: 'waitTimeoutMs',
+      displayName: 'Wait Timeout (ms)',
+      type: 'number',
+      required: false,
+      default: 3000,
           description: 'Maximum time to wait for data (wait mode only)'
-        }
+    }
       ]
     }
   ],

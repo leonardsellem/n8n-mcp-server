@@ -147,65 +147,72 @@ export const gmailNode: NodeTypeInfo = {
       },
       options: [
         {
-          name: 'ccEmails',
-          displayName: 'CC',
-          type: 'string',
-          default: '',
+      name: 'ccEmails',
+      displayName: 'CC',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Email addresses for CC'
-        },
+    },
         {
-          name: 'bccEmails',
-          displayName: 'BCC',
-          type: 'string',
-          default: '',
+      name: 'bccEmails',
+      displayName: 'BCC',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Email addresses for BCC'
-        },
+    },
         {
-          name: 'threadId',
-          displayName: 'Thread ID',
-          type: 'string',
-          default: '',
+      name: 'threadId',
+      displayName: 'Thread ID',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'ID of the thread for reply'
-        },
+    },
         {
-          name: 'inReplyTo',
-          displayName: 'In Reply To',
-          type: 'string',
-          default: '',
+      name: 'inReplyTo',
+      displayName: 'In Reply To',
+      type: 'string',
+      required: false,
+      default: '',
           description: 'Message ID this is replying to'
-        },
+    },
         {
-          name: 'attachments',
-          displayName: 'Attachments',
-          type: 'fixedCollection',
-          default: {},
-          description: 'Email attachments',
+      name: 'attachments',
+      displayName: 'Attachments',
+      type: 'fixedCollection',
+      required: false,
+      default: {
+    },description: 'Email attachments',
           options: [
             {
               name: 'attachment',
               displayName: 'Attachment',
               values: [
                 {
-                  name: 'filename',
-                  displayName: 'Filename',
-                  type: 'string',
-                  default: '',
+      name: 'filename',
+      displayName: 'Filename',
+      type: 'string',
+      required: false,
                   description: 'Name of the file'
-                },
+    },
                 {
-                  name: 'data',
-                  displayName: 'Data',
-                  type: 'string',
-                  default: '',
+      name: 'data',
+      displayName: 'Data',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'Base64 encoded file data or binary data reference'
-                },
+    },
                 {
-                  name: 'type',
-                  displayName: 'MIME Type',
-                  type: 'string',
-                  default: '',
+      name: 'type',
+      displayName: 'MIME Type',
+      type: 'string',
+      required: false,
+      default: '',
                   description: 'MIME type of the file'
-                }
+    }
               ]
             }
           ]

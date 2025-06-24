@@ -28,99 +28,106 @@ export const langchainOpenAINode: NodeTypeInfo = {
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Additional model configuration options',
+      default: {},description: 'Additional model configuration options',
       options: [
         {
-          name: 'temperature',
-          displayName: 'Temperature',
-          type: 'number',
-          default: 0.7,
+      name: 'temperature',
+      displayName: 'Temperature',
+      type: 'number',
+      required: false,
           description: 'Controls randomness. Lower = more focused, Higher = more creative',
           typeOptions: {
             minValue: 0,
             maxValue: 2,
             numberPrecision: 2
-          }
+    }
         },
         {
-          name: 'maxTokens',
-          displayName: 'Max Tokens',
-          type: 'number',
-          default: 1000,
+      name: 'maxTokens',
+      displayName: 'Max Tokens',
+      type: 'number',
+      required: false,
+      default: 1000,
           description: 'Maximum number of tokens to generate',
           typeOptions: {
             minValue: 1,
             maxValue: 4096
-          }
+    }
         },
         {
-          name: 'topP',
-          displayName: 'Top P',
-          type: 'number',
-          default: 1,
+      name: 'topP',
+      displayName: 'Top P',
+      type: 'number',
+      required: false,
+      default: 1,
           description: 'Nucleus sampling parameter',
           typeOptions: {
             minValue: 0,
             maxValue: 1,
             numberPrecision: 2
-          }
+    }
         },
         {
-          name: 'frequencyPenalty',
-          displayName: 'Frequency Penalty',
-          type: 'number',
-          default: 0,
+      name: 'frequencyPenalty',
+      displayName: 'Frequency Penalty',
+      type: 'number',
+      required: false,
+      default: 0,
           description: 'Penalty for frequent tokens',
           typeOptions: {
             minValue: -2,
             maxValue: 2,
             numberPrecision: 2
-          }
+    }
         },
         {
-          name: 'presencePenalty',
-          displayName: 'Presence Penalty',
-          type: 'number',
-          default: 0,
+      name: 'presencePenalty',
+      displayName: 'Presence Penalty',
+      type: 'number',
+      required: false,
+      default: 0,
           description: 'Penalty for tokens that have appeared',
           typeOptions: {
             minValue: -2,
             maxValue: 2,
             numberPrecision: 2
-          }
+    }
         },
         {
-          name: 'responseFormat',
-          displayName: 'Response Format',
-          type: 'options',
-          default: 'text',
+      name: 'responseFormat',
+      displayName: 'Response Format',
+      type: 'options',
+      required: false,
+      default: 'text',
           description: 'Format of the response',
           options: [
-            { name: 'Text', value: 'text', description: 'Standard text response' },
+            { name: 'Text', value: 'text', description: 'Standard text response'
+    },
             { name: 'JSON Object', value: 'json_object', description: 'Structured JSON response' }
           ]
         },
         {
-          name: 'seed',
-          displayName: 'Seed',
-          type: 'number',
-          default: '',
+      name: 'seed',
+      displayName: 'Seed',
+      type: 'number',
+      required: false,
+      default: '',
           description: 'Seed for deterministic outputs (optional)',
           typeOptions: {
             minValue: 0
-          }
+    }
         },
         {
-          name: 'timeout',
-          displayName: 'Timeout (ms)',
-          type: 'number',
-          default: 60000,
+      name: 'timeout',
+      displayName: 'Timeout (ms)',
+      type: 'number',
+      required: false,
+      default: 60000,
           description: 'Request timeout in milliseconds',
           typeOptions: {
             minValue: 1000,
             maxValue: 300000
-          }
+    }
         }
       ]
     }

@@ -10,8 +10,9 @@ import {
   ALL_COMPLETE_NODES,
   searchNodes,
   getNodesByCategory,
-  completeN8NCatalog
-} from '../../data/final-complete-catalog.js';
+  getNodeCategories,
+  getNodeStatistics
+} from '../../discovery/enhanced-discovery.js';
 
 interface EnhancedBrowseArgs {
   category?: string;
@@ -65,12 +66,11 @@ export class EnhancedBrowseIntegrationsHandler extends IntegrationBaseHandler {
       } = args;
 
       // Start with all nodes
-      let nodes = [...ALL_MASSIVE_NODES];
+      let nodes = [...ALL_COMPLETE_NODES];
 
       // Apply category filter
       if (category) {
-        const categoriesMap = getNodesByCategory();
-        nodes = categoriesMap.get(category) || [];
+        nodes = getNodesByCategory(category);
       }
 
       // Apply search filter
@@ -144,7 +144,9 @@ export class EnhancedBrowseIntegrationsHandler extends IntegrationBaseHandler {
         inputCount: node.inputs.length,
         outputCount: node.outputs.length,
         propertyCount: node.properties.length,
-        credentials: node.credentials,
+        credentials: Array.isArray(node.credentials) 
+          ? node.credentials.map(c => typeof c === 'string' ? c : c.name)
+          : undefined,
         examples: includeDetails ? node.examples : undefined
       }));
 
@@ -166,7 +168,7 @@ export class EnhancedBrowseIntegrationsHandler extends IntegrationBaseHandler {
           filterBy
         },
         statistics: {
-          totalInRegistry: MASSIVE_REGISTRY_STATS.total,
+          totalInRegistry: ALL_COMPLETE_NODES.length,
           filteredCount: total,
           byCategory: this.getCategoryBreakdown(paginatedNodes),
           byType: {
@@ -176,12 +178,12 @@ export class EnhancedBrowseIntegrationsHandler extends IntegrationBaseHandler {
             withWebhooks: paginatedNodes.filter(n => n.webhookSupport).length
           }
         },
-        availableCategories: Array.from(getNodesByCategory().keys()),
+        availableCategories: getNodeCategories(),
         registryInfo: {
           version: '1.0.0',
           lastUpdated: new Date().toISOString(),
-          totalNodes: completeN8NCatalog.getStats().totalNodes,
-          coverage: completeN8NCatalog.getStats().nodesByCategory
+          totalNodes: getNodeStatistics().totalNodes,
+          coverage: getNodeStatistics().categoryList
         }
       };
 

@@ -63,26 +63,26 @@ export const postbinNode: NodeTypeInfo = {
       displayName: 'Headers',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Headers to send with the request',
+      default: {},description: 'Headers to send with the request',
       options: [
         {
           name: 'headerItem',
           values: [
             {
-              name: 'name',
-              displayName: 'Name',
-              type: 'string',
-              default: '',
+      name: 'name',
+      displayName: 'Name',
+      type: 'string',
+      required: false,
               description: 'Header name'
-            },
+    },
             {
-              name: 'value',
-              displayName: 'Value',
-              type: 'string',
-              default: '',
+      name: 'value',
+      displayName: 'Value',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Header value'
-            }
+    }
           ]
         }
       ]
@@ -114,26 +114,26 @@ export const postbinNode: NodeTypeInfo = {
       displayName: 'Query Parameters',
       type: 'collection',
       required: false,
-      default: {},
-      description: 'Query parameters to add to the request URL',
+      default: {},description: 'Query parameters to add to the request URL',
       options: [
         {
           name: 'parameterItem',
           values: [
             {
-              name: 'name',
-              displayName: 'Name',
-              type: 'string',
-              default: '',
+      name: 'name',
+      displayName: 'Name',
+      type: 'string',
+      required: false,
               description: 'Parameter name'
-            },
+    },
             {
-              name: 'value',
-              displayName: 'Value',
-              type: 'string',
-              default: '',
+      name: 'value',
+      displayName: 'Value',
+      type: 'string',
+      required: false,
+      default: '',
               description: 'Parameter value'
-            }
+    }
           ]
         }
       ]

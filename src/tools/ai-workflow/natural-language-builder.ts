@@ -88,7 +88,7 @@ const WORKFLOW_PATTERNS = [
 /**
  * Node type mappings for natural language terms
  */
-const NL_NODE_MAPPING = {
+const NL_NODE_MAPPING: { [key: string]: string } = {
   // Triggers
   'manual': 'n8n-nodes-base.manualTrigger',
   'schedule': 'n8n-nodes-base.scheduleTrigger',

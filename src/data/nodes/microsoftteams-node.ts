@@ -6,7 +6,7 @@ export const microsoftTeamsNodeData = {
   description: 'Interact with Microsoft Teams to automate channel management, messaging, and task operations',
   defaults: {
     name: 'Microsoft Teams',
-    color: '#5A5AC4',
+    color: '#5A5AC4'
   },
   
   // Core node information

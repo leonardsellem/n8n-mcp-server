@@ -7,7 +7,7 @@
 
 import { NodeTypeInfo } from '../data/node-types.js';
 import { ToolNodeInfo } from './dual-architecture.js';
-import { universalNodeCatalog } from './live-node-catalog.js';
+import { universalNodeCatalog } from './index.js';
 import { dualNodeArchitecture } from './dual-architecture.js';
 
 /**
@@ -1418,7 +1418,7 @@ export class DynamicNodeDiscoveryService implements DynamicNodeDiscovery {
     const allNodes = await universalNodeCatalog.getAllAvailableNodes();
     
     // Find nodes in same category or with similar functionality
-    const candidates = allNodes.filter(node => 
+    const candidates = allNodes.filter((node: any) => 
       node.name !== currentNode.name &&
       (node.category === currentNode.category ||
        this.calculateSimilarity(node.description, currentNode.description) > 0.6)
@@ -1553,7 +1553,7 @@ export class DynamicNodeDiscoveryService implements DynamicNodeDiscovery {
     for (const category of categories) {
       const nodes = await universalNodeCatalog.discoverByCategory(category);
       statuses.push({
-        category,
+        category: category as string,
         totalNodes: nodes.length,
         activeNodes: nodes.length, // Assume all active for now
         healthScore: 0.95,

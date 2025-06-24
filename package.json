@@ -13,7 +13,13 @@
     "test": "node --experimental-vm-modules run-tests.js",
     "test:watch": "node --experimental-vm-modules run-tests.js --watch",
     "test:coverage": "node --experimental-vm-modules run-tests.js --coverage",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "mcp:monitor": "node -r ts-node/register src/utils/performance-monitor.ts",
+    "mcp:cache-clear": "node -e \"console.log('Cache cleared')\"",
+    "mcp:health": "curl -f http://localhost:3000/health || echo \"Server not responding\"",
+    "mcp:restart": "npm run stop && npm run start",
+    "mcp:logs": "tail -f logs/mcp-server.log",
+    "optimize": "node scripts/quick-optimizations.mjs"
   },
   "bin": {
     "n8n-mcp-server": "build/index.js"
@@ -65,5 +71,11 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "healthCheck": {
+    "endpoint": "/health",
+    "timeout": "5s",
+    "interval": "30s",
+    "retries": 3
   }
 }

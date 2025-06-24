@@ -7,7 +7,7 @@
 
 import { BaseDiscoveryToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
-import { universalNodeCatalog } from '../../discovery/live-node-catalog.js';
+import { universalNodeCatalog } from '../../discovery/index.js';
 import { dualNodeArchitecture } from '../../discovery/dual-architecture.js';
 import { dynamicNodeDiscovery } from '../../discovery/dynamic-discovery.js';
 
@@ -188,7 +188,7 @@ export class NodeCompatibilityAnalyzer extends BaseDiscoveryToolHandler {
       }
 
       const allNodes = await universalNodeCatalog.getAllAvailableNodes();
-      return allNodes.find(node => 
+      return allNodes.find((node: any) => 
         node.name === nodeIdentifier || 
         node.displayName === nodeIdentifier
       );
