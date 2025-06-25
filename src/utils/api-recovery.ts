@@ -252,7 +252,7 @@ export class ApiRecoveryManager {
       name: 'basic-node-types',
       priority: 1,
       enabled: true,
-      execute: async (context) => {
+      execute: async (_context) => {
         // Return basic node types that should always be available
         return [
           {
@@ -285,7 +285,7 @@ export class ApiRecoveryManager {
       name: 'empty-credentials-list',
       priority: 1,
       enabled: true,
-      execute: async (context) => {
+      execute: async (_context) => {
         console.warn('[ApiRecovery] Returning empty credentials list - credential management unavailable');
         return [];
       }
@@ -295,7 +295,7 @@ export class ApiRecoveryManager {
       name: 'basic-credential-types',
       priority: 1,
       enabled: true,
-      execute: async (context) => {
+      execute: async (_context) => {
         return [
           {
             name: 'httpBasicAuth',
@@ -318,7 +318,7 @@ export class ApiRecoveryManager {
       name: 'empty-executions-list',
       priority: 1,
       enabled: true,
-      execute: async (context) => {
+      execute: async (_context) => {
         return [];
       }
     });

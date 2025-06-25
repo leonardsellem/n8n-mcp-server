@@ -366,7 +366,7 @@ export class AIExpressionHelper {
   /**
    * Generate expressions for common API scenarios
    */
-  static generateAPIExpression(scenario: string, context: Record<string, any> = {}): string {
+  static generateAPIExpression(scenario: string, _context: Record<string, any> = {}): string {
     switch (scenario) {
       case 'authorization_header':
         return `={{"Bearer " + $json.access_token}}`;
@@ -413,8 +413,8 @@ export const COMMON_EXPRESSIONS = {
   
   // Common transformations
   EMAIL_TO_LOWERCASE: '={{$json.email.toLowerCase()}}',
-  NAME_TITLE_CASE: '={{$json.name.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}}',
-  PHONE_DIGITS_ONLY: '={{$json.phone.replace(/\D/g, "")}}',
+  NAME_TITLE_CASE: '={{$json.name.replace(/\\w\\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())}}',
+  PHONE_DIGITS_ONLY: '={{$json.phone.replace(/\\D/g, "")}}',
   
   // Error handling
   SAFE_STRING: '={{$json.value ? $json.value.toString() : ""}}',

@@ -22,7 +22,7 @@ export class MCPConnectionPool {
     });
   }
   
-  static releaseConnection(poolName: string, connectionId: string) {
+  static releaseConnection(poolName: string, _connectionId: string) {
     const pool = this.pools.get(poolName);
     if (pool) {
       pool.active--;

@@ -626,7 +626,7 @@ export function searchVerifiedNodes(query: string): NodeTypeInfo[] {
  * Verify if a node exists in the verified registry
  */
 export function isNodeVerified(nodeName: string): boolean {
-  return verifiedNodesByName.hasOwnProperty(nodeName);
+  return Object.prototype.hasOwnProperty.call(verifiedNodesByName, nodeName);
 }
 
 /**

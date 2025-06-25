@@ -19,7 +19,13 @@
     "mcp:health": "curl -f http://localhost:3000/health || echo \"Server not responding\"",
     "mcp:restart": "npm run stop && npm run start",
     "mcp:logs": "tail -f logs/mcp-server.log",
-    "optimize": "node scripts/quick-optimizations.mjs"
+    "optimize": "node scripts/quick-optimizations.mjs",
+    "docker:build": "docker build -t n8n-mcp-server .",
+    "docker:run": "docker run --rm -it -p 3000:3000 n8n-mcp-server",
+    "docker:dev": "docker-compose up --build",
+    "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
+    "docker:logs": "docker-compose logs -f n8n-mcp-server",
+    "docker:health": "docker-compose exec n8n-mcp-server node build/utils/health-check.js"
   },
   "bin": {
     "n8n-mcp-server": "build/index.js"
@@ -50,17 +56,22 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.7.0",
     "axios": "^1.6.2",
+    "compression": "^1.7.4",
     "dotenv": "^16.3.1",
-    "find-config": "^1.0.0"
+    "find-config": "^1.0.0",
+    "winston": "^3.11.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.26.0",
+    "@types/compression": "^1.7.5",
     "@types/find-config": "^1.0.4",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.10.0",
+    "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
     "babel-jest": "^29.7.0",
@@ -70,7 +81,7 @@
     "typescript": "^5.3.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "healthCheck": {
     "endpoint": "/health",

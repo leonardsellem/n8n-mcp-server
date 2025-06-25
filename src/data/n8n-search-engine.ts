@@ -237,7 +237,7 @@ export class N8NSearchEngine {
   /**
    * Get all nodes sorted by category and popularity
    */
-  private getAllNodesSorted(filters: SearchFilters): SearchResult[] {
+  private getAllNodesSorted(_filters: SearchFilters): SearchResult[] {
     const results: SearchResult[] = [];
 
     this.nodes.forEach(node => {
@@ -260,7 +260,7 @@ export class N8NSearchEngine {
   /**
    * Perform text-based search with scoring
    */
-  private performTextSearch(query: string, filters: SearchFilters): SearchResult[] {
+  private performTextSearch(query: string, _filters: SearchFilters): SearchResult[] {
     const results: SearchResult[] = [];
     const searchTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 0);
 

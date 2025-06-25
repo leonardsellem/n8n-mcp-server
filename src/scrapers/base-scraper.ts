@@ -241,7 +241,7 @@ export abstract class BaseScraper {
     try {
       // Handle basic tag selectors
       if (selector.match(/^[a-zA-Z]+$/)) {
-        const tagRegex = new RegExp(`<${selector}[^>]*>(.*?)<\/${selector}>`, 'gis');
+        const tagRegex = new RegExp(`<${selector}[^>]*>(.*?)</${selector}>`, 'gis');
         const matches = html.match(tagRegex);
         if (matches) {
           matches.forEach(match => {
@@ -254,7 +254,7 @@ export abstract class BaseScraper {
       // Handle class selectors
       else if (selector.startsWith('.')) {
         const className = selector.substring(1);
-        const classRegex = new RegExp(`class="[^"]*${className}[^"]*"[^>]*>(.*?)<\/`, 'gis');
+        const classRegex = new RegExp(`class="[^"]*${className}[^"]*"[^>]*>(.*?)</`, 'gis');
         const matches = html.match(classRegex);
         if (matches) {
           matches.forEach(match => {
@@ -267,7 +267,7 @@ export abstract class BaseScraper {
       // Handle ID selectors
       else if (selector.startsWith('#')) {
         const id = selector.substring(1);
-        const idRegex = new RegExp(`id="${id}"[^>]*>(.*?)<\/`, 'gis');
+        const idRegex = new RegExp(`id="${id}"[^>]*>(.*?)</`, 'gis');
         const matches = html.match(idRegex);
         if (matches) {
           matches.forEach(match => {

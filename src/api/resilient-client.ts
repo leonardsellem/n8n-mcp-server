@@ -5,10 +5,10 @@
  * connection pooling, and graceful degradation for external API integrations.
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { EnhancedN8nApiClient } from './enhanced-client.js';
 import { EnvConfig } from '../config/environment.js';
-import { handleAxiosError, N8nApiError } from '../errors/index.js';
+import { handleAxiosError } from '../errors/index.js';
 
 export interface RetryConfig {
   maxRetries: number;
@@ -135,7 +135,7 @@ class EnhancedConnectionPool {
     });
   }
 
-  releaseConnection(endpoint: string, connectionId: string): void {
+  releaseConnection(endpoint: string, _connectionId: string): void {
     const current = this.activeConnections.get(endpoint) || 0;
     this.activeConnections.set(endpoint, Math.max(0, current - 1));
     

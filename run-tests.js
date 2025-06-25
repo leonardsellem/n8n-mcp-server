@@ -5,9 +5,9 @@
  * ESM support and error handling.
  */
 
-import { spawn } from 'child_process';
+import { exec } from 'child_process';
 import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
+import { dirname } from 'path';
 
 // Get the directory of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -22,12 +22,17 @@ console.log('🧪 Running tests for n8n MCP Server...');
 const args = process.argv.slice(2);
 const jestArgs = ['--config', './jest.config.cjs', ...args];
 
-// Spawn Jest process
-const jestProcess = spawn('node_modules/.bin/jest', jestArgs, {
-  stdio: 'inherit',
+// Use npx to run Jest which handles cross-platform execution better
+const command = `npx jest ${jestArgs.join(' ')}`;
+
+// Execute Jest
+const jestProcess = exec(command, {
   cwd: __dirname,
   env: { ...process.env, NODE_ENV: 'test' }
 });
+
+jestProcess.stdout.pipe(process.stdout);
+jestProcess.stderr.pipe(process.stderr);
 
 // Handle process events
 jestProcess.on('error', (error) => {

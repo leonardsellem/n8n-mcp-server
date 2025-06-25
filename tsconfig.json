@@ -5,6 +5,7 @@
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "strict": true,
+    "isolatedModules": true,
     "outDir": "build",
     "declaration": true,
     "sourceMap": true,

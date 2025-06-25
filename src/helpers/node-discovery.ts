@@ -3,14 +3,14 @@
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { getAllAvailableNodes, searchNodes, getNodesByCategory } from '../discovery/enhanced-discovery.js';
+import { allNodes, searchNodes, getNodesByCategory } from '../data/index.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 
 export class NodeDiscoveryService {
   private nodeCache = new Map<string, NodeTypeInfo>();
   private allNodesCache: NodeTypeInfo[] | null = null;
 
-  constructor(apiClient?: any) {
+  constructor(_apiClient?: any) {
     console.log('[NodeDiscovery] Initializing with enhanced discovery and performance monitoring');
     
     // Initialize performance monitoring
@@ -27,11 +27,11 @@ export class NodeDiscoveryService {
       performanceMonitor.recordCacheMiss();
       const timer = performanceMonitor.createTimer('load-all-nodes');
       
-      const nodes = await getAllAvailableNodes();
+      const nodes = allNodes;
       this.allNodesCache = nodes;
       
       // Update cache
-      nodes.forEach(node => {
+      nodes.forEach((node: NodeTypeInfo) => {
         this.nodeCache.set(node.name, node);
       });
       
@@ -66,14 +66,11 @@ export class NodeDiscoveryService {
     }, `getNodeByName-${name}`);
   }
 
-  async searchNodes(query: string, options: any = {}): Promise<NodeTypeInfo[]> {
+  async searchNodes(query: string, _options: any = {}): Promise<NodeTypeInfo[]> {
     return performanceMonitor.wrapRequest(async () => {
       const timer = performanceMonitor.createTimer(`search-${query}`);
       
-      const results = await searchNodes(query, {
-        limit: options.limit || 50,
-        categories: options.categories
-      });
+      const results = searchNodes(query);
       
       timer();
       console.log(`[NodeDiscovery] Search '${query}' found ${results.length} results`);
@@ -144,7 +141,7 @@ export class NodeDiscoveryService {
   /**
    * Validate a node configuration
    */
-  validateNode(nodeConfig: any, context?: any): any {
+  validateNode(nodeConfig: any, _context?: any): any {
     const errors: string[] = [];
     const warnings: string[] = [];
     const suggestions: string[] = [];
@@ -223,7 +220,7 @@ export class NodeDiscoveryService {
 export const nodeDiscovery = new NodeDiscoveryService();
 
 // Initialize function for server setup
-export function initializeNodeDiscovery(apiClient?: any): void {
+export function initializeNodeDiscovery(_apiClient?: any): void {
   console.log('[NodeDiscovery] Enhanced discovery system initialized with performance monitoring');
   
   // Preload popular nodes for better performance

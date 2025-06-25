@@ -381,7 +381,7 @@ export class WorkflowBuilder {
   /**
    * Calculate proper node positioning with good spacing
    */
-  static calculateNodePosition(nodeIndex: number, totalNodes: number): [number, number] {
+  static calculateNodePosition(nodeIndex: number, _totalNodes: number): [number, number] {
     const SPACING_X = 400;
     const SPACING_Y = 200;
     const NODES_PER_ROW = 3;
@@ -420,7 +420,6 @@ export class WorkflowBuilder {
 
       // Create connections (linear chain for now)
       if (index > 0 && !nodeInfo.triggerNode) {
-        const previousNodeId = `node_${index - 1}`;
         if (!connections[nodes[index - 1].name]) {
           connections[nodes[index - 1].name] = {};
         }
@@ -454,7 +453,7 @@ export class WorkflowBuilder {
   static createWorkflowFromPattern(
     name: string,
     nodeNames: string[],
-    description?: string
+    _description?: string
   ): N8nWorkflow {
     // This will be enhanced with the node catalog
     const nodes: N8nNode[] = [];

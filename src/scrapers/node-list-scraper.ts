@@ -6,7 +6,7 @@
  */
 
 import { BaseScraper } from './base-scraper.js';
-import { NodeReference, RawNodeData } from './interfaces.js';
+import { NodeReference } from './interfaces.js';
 import { NODE_CATEGORIES } from './config.js';
 
 /**
@@ -207,7 +207,7 @@ export class NodeListScraper extends BaseScraper {
   private cleanText(text: string): string {
     return text
       .replace(/\s+/g, ' ')
-      .replace(/[^\w\s\-\.]/g, '')
+      .replace(/[^\w\s\-.]/g, '')
       .trim();
   }
 

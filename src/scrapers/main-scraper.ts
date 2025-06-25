@@ -12,8 +12,6 @@ import { NodeTypeInfo } from '../data/node-types.js';
 import { 
   NodeReference, 
   RawNodeData, 
-  TransformationResult, 
-  BatchResult,
   ScraperStats 
 } from './interfaces.js';
 import { PERFORMANCE_CONFIG } from './config.js';
@@ -124,7 +122,6 @@ export class MainScraper {
    * Discover all available nodes
    */
   private async discoverNodes(): Promise<NodeReference[]> {
-    const progress = this.nodeListScraper.getProgress();
     console.log(`Starting node discovery...`);
     
     const nodeRefs = await this.nodeListScraper.scrape();

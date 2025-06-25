@@ -10,7 +10,7 @@
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { getAllAvailableNodes } from '../discovery/enhanced-discovery.js';
+import { allNodes } from '../data/index.js';
 
 export interface ValidationResult {
   valid: boolean;
@@ -64,8 +64,7 @@ export class NodeParameterValidator {
 
   private async initializeNodeDefinitions(): Promise<void> {
     try {
-      const allNodes = await getAllAvailableNodes();
-      allNodes.forEach(node => {
+      allNodes.forEach((node: NodeTypeInfo) => {
         this.nodeDefinitions.set(node.name, node);
       });
       console.log(`[NodeParameterValidator] Loaded ${allNodes.length} node definitions for validation`);
@@ -139,36 +138,36 @@ export class NodeParameterValidator {
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): Promise<void> {
     switch (nodeType) {
       case 'n8n-nodes-base.webhook':
-        this.validateWebhookNode(parameters, errors, warnings, suggestions);
+        this.validateWebhookNode(parameters, errors, warnings, _suggestions);
         break;
       
       case 'n8n-nodes-base.httpRequest':
-        this.validateHttpRequestNode(parameters, errors, warnings, suggestions);
+        this.validateHttpRequestNode(parameters, errors, warnings, _suggestions);
         break;
       
       case 'n8n-nodes-base.function':
-        this.validateFunctionNode(parameters, errors, warnings, suggestions);
+        this.validateFunctionNode(parameters, errors, warnings, _suggestions);
         break;
       
       case 'n8n-nodes-base.switch':
-        this.validateSwitchNode(parameters, errors, warnings, suggestions);
+        this.validateSwitchNode(parameters, errors, warnings, _suggestions);
         break;
       
       case 'n8n-nodes-base.set':
-        this.validateSetNode(parameters, errors, warnings, suggestions);
+        this.validateSetNode(parameters, errors, warnings, _suggestions);
         break;
       
       case 'n8n-nodes-base.scheduleTrigger':
-        this.validateScheduleTriggerNode(parameters, errors, warnings, suggestions);
+        this.validateScheduleTriggerNode(parameters, errors, warnings, _suggestions);
         break;
 
       default:
         // Generic validation for unknown node types
-        this.validateGenericNode(parameters, errors, warnings, suggestions);
+        this.validateGenericNode(parameters, errors, warnings, _suggestions);
     }
   }
 
@@ -180,7 +179,7 @@ export class NodeParameterValidator {
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): Promise<void> {
     const value = parameters[paramDef.name];
     
@@ -219,7 +218,7 @@ export class NodeParameterValidator {
     paramDef: ParameterDefinition,
     value: any,
     errors: ValidationError[],
-    warnings: ValidationWarning[]
+    _warnings: ValidationWarning[]
   ): void {
     const expectedType = paramDef.type;
     const actualType = typeof value;
@@ -285,7 +284,7 @@ export class NodeParameterValidator {
     paramDef: ParameterDefinition,
     value: any,
     errors: ValidationError[],
-    warnings: ValidationWarning[]
+    _warnings: ValidationWarning[]
   ): void {
     const validValues = paramDef.options!
       .map(opt => opt.value !== undefined ? opt.value : opt.name)
@@ -359,7 +358,7 @@ export class NodeParameterValidator {
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     // Validate webhook path
     if (parameters.path) {
@@ -402,15 +401,15 @@ export class NodeParameterValidator {
       }
     }
 
-    suggestions.push('Consider adding authentication for webhook security');
-    suggestions.push('Set appropriate response mode for your use case');
+    _suggestions.push('Consider adding authentication for webhook security');
+    _suggestions.push('Set appropriate response mode for your use case');
   }
 
   private validateHttpRequestNode(
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     // Validate URL
     if (parameters.url) {
@@ -446,15 +445,15 @@ export class NodeParameterValidator {
       }
     }
 
-    suggestions.push('Add appropriate timeout settings for reliability');
-    suggestions.push('Consider adding retry logic for critical requests');
+    _suggestions.push('Add appropriate timeout settings for reliability');
+    _suggestions.push('Consider adding retry logic for critical requests');
   }
 
   private validateFunctionNode(
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     if (parameters.functionCode) {
       if (typeof parameters.functionCode !== 'string') {
@@ -495,15 +494,15 @@ export class NodeParameterValidator {
       }
     }
 
-    suggestions.push('Use console.log() for debugging function behavior');
-    suggestions.push('Handle errors gracefully with try-catch blocks');
+    _suggestions.push('Use console.log() for debugging function behavior');
+    _suggestions.push('Handle errors gracefully with try-catch blocks');
   }
 
   private validateSwitchNode(
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     if (parameters.conditions && parameters.conditions.conditions) {
       const conditions = parameters.conditions.conditions;
@@ -542,15 +541,15 @@ export class NodeParameterValidator {
       });
     }
 
-    suggestions.push('Add a fallback output for unmatched conditions');
-    suggestions.push('Use meaningful condition descriptions for clarity');
+    _suggestions.push('Add a fallback output for unmatched conditions');
+    _suggestions.push('Use meaningful condition descriptions for clarity');
   }
 
   private validateSetNode(
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     if (parameters.values) {
       const values = parameters.values;
@@ -571,15 +570,15 @@ export class NodeParameterValidator {
       }
     }
 
-    suggestions.push('Use descriptive names for set values');
-    suggestions.push('Consider using expressions for dynamic values');
+    _suggestions.push('Use descriptive names for set values');
+    _suggestions.push('Consider using expressions for dynamic values');
   }
 
   private validateScheduleTriggerNode(
     parameters: Record<string, any>,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    suggestions: string[]
+    _suggestions: string[]
   ): void {
     if (parameters.rule && parameters.rule.interval) {
       const intervals = parameters.rule.interval;
@@ -593,8 +592,8 @@ export class NodeParameterValidator {
       }
     }
 
-    suggestions.push('Consider timezone settings for scheduled workflows');
-    suggestions.push('Test schedule triggers with appropriate intervals');
+    _suggestions.push('Consider timezone settings for scheduled workflows');
+    _suggestions.push('Test schedule triggers with appropriate intervals');
   }
 
   private validateGenericNode(

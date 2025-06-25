@@ -2,8 +2,8 @@
  * Final Complete Catalog - Redirected to Enhanced Discovery
  */
 
-export { ALL_COMPLETE_NODES, searchNodes, getNodesByCategory } from '../discovery/enhanced-discovery.js';
-export { NodeTypeInfo } from './node-types.js';
+export { allNodes as ALL_COMPLETE_NODES, searchNodes, getNodesByCategory } from './index.js';
+export type { NodeTypeInfo } from './node-types.js';
 
 // Legacy exports for compatibility
 export const ENHANCED_CORE_NODES = [];
@@ -13,12 +13,12 @@ export const getPopularNodes = () => [];
 
 // Main catalog export
 export const completeN8NCatalog = {
-  getAllAvailableNodes: () => import('../discovery/enhanced-discovery.js').then(m => m.getAllAvailableNodes())
+  getAllAvailableNodes: () => import('./index.js').then(m => m.allNodes)
 };
 
 export class CompleteN8NCatalog {
   static async getAllAvailableNodes() {
-    const { getAllAvailableNodes } = await import('../discovery/enhanced-discovery.js');
-    return getAllAvailableNodes();
+    const { allNodes } = await import('./index.js');
+    return allNodes;
   }
 }

@@ -26,7 +26,7 @@ export class NodeDetailScraper extends BaseScraper {
   private cleanText(text: string): string {
     return text
       .replace(/\s+/g, ' ')
-      .replace(/[^\w\s\-\.]/g, '')
+      .replace(/[^\w\s\-.]/g, '')
       .trim();
   }
 
@@ -471,7 +471,7 @@ export class NodeDetailScraper extends BaseScraper {
     const sections: string[] = [];
     
     for (const keyword of authKeywords) {
-      const regex = new RegExp(`<h[2-6][^>]*>([^<]*${keyword}[^<]*)<\/h[2-6]>(.*?)(?=<h[2-6]|$)`, 'gis');
+      const regex = new RegExp(`<h[2-6][^>]*>([^<]*${keyword}[^<]*)</h[2-6]>(.*?)(?=<h[2-6]|$)`, 'gis');
       let match;
       
       while ((match = regex.exec(html)) !== null) {
@@ -566,7 +566,7 @@ export class NodeDetailScraper extends BaseScraper {
     const sections: string[] = [];
     
     for (const keyword of exampleKeywords) {
-      const regex = new RegExp(`<h[2-6][^>]*>([^<]*${keyword}[^<]*)<\/h[2-6]>(.*?)(?=<h[2-6]|$)`, 'gis');
+      const regex = new RegExp(`<h[2-6][^>]*>([^<]*${keyword}[^<]*)</h[2-6]>(.*?)(?=<h[2-6]|$)`, 'gis');
       let match;
       
       while ((match = regex.exec(html)) !== null) {

@@ -410,7 +410,7 @@ export class N8nApiClient {
   async getTemplates(options: { category?: string; search?: string } = {}): Promise<any[]> {
     try {
       // Try templates endpoint first, fallback to workflows if needed
-      let endpoint = '/templates';
+      const endpoint = '/templates';
       const params = new URLSearchParams();
       
       if (options.category) params.append('category', options.category);

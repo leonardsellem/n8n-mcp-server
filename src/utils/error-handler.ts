@@ -13,9 +13,12 @@ export class MCPErrorHandler {
     // Log to file if available
     if (typeof require !== 'undefined') {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const fs = require('fs');
         fs.appendFileSync('logs/errors.log', JSON.stringify(errorInfo) + '\n');
-      } catch {}
+      } catch {
+        // Ignore file logging errors
+      }
     }
     
     return errorInfo;

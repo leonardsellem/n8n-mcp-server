@@ -84,8 +84,8 @@ export const NODE_CATEGORIES = {
  * Known n8n documentation URL patterns
  */
 export const URL_PATTERNS = {
-  nodeDetail: /\/integrations\/builtin\/[^\/]+\/$/,
-  categoryIndex: /\/integrations\/builtin\/[^\/]+\/$/,
+  nodeDetail: /\/integrations\/builtin\/[^/]+\/$/,
+  categoryIndex: /\/integrations\/builtin\/[^/]+\/$/,
   mainIndex: /\/integrations\/builtin\/$/
 };
 

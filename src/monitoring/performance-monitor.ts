@@ -251,6 +251,14 @@ ${this.getTopSlowNodes(5)}
   }
 
   /**
+   * Stop performance monitoring
+   */
+  stop(): void {
+    console.log('[Performance] Performance monitoring stopped');
+    // Any cleanup logic can be added here
+  }
+
+  /**
    * Middleware wrapper for tracking request performance
    */
   wrapRequest<T>(operation: () => Promise<T>, operationName: string): Promise<T> {

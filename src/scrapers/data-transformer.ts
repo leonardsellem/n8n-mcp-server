@@ -81,7 +81,7 @@ export class DataTransformer {
   private generateNodeName(raw: RawNodeData): string {
     // Extract base name from URL or existing name
     const baseName = raw.name.toLowerCase()
-      .replace(/[^a-z0-9\-]/g, '')
+      .replace(/[^a-z0-9-]/g, '')
       .replace(/^n8n-nodes-base\./, '');
     
     // Ensure it follows n8n naming convention
@@ -98,7 +98,7 @@ export class DataTransformer {
     
     return description
       .replace(/\s+/g, ' ')
-      .replace(/[^\w\s\-\.\,\!\?]/g, '')
+      .replace(/[^\w\s\-.!,?]/g, '')
       .trim()
       .substring(0, 500); // Limit length
   }
