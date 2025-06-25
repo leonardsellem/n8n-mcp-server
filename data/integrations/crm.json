@@ -1,0 +1,144 @@
+{
+  "category": "CRM",
+  "count": 3,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.salesforce",
+      "name": "Salesforce",
+      "description": "World's #1 CRM platform",
+      "category": "CRM",
+      "credentials": [
+        "salesforceOAuth2Api"
+      ],
+      "tags": [
+        "crm",
+        "sales",
+        "lead-management",
+        "enterprise"
+      ],
+      "nodeType": "n8n-nodes-base.salesforce",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.hubspot",
+      "name": "HubSpot",
+      "description": "Inbound marketing, sales, and service platform",
+      "category": "CRM",
+      "credentials": [
+        "hubspotOAuth2Api"
+      ],
+      "tags": [
+        "crm",
+        "marketing",
+        "sales",
+        "automation"
+      ],
+      "nodeType": "n8n-nodes-base.hubspot",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.pipedrive",
+      "name": "Pipedrive",
+      "description": "Sales CRM and pipeline management tool",
+      "category": "CRM",
+      "credentials": [
+        "pipedriveApi"
+      ],
+      "tags": [
+        "crm",
+        "sales",
+        "pipeline",
+        "deals"
+      ],
+      "nodeType": "n8n-nodes-base.pipedrive",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

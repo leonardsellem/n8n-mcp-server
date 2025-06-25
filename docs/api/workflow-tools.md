@@ -151,7 +151,7 @@ const newWorkflow = await useWorkflowCreate({
   nodes: [
     {
       "name": "Start",
-      "type": "n8n-nodes-base.start",
+      "type": "n8n-nodes-base.manualTrigger",
       "position": [100, 200],
       "parameters": {}
     }
@@ -172,7 +172,7 @@ const newWorkflow = await useWorkflowCreate({
   "nodes": [
     {
       "name": "Start",
-      "type": "n8n-nodes-base.start",
+      "type": "n8n-nodes-base.manualTrigger",
       "position": [100, 200],
       "parameters": {}
     }

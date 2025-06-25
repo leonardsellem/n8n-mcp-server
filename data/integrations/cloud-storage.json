@@ -1,0 +1,236 @@
+{
+  "category": "Cloud Storage",
+  "count": 5,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.awsS3",
+      "name": "AWS S3",
+      "description": "Amazon Simple Storage Service",
+      "category": "Cloud Storage",
+      "nodeType": "n8n-nodes-base.awsS3",
+      "credentials": [
+        "aws"
+      ],
+      "tags": [
+        "aws",
+        "storage",
+        "cloud",
+        "files"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.googleDrive",
+      "name": "Google Drive",
+      "description": "Cloud storage and file sharing",
+      "category": "Cloud Storage",
+      "nodeType": "n8n-nodes-base.googleDrive",
+      "credentials": [
+        "googleDriveOAuth2Api"
+      ],
+      "tags": [
+        "google",
+        "storage",
+        "files",
+        "sharing"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.googleCloudStorage",
+      "name": "Google Cloud Storage",
+      "description": "Enterprise cloud storage",
+      "category": "Cloud Storage",
+      "nodeType": "n8n-nodes-base.googleCloudStorage",
+      "credentials": [
+        "googleCloudStorageOAuth2Api"
+      ],
+      "tags": [
+        "google",
+        "cloud",
+        "storage",
+        "enterprise"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.microsoftOneDrive",
+      "name": "Microsoft OneDrive",
+      "description": "Cloud storage service",
+      "category": "Cloud Storage",
+      "nodeType": "n8n-nodes-base.microsoftOneDrive",
+      "credentials": [
+        "microsoftOneDriveOAuth2Api"
+      ],
+      "tags": [
+        "microsoft",
+        "storage",
+        "cloud",
+        "files"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.dropbox",
+      "name": "Dropbox",
+      "description": "Cloud storage and file synchronization",
+      "category": "Cloud Storage",
+      "nodeType": "n8n-nodes-base.dropbox",
+      "credentials": [
+        "dropboxOAuth2Api"
+      ],
+      "tags": [
+        "storage",
+        "sync",
+        "files",
+        "cloud"
+      ],
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

@@ -91,7 +91,7 @@ function setupDynamicResources(server: Server, envConfig: EnvConfig): void {
 
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     const uri = request.params.uri;
-    console.log(`Resource requested: ${uri}`);
+    console.error(`Resource requested: ${uri}`);
     
     try {
       // Handle static resources

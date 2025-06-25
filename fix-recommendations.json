@@ -1,0 +1,894 @@
+{
+  "failed": [
+    {
+      "file": "airtable-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "asana-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "bitbucket-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "code-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "function-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "linear-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "mailerlite-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "matrix-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "mattermost-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "merge-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "microsoft-excel-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "microsoft-onedrive-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "microsoftonedrive-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "microsofttodo-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "mindee-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "monday-com-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "mysql-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "nasa-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "netlify-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "nextcloud-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "npm-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "one-simple-api-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "onfleet-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "openai-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "openthesaurus-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "overwatch-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "paddle-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "peekalink-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "phantombuster-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "plivo-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "postbin-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "postmark-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "pushbullet-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "pushcut-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "quickbase-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "rabbitmq-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "schedule-trigger-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "set-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "stripe-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "switch-node.ts",
+      "issues": [],
+      "fixes": []
+    },
+    {
+      "file": "webhook-node.ts",
+      "issues": [],
+      "fixes": []
+    }
+  ],
+  "warnings": [
+    {
+      "file": "azure-openai-chat-model-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "bigcommerce-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "box-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "brandfetch-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "call-n8n-workflow-tool-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "claude-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "clearbit-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "clickup-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "cohere-model-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "convertkit-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "copper-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "discord-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "dropbox-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "dropcontact-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "enhanced-openai-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "execute-command-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "facebook-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "github-trigger-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "gitlab-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "gmail-node-real.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "gmail-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "google-drive-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "google-sheets-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "groq-chat-model-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "home-assistant-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "http-request-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "hubspot-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "if-node-real.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "if-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "intercom-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "jira-software-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "langchain-text-classifier-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "linkedin-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "mailchimp-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "mandrill-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "manual-trigger-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "microsoft-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "microsoft-teams-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "microsoftgraphsecurity-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "microsoftsharepoint-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "microsoftteams-node.ts",
+      "issues": [
+        "Has trailing commas before closing braces",
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Remove trailing commas",
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "mocean-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "monday-node.ts",
+      "issues": [
+        "Missing examples",
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Add practical usage examples",
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "mongodb-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "mqtt-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "n8n-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "netscaler-adc-node.ts",
+      "issues": [
+        "Missing examples"
+      ],
+      "fixes": [
+        "Add practical usage examples"
+      ]
+    },
+    {
+      "file": "nocodb-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "notion-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "odoo-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "okta-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "paypal-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "pipedrive-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "postgres-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "profitwell-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "pushover-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "qr-code-node.ts",
+      "issues": [
+        "Missing examples",
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Add practical usage examples",
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "quickbooks-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "remove-duplicates-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "rss-read-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "salesforce-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "servicenow-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "set-node-real.ts",
+      "issues": [
+        "Contains null values in arrays"
+      ],
+      "fixes": [
+        "Remove null entries from arrays"
+      ]
+    },
+    {
+      "file": "shopify-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "slack-node-real.ts",
+      "issues": [
+        "Has trailing commas before closing braces",
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Remove trailing commas",
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "slack-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "slack-trigger-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "snowflake-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "telegram-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "trello-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "twitter-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "uproc-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "whatsapp-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "youtube-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    },
+    {
+      "file": "zendesk-node.ts",
+      "issues": [
+        "Has TypeScript type issues"
+      ],
+      "fixes": [
+        "Fix type annotations and remove any types"
+      ]
+    }
+  ]
+}

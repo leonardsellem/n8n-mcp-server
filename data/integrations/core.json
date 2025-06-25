@@ -1,0 +1,111 @@
+{
+  "category": "Core",
+  "count": 3,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.manualTrigger",
+      "name": "Manual Trigger",
+      "description": "Runs the flow on clicking a button in n8n",
+      "category": "Core",
+      "subcategory": "Triggers",
+      "nodeType": "n8n-nodes-base.manualTrigger",
+      "triggerNode": true,
+      "properties": [
+        {
+          "name": "manualTriggerConfiguration",
+          "type": "notice",
+          "description": "Manual trigger configuration"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.scheduleTrigger",
+      "name": "Schedule Trigger",
+      "description": "Runs the flow every day, hour, or custom interval",
+      "category": "Core",
+      "subcategory": "Triggers",
+      "nodeType": "n8n-nodes-base.scheduleTrigger",
+      "triggerNode": true,
+      "properties": [
+        {
+          "name": "rule",
+          "type": "options",
+          "required": true,
+          "description": "When to trigger the workflow"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.webhook",
+      "name": "Webhook",
+      "description": "Runs the flow on receiving an HTTP request",
+      "category": "Core",
+      "subcategory": "Triggers",
+      "nodeType": "n8n-nodes-base.webhook",
+      "triggerNode": true,
+      "webhookSupport": true,
+      "properties": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "The webhook path"
+        },
+        {
+          "name": "httpMethod",
+          "type": "options",
+          "required": true,
+          "description": "HTTP method to listen for"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

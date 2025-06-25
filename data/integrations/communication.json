@@ -1,0 +1,326 @@
+{
+  "category": "Communication",
+  "count": 7,
+  "integrations": [
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.slack",
+      "name": "Slack",
+      "description": "Business communication platform for teams",
+      "nodeType": "n8n-nodes-base.slack",
+      "credentials": [
+        "slackOAuth2Api"
+      ],
+      "tags": [
+        "chat",
+        "messaging",
+        "team",
+        "notifications"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.discord",
+      "name": "Discord",
+      "description": "Communication platform for communities and gaming",
+      "nodeType": "n8n-nodes-base.discord",
+      "credentials": [
+        "discordApi"
+      ],
+      "tags": [
+        "chat",
+        "gaming",
+        "community",
+        "bots"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.telegram",
+      "name": "Telegram",
+      "description": "Fast and secure messaging platform",
+      "nodeType": "n8n-nodes-base.telegram",
+      "credentials": [
+        "telegramApi"
+      ],
+      "tags": [
+        "messaging",
+        "chat",
+        "bots",
+        "notifications"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.whatsApp",
+      "name": "WhatsApp Business",
+      "description": "Business messaging via WhatsApp API",
+      "nodeType": "n8n-nodes-base.whatsApp",
+      "credentials": [
+        "whatsAppApi"
+      ],
+      "tags": [
+        "messaging",
+        "business",
+        "customer-service"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.microsoftTeams",
+      "name": "Microsoft Teams",
+      "description": "Collaboration platform and chat service",
+      "nodeType": "n8n-nodes-base.microsoftTeams",
+      "credentials": [
+        "microsoftTeamsOAuth2Api"
+      ],
+      "tags": [
+        "collaboration",
+        "chat",
+        "microsoft",
+        "enterprise"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.gmail",
+      "name": "Gmail",
+      "description": "Email service from Google",
+      "nodeType": "n8n-nodes-base.gmail",
+      "credentials": [
+        "gmailOAuth2"
+      ],
+      "tags": [
+        "email",
+        "google",
+        "communication"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    },
+    {
+      "official": true,
+      "free": true,
+      "verified": true,
+      "id": "n8n-nodes-base.microsoftOutlook",
+      "name": "Microsoft Outlook",
+      "description": "Email and calendar service from Microsoft",
+      "nodeType": "n8n-nodes-base.microsoftOutlook",
+      "credentials": [
+        "microsoftOutlookOAuth2Api"
+      ],
+      "tags": [
+        "email",
+        "calendar",
+        "microsoft",
+        "enterprise"
+      ],
+      "category": "Communication",
+      "properties": [
+        {
+          "name": "resource",
+          "type": "options",
+          "required": true,
+          "description": "The resource to operate on"
+        },
+        {
+          "name": "operation",
+          "type": "options",
+          "required": true,
+          "description": "The operation to perform"
+        }
+      ],
+      "inputs": [
+        {
+          "type": "main",
+          "displayName": "Input",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "type": "main",
+          "displayName": "Output"
+        }
+      ]
+    }
+  ]
+}

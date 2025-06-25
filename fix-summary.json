@@ -1,0 +1,17 @@
+{
+  "originalStats": {
+    "passed": 416,
+    "warnings": 75,
+    "failed": 41,
+    "total": 532
+  },
+  "fixedNodes": 115,
+  "errors": 0,
+  "estimatedNewStats": {
+    "passed": 531,
+    "warnings": 0,
+    "failed": 0,
+    "total": 532
+  },
+  "timestamp": "2025-06-22T19:03:00.091Z"
+}

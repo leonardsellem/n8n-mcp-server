@@ -5,6 +5,7 @@
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "strict": true,
+    "isolatedModules": true,
     "outDir": "build",
     "declaration": true,
     "sourceMap": true,
@@ -12,6 +13,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@modelcontextprotocol/sdk/*": [
+        "node_modules/@modelcontextprotocol/sdk/dist/*"
+      ]
+    },
     "lib": [
       "ES2020",
       "DOM"

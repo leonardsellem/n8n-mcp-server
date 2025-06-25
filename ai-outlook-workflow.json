@@ -1,0 +1,597 @@
+{
+  "name": "AI Outlook Email Assistant - Advanced",
+  "nodes": [
+    {
+      "id": "xwqe5gyt5",
+      "name": "Email Trigger (IMAP)",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "protocol": "imap",
+        "host": "outlook.office365.com",
+        "port": 993,
+        "secure": true,
+        "mailbox": "INBOX",
+        "action": "read",
+        "format": "simple",
+        "readEmailsFromDate": "",
+        "options": {
+          "allowUnauthorizedCerts": false,
+          "connTimeout": 60000,
+          "authTimeout": 5000,
+          "keepAlive": {
+            "enabled": true
+          }
+        }
+      },
+      "credentials": {
+        "imap": {
+          "id": "outlook_imap_credentials",
+          "name": "Outlook IMAP"
+        }
+      }
+    },
+    {
+      "id": "wrave6rcd",
+      "name": "Email Content Processor",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "functionCode": "\n        // Extract and process email data\n        const emailData = $input.all();\n        const processedEmails = [];\n        \n        for (const email of emailData) {\n          const processed = {\n            id: email.json.messageId || generateId(),\n            subject: email.json.subject || '',\n            from: email.json.from || '',\n            to: email.json.to || '',\n            cc: email.json.cc || '',\n            bcc: email.json.bcc || '',\n            date: email.json.date || new Date().toISOString(),\n            body: email.json.text || email.json.html || '',\n            html: email.json.html || '',\n            attachments: email.json.attachments || [],\n            headers: email.json.headers || {},\n            receivedAt: new Date().toISOString(),\n            processed: false,\n            priority: 'medium',\n            category: 'unclassified',\n            sentiment: 'neutral',\n            urgency: 'normal',\n            entities: [],\n            aiAnalysis: null,\n            draftResponse: null,\n            conversationId: null\n          };\n          \n          // Extract conversation ID from subject or message ID\n          const subjectMatch = processed.subject.match(/\\[#([A-Z0-9]+)\\]/);\n          if (subjectMatch) {\n            processed.conversationId = subjectMatch[1];\n          } else {\n            processed.conversationId = processed.id.substring(0, 8).toUpperCase();\n          }\n          \n          processedEmails.push(processed);\n        }\n        \n        return processedEmails;\n      "
+      }
+    },
+    {
+      "id": "pgpqiu2b0",
+      "name": "Attachment Handler",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        680,
+        200
+      ],
+      "parameters": {
+        "functionCode": "\n        // Process email attachments\n        const emails = $input.all();\n        const processedEmails = [];\n        \n        for (const email of emails) {\n          const emailData = email.json;\n          \n          if (emailData.attachments && emailData.attachments.length > 0) {\n            const processedAttachments = [];\n            \n            for (const attachment of emailData.attachments) {\n              const processed = {\n                filename: attachment.filename || 'unknown',\n                contentType: attachment.contentType || 'application/octet-stream',\n                size: attachment.size || 0,\n                content: attachment.content || '',\n                extractedText: '',\n                fileType: attachment.filename ? attachment.filename.split('.').pop().toLowerCase() : 'unknown',\n                processed: true,\n                extractedAt: new Date().toISOString()\n              };\n              \n              // Basic text extraction for common file types\n              if (processed.fileType === 'txt') {\n                processed.extractedText = attachment.content;\n              } else if (processed.fileType === 'pdf') {\n                processed.extractedText = '[PDF content - requires specialized extraction]';\n              } else if (['doc', 'docx'].includes(processed.fileType)) {\n                processed.extractedText = '[Word document - requires specialized extraction]';\n              }\n              \n              processedAttachments.push(processed);\n            }\n            \n            emailData.processedAttachments = processedAttachments;\n            emailData.hasAttachments = true;\n          } else {\n            emailData.processedAttachments = [];\n            emailData.hasAttachments = false;\n          }\n          \n          processedEmails.push(email);\n        }\n        \n        return processedEmails;\n      "
+      }
+    },
+    {
+      "id": "gonzufatz",
+      "name": "OpenAI Email Classifier",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        680,
+        400
+      ],
+      "parameters": {
+        "operation": "text",
+        "model": "gpt-4",
+        "prompt": "Analyze the following email and provide a JSON response with classification:\n\nEmail Subject: {{ $json.subject }}\nEmail From: {{ $json.from }}\nEmail Body: {{ $json.body }}\nHas Attachments: {{ $json.hasAttachments }}\n\nPlease classify this email and return a JSON object with the following structure:\n{\n  \"type\": \"customer_inquiry|sales_prospect|support_request|internal_communication|spam|newsletter|urgent_request|complaint|compliment|order_status|invoice|meeting_request|other\",\n  \"priority\": \"high|medium|low\",\n  \"sentiment\": \"positive|negative|neutral\",\n  \"urgency\": \"urgent|high|medium|low\",\n  \"confidence\": 0.95,\n  \"entities\": {\n    \"people\": [\"John Doe\", \"Jane Smith\"],\n    \"organizations\": [\"Company ABC\", \"XYZ Corp\"],\n    \"dates\": [\"2024-01-15\", \"next Monday\"],\n    \"amounts\": [\"$1,000\", \"€500\"],\n    \"products\": [\"Product A\", \"Service B\"],\n    \"locations\": [\"New York\", \"London\"]\n  },\n  \"keyTopics\": [\"pricing\", \"demo\", \"support\"],\n  \"actionRequired\": true,\n  \"suggestedActions\": [\"schedule_demo\", \"provide_quote\", \"escalate_to_manager\"],\n  \"responseUrgency\": \"within_1_hour|within_4_hours|within_24_hours|within_week\",\n  \"emotionalTone\": \"frustrated|excited|concerned|satisfied|angry|happy|neutral\",\n  \"businessValue\": \"high|medium|low\",\n  \"riskLevel\": \"high|medium|low|none\"\n}\n\nOnly return the JSON object, no additional text.",
+        "temperature": 0.1,
+        "maxTokens": 1000,
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "id": "0qblmpukv",
+      "name": "AI Analysis Parser",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        900,
+        400
+      ],
+      "parameters": {
+        "functionCode": "\n        // Parse OpenAI analysis response\n        const items = $input.all();\n        const processedItems = [];\n        \n        for (const item of items) {\n          try {\n            const emailData = item.json;\n            const aiResponse = emailData.choices?.[0]?.message?.content || emailData.text || '';\n            \n            // Parse JSON response from OpenAI\n            let aiAnalysis;\n            try {\n              aiAnalysis = JSON.parse(aiResponse);\n            } catch (parseError) {\n              // Fallback analysis if JSON parsing fails\n              aiAnalysis = {\n                type: 'other',\n                priority: 'medium',\n                sentiment: 'neutral',\n                urgency: 'medium',\n                confidence: 0.5,\n                entities: { people: [], organizations: [], dates: [], amounts: [], products: [], locations: [] },\n                keyTopics: [],\n                actionRequired: false,\n                suggestedActions: [],\n                responseUrgency: 'within_24_hours',\n                emotionalTone: 'neutral',\n                businessValue: 'medium',\n                riskLevel: 'none',\n                parsingError: parseError.message\n              };\n            }\n            \n            // Merge AI analysis with email data\n            const enhancedEmail = {\n              ...emailData,\n              aiAnalysis: aiAnalysis,\n              type: aiAnalysis.type,\n              priority: aiAnalysis.priority,\n              sentiment: aiAnalysis.sentiment,\n              urgency: aiAnalysis.urgency,\n              entities: aiAnalysis.entities,\n              keyTopics: aiAnalysis.keyTopics,\n              actionRequired: aiAnalysis.actionRequired,\n              suggestedActions: aiAnalysis.suggestedActions,\n              responseUrgency: aiAnalysis.responseUrgency,\n              emotionalTone: aiAnalysis.emotionalTone,\n              businessValue: aiAnalysis.businessValue,\n              riskLevel: aiAnalysis.riskLevel,\n              confidence: aiAnalysis.confidence,\n              analysisTimestamp: new Date().toISOString(),\n              processed: true\n            };\n            \n            processedItems.push({ json: enhancedEmail });\n          } catch (error) {\n            console.error('Error processing AI analysis:', error);\n            processedItems.push(item);\n          }\n        }\n        \n        return processedItems;\n      "
+      }
+    },
+    {
+      "id": "3rz31g1my",
+      "name": "Vector Embeddings Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ],
+      "parameters": {
+        "operation": "embedding",
+        "model": "text-embedding-ada-002",
+        "text": "{{ $json.subject }} {{ $json.body }}",
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "id": "1qhvro5fr",
+      "name": "PostgreSQL Storage",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        300
+      ],
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "emails",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "subject": "={{ $json.subject }}",
+            "sender": "={{ $json.from }}",
+            "recipient": "={{ $json.to }}",
+            "body": "={{ $json.body }}",
+            "html_body": "={{ $json.html }}",
+            "received_at": "={{ $json.date }}",
+            "processed_at": "={{ $json.analysisTimestamp }}",
+            "email_type": "={{ $json.type }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "urgency": "={{ $json.urgency }}",
+            "confidence": "={{ $json.confidence }}",
+            "entities": "={{ JSON.stringify($json.entities) }}",
+            "key_topics": "={{ JSON.stringify($json.keyTopics) }}",
+            "suggested_actions": "={{ JSON.stringify($json.suggestedActions) }}",
+            "response_urgency": "={{ $json.responseUrgency }}",
+            "emotional_tone": "={{ $json.emotionalTone }}",
+            "business_value": "={{ $json.businessValue }}",
+            "risk_level": "={{ $json.riskLevel }}",
+            "has_attachments": "={{ $json.hasAttachments }}",
+            "attachments_data": "={{ JSON.stringify($json.processedAttachments) }}",
+            "conversation_id": "={{ $json.conversationId }}",
+            "embedding": "={{ JSON.stringify($('Vector Embeddings Generator').item.json.data[0].embedding) }}",
+            "ai_analysis": "={{ JSON.stringify($json.aiAnalysis) }}",
+            "headers": "={{ JSON.stringify($json.headers) }}"
+          }
+        },
+        "options": {
+          "queryBatching": "transaction"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "postgres_credentials",
+          "name": "PostgreSQL Database"
+        }
+      }
+    },
+    {
+      "id": "arqe8be0u",
+      "name": "Response Generator",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        900,
+        600
+      ],
+      "parameters": {
+        "operation": "text",
+        "model": "gpt-4",
+        "prompt": "Generate a professional email response based on the following email analysis:\n\nOriginal Email:\nSubject: {{ $json.subject }}\nFrom: {{ $json.from }}\nBody: {{ $json.body }}\n\nAI Analysis:\nType: {{ $json.type }}\nPriority: {{ $json.priority }}\nSentiment: {{ $json.sentiment }}\nUrgency: {{ $json.urgency }}\nKey Topics: {{ JSON.stringify($json.keyTopics) }}\nSuggested Actions: {{ JSON.stringify($json.suggestedActions) }}\nEmotional Tone: {{ $json.emotionalTone }}\n\nPlease generate a professional, personalized draft response that:\n1. Acknowledges the sender's message appropriately\n2. Addresses the key topics and concerns raised\n3. Maintains a professional but warm tone\n4. Includes relevant next steps or actions\n5. Uses the company's standard email signature format\n\nReturn a JSON object with:\n{\n  \"subject\": \"Re: [original subject]\",\n  \"body\": \"Complete email response text\",\n  \"tone\": \"professional|friendly|formal|casual\",\n  \"nextSteps\": [\"action1\", \"action2\"],\n  \"priority\": \"high|medium|low\",\n  \"reviewRequired\": true/false,\n  \"confidence\": 0.95,\n  \"estimatedSentiment\": \"positive|neutral|negative\"\n}\n\nOnly return the JSON object.",
+        "temperature": 0.3,
+        "maxTokens": 1500,
+        "options": {}
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai_credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "id": "qe5ya2xx0",
+      "name": "Response Parser",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        600
+      ],
+      "parameters": {
+        "functionCode": "\n        // Parse AI-generated response\n        const items = $input.all();\n        const processedItems = [];\n        \n        for (const item of items) {\n          try {\n            const responseData = item.json.choices?.[0]?.message?.content || item.json.text || '';\n            \n            let draftResponse;\n            try {\n              draftResponse = JSON.parse(responseData);\n            } catch (parseError) {\n              // Fallback response structure\n              draftResponse = {\n                subject: 'Re: ' + (item.json.subject || 'Your Message'),\n                body: 'Thank you for your message. We have received your inquiry and will respond shortly.',\n                tone: 'professional',\n                nextSteps: ['manual_review'],\n                priority: 'medium',\n                reviewRequired: true,\n                confidence: 0.5,\n                estimatedSentiment: 'neutral',\n                parsingError: parseError.message\n              };\n            }\n            \n            const enhancedItem = {\n              ...item.json,\n              draftResponse: draftResponse,\n              responseGenerated: true,\n              responseGeneratedAt: new Date().toISOString(),\n              readyForReview: true\n            };\n            \n            processedItems.push({ json: enhancedItem });\n          } catch (error) {\n            console.error('Error parsing response:', error);\n            processedItems.push(item);\n          }\n        }\n        \n        return processedItems;\n      "
+      }
+    },
+    {
+      "id": "b2xz3c3yd",
+      "name": "High Priority Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        600
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combineOperation": "any"
+        }
+      }
+    },
+    {
+      "id": "nxy3089mg",
+      "name": "Teams High Priority Alert",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        500
+      ],
+      "parameters": {
+        "operation": "postMessage",
+        "channelId": "{{ $json.teamsChannelId || 'general' }}",
+        "message": "🚨 **HIGH PRIORITY EMAIL ALERT** 🚨\n\n**From:** {{ $json.from }}\n**Subject:** {{ $json.subject }}\n**Type:** {{ $json.type }}\n**Urgency:** {{ $json.urgency }}\n**Sentiment:** {{ $json.sentiment }}\n**Risk Level:** {{ $json.riskLevel }}\n\n**Key Topics:** {{ JSON.stringify($json.keyTopics) }}\n**Suggested Actions:** {{ JSON.stringify($json.suggestedActions) }}\n\n**Draft Response Generated:** {{ $json.draftResponse.subject }}\n\n**Action Required:** Please review and approve the draft response.\n\n**Email ID:** {{ $json.id }}\n**Conversation ID:** {{ $json.conversationId }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "credentials": {
+        "microsoftTeamsOAuth2Api": {
+          "id": "teams_credentials",
+          "name": "Microsoft Teams"
+        }
+      }
+    },
+    {
+      "id": "roni2718y",
+      "name": "Teams Regular Notification",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        700
+      ],
+      "parameters": {
+        "operation": "postMessage",
+        "channelId": "{{ $json.teamsChannelId || 'email-processing' }}",
+        "message": "📧 **Email Processed**\n\n**From:** {{ $json.from }}\n**Subject:** {{ $json.subject }}\n**Type:** {{ $json.type }}\n**Priority:** {{ $json.priority }}\n**Sentiment:** {{ $json.sentiment }}\n\n**Draft Response:** Ready for review\n**Confidence:** {{ $json.confidence }}\n\n**Email ID:** {{ $json.id }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "credentials": {
+        "microsoftTeamsOAuth2Api": {
+          "id": "teams_credentials",
+          "name": "Microsoft Teams"
+        }
+      }
+    },
+    {
+      "id": "eoyzm9sb3",
+      "name": "Conversation History Tracker",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        800
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\n        INSERT INTO conversation_history (\n          conversation_id, email_id, participant, message_type, \n          subject, body, timestamp, ai_confidence, response_approved\n        ) VALUES (\n          '{{ $json.conversationId }}',\n          '{{ $json.id }}',\n          '{{ $json.from }}',\n          'received',\n          '{{ $json.subject }}',\n          '{{ $json.body }}',\n          '{{ $json.date }}',\n          {{ $json.confidence }},\n          false\n        );\n        \n        INSERT INTO conversation_history (\n          conversation_id, email_id, participant, message_type,\n          subject, body, timestamp, ai_confidence, response_approved\n        ) VALUES (\n          '{{ $json.conversationId }}',\n          '{{ $json.id }}_draft',\n          'AI Assistant',\n          'draft_response',\n          '{{ $json.draftResponse.subject }}',\n          '{{ $json.draftResponse.body }}',\n          '{{ $json.responseGeneratedAt }}',\n          {{ $json.draftResponse.confidence }},\n          false\n        );\n      ",
+        "options": {}
+      },
+      "credentials": {
+        "postgres": {
+          "id": "postgres_credentials",
+          "name": "PostgreSQL Database"
+        }
+      }
+    },
+    {
+      "id": "adwgbkwpf",
+      "name": "Analytics Data Collector",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        400
+      ],
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "email_analytics",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.format('YYYY-MM-DD') }}",
+            "hour": "={{ $now.format('HH') }}",
+            "email_type": "={{ $json.type }}",
+            "priority": "={{ $json.priority }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "urgency": "={{ $json.urgency }}",
+            "business_value": "={{ $json.businessValue }}",
+            "risk_level": "={{ $json.riskLevel }}",
+            "response_time_seconds": "={{ Math.floor((new Date() - new Date($json.date)) / 1000) }}",
+            "ai_confidence": "={{ $json.confidence }}",
+            "has_attachments": "={{ $json.hasAttachments }}",
+            "sender_domain": "={{ $json.from.split('@')[1] }}",
+            "processing_timestamp": "={{ $now.toISOString() }}"
+          }
+        },
+        "options": {
+          "queryBatching": "transaction"
+        }
+      },
+      "credentials": {
+        "postgres": {
+          "id": "postgres_credentials",
+          "name": "PostgreSQL Database"
+        }
+      }
+    },
+    {
+      "id": "tevakf3l5",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        600
+      ],
+      "parameters": {
+        "functionCode": "\n        // Handle errors and implement retry logic\n        const items = $input.all();\n        const processedItems = [];\n        \n        for (const item of items) {\n          try {\n            const errorData = {\n              errorId: generateId(),\n              originalEmailId: item.json.id || 'unknown',\n              errorType: item.json.error?.name || 'UnknownError',\n              errorMessage: item.json.error?.message || 'No error message available',\n              errorStack: item.json.error?.stack || '',\n              timestamp: new Date().toISOString(),\n              retryCount: item.json.retryCount || 0,\n              maxRetries: 3,\n              canRetry: (item.json.retryCount || 0) < 3,\n              workflowExecution: $workflow.id,\n              nodeExecution: $node.name\n            };\n            \n            // Log error for monitoring\n            console.error('Email processing error:', errorData);\n            \n            processedItems.push({ json: errorData });\n          } catch (processingError) {\n            console.error('Error in error handler:', processingError);\n            processedItems.push(item);\n          }\n        }\n        \n        return processedItems;\n      "
+      }
+    },
+    {
+      "id": "agpt0st9i",
+      "name": "Batch Processing Manager",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        460,
+        100
+      ],
+      "parameters": {
+        "functionCode": "\n        // Manage batch processing for high-volume emails\n        const items = $input.all();\n        const batchSize = 10; // Process 10 emails at a time\n        const batches = [];\n        \n        // Split items into batches\n        for (let i = 0; i < items.length; i += batchSize) {\n          const batch = items.slice(i, i + batchSize);\n          batches.push({\n            json: {\n              batchId: generateId(),\n              batchNumber: Math.floor(i / batchSize) + 1,\n              totalBatches: Math.ceil(items.length / batchSize),\n              batchSize: batch.length,\n              totalItems: items.length,\n              items: batch,\n              createdAt: new Date().toISOString(),\n              processed: false\n            }\n          });\n        }\n        \n        console.log(`Created ${batches.length} batches for ${items.length} emails`);\n        return batches;\n      "
+      }
+    }
+  ],
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "Batch Processing Manager",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Content Processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Content Processor": {
+      "main": [
+        [
+          {
+            "node": "Attachment Handler",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI Email Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment Handler": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Email Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Email Classifier": {
+      "main": [
+        [
+          {
+            "node": "AI Analysis Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analysis Parser": {
+      "main": [
+        [
+          {
+            "node": "Vector Embeddings Generator",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Response Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Embeddings Generator": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response Generator": {
+      "main": [
+        [
+          {
+            "node": "Response Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response Parser": {
+      "main": [
+        [
+          {
+            "node": "High Priority Filter",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Conversation History Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority Filter": {
+      "main": [
+        [
+          {
+            "node": "Teams High Priority Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Teams Regular Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teams High Priority Alert": {
+      "main": [
+        [
+          {
+            "node": "Analytics Data Collector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teams Regular Notification": {
+      "main": [
+        [
+          {
+            "node": "Analytics Data Collector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation History Tracker": {
+      "main": [
+        [
+          {
+            "node": "Analytics Data Collector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL Storage": {
+      "main": [
+        [
+          {
+            "node": "Analytics Data Collector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true,
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "executionTimeout": 7200,
+    "timezone": "UTC",
+    "errorWorkflow": {
+      "value": "",
+      "__rl": true
+    }
+  },
+  "staticData": {},
+  "tags": [
+    {
+      "id": "agrtwipcy",
+      "name": "AI Email Processing",
+      "createdAt": "2025-06-22T13:38:56.790Z",
+      "updatedAt": "2025-06-22T13:38:56.790Z"
+    },
+    {
+      "id": "te40fnkcj",
+      "name": "Outlook Integration",
+      "createdAt": "2025-06-22T13:38:56.790Z",
+      "updatedAt": "2025-06-22T13:38:56.790Z"
+    },
+    {
+      "id": "cftmy54wm",
+      "name": "High Volume",
+      "createdAt": "2025-06-22T13:38:56.790Z",
+      "updatedAt": "2025-06-22T13:38:56.790Z"
+    }
+  ],
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "m3xa1hdi9"
+  },
+  "id": "arlvonrqo",
+  "versionId": "v4qktp5z4",
+  "createdAt": "2025-06-22T13:38:56.790Z",
+  "updatedAt": "2025-06-22T13:38:56.790Z"
+}

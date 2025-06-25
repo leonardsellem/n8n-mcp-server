@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.n8n.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:n8n.io)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(find:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(rg:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test)",
+      "Bash(timeout 10s npm start)",
+      "Bash(npm run:*)",
+      "Bash(pkill:*)",
+      "Bash(timeout 15s npm start)",
+      "Bash(npm start:*)",
+      "Bash(curl:*)",
+      "Bash(timeout:*)",
+      "Bash(true)",
+      "Bash(taskkill:*)",
+      "Bash(killall:*)",
+      "Bash(npx:*)",
+      "Bash(npm search:*)"
+    ],
+    "deny": []
+  }
+}
