@@ -2,6 +2,7 @@
 FROM node:20 AS builder
 
 WORKDIR /app
+HEALTHCHECK NONE
 
 # 1️⃣  Copy only dependency manifests first (keeps layer cache efficient)
 COPY package*.json ./
