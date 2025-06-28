@@ -1,9 +1,12 @@
 /**
- * Optimized Node Discovery - Enhanced System with Performance Monitoring
+ * Dynamic Node Discovery - Enhanced System with 533+ Auto-Discovered Nodes
+ * 
+ * Now powered by dynamic node registry that automatically discovers all nodes
+ * from organized folder structure (actions/, triggers/, core/, clusters/)
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { allNodes, searchNodes, getNodesByCategory } from '../data/index.js';
+import { dynamicNodeRegistry, allDiscoveredNodes, type DiscoveredNode } from '../data/index.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 
 export class NodeDiscoveryService {
@@ -27,18 +30,19 @@ export class NodeDiscoveryService {
       performanceMonitor.recordCacheMiss();
       const timer = performanceMonitor.createTimer('load-all-nodes');
       
-      const nodes = allNodes;
+      const nodes = allDiscoveredNodes as NodeTypeInfo[];
       this.allNodesCache = nodes;
       
       // Update cache
       nodes.forEach((node: NodeTypeInfo) => {
         this.nodeCache.set(node.name, node);
+        this.nodeCache.set(node.displayName, node);
       });
       
       timer();
-      performanceMonitor.updateDiscoveryStats(532, nodes.length);
+      performanceMonitor.updateDiscoveryStats(nodes.length, nodes.length);
       
-      console.log(`[NodeDiscovery] Returning ${nodes.length} available nodes (enhanced discovery)`);
+      console.log(`[NodeDiscovery] Returning ${nodes.length} available nodes from dynamic registry`);
       return nodes;
     }, 'getAvailableNodes');
   }
@@ -66,11 +70,11 @@ export class NodeDiscoveryService {
     }, `getNodeByName-${name}`);
   }
 
-  async searchNodes(query: string, _options: any = {}): Promise<NodeTypeInfo[]> {
+  async searchNodes(query: string, options: any = {}): Promise<NodeTypeInfo[]> {
     return performanceMonitor.wrapRequest(async () => {
       const timer = performanceMonitor.createTimer(`search-${query}`);
       
-      const results = searchNodes(query);
+      const results = dynamicNodeRegistry.searchNodes(query, options) as NodeTypeInfo[];
       
       timer();
       console.log(`[NodeDiscovery] Search '${query}' found ${results.length} results`);
@@ -82,7 +86,7 @@ export class NodeDiscoveryService {
     return performanceMonitor.wrapRequest(async () => {
       const timer = performanceMonitor.createTimer(`category-${category}`);
       
-      const results = await getNodesByCategory(category);
+      const results = dynamicNodeRegistry.getNodesByCategory(category) as NodeTypeInfo[];
       
       timer();
       console.log(`[NodeDiscovery] Category '${category}' has ${results.length} nodes`);

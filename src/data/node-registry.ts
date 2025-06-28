@@ -1,48 +1,31 @@
 /**
- * Comprehensive Node Registry - All Available n8n Nodes
+ * Legacy Node Registry - Backward Compatibility Only
  * 
- * This registry provides a centralized index of all available n8n nodes
- * for the MCP server, organized by category for easy discovery and access.
+ * This registry provides minimal backward compatibility.
+ * For the full 533+ node catalog, use the dynamic registry instead.
+ * 
+ * @deprecated Use dynamic registry for full node access
  */
 
 import { NodeTypeInfo } from './node-types.js';
 
-// Import all manually created nodes
-import { bigcommerceNode } from './nodes/bigcommerce-node.js';
-import { convertkitNode } from './nodes/convertkit-node.js';
-import { googleAnalyticsNode } from './nodes/google-analytics-node.js';
-import { intercomNode, intercomTriggerNode } from './nodes/intercom-node.js';
-import { linearNode } from './nodes/linear-node.js';
-import { quickbooksNode } from './nodes/quickbooks-node.js';
-import { zendeskNode } from './nodes/zendesk-node.js';
-
 /**
- * Complete Node Registry - Organized by Category
+ * Legacy Node Registry - All nodes now auto-discovered
+ * @deprecated Use dynamicNodeRegistry.getNodesByCategory() instead
  */
 export const nodeRegistry: Record<string, NodeTypeInfo[]> = {
-  // E-commerce & Finance
-  ecommerce: [
-    bigcommerceNode,
-    quickbooksNode
-  ],
-
-  // Marketing & Analytics
-  marketing: [
-    convertkitNode,
-    googleAnalyticsNode
-  ],
-
-  // Customer Support
-  customerSupport: [
-    intercomNode,
-    intercomTriggerNode,
-    zendeskNode
-  ],
-
-  // Project Management
-  projectManagement: [
-    linearNode
-  ]
+  // All nodes now auto-discovered by dynamic registry
+  actions: [],
+  triggers: [],
+  core: [],
+  clusters: [],
+  
+  // Legacy categories for backward compatibility
+  aiProductivity: [],
+  ecommerce: [],
+  marketing: [],
+  customerSupport: [],
+  projectManagement: []
 };
 
 /**
