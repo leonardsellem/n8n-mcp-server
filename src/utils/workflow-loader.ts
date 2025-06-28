@@ -5,7 +5,6 @@
  * for AI agents working with n8n workflows.
  */
 
-import { NodeTypeInfo } from '../data/node-types.js';
 import { DiscoveredNode, dynamicNodeRegistry } from '../data/dynamic-node-registry.js';
 import { NodeParameterValidator, ValidationResult } from '../validation/node-parameter-validator.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
@@ -223,7 +222,7 @@ export class WorkflowLoader {
     return performanceMonitor.wrapRequest(async () => {
       const {
         includeErrorHandling = true,
-        optimizeForPerformance = false,
+        optimizeForPerformance: _optimizeForPerformance = false,
         addLogging = false,
         includeRetry = false,
         generateDocumentation = true,

@@ -1,76 +1,222 @@
+/**
+ * If Node
+ * 
+ * Use the If node to split a workflow conditionally based on comparison operations.
+ * Supports multiple data types and comparison operations with AND/OR logic.
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const ifNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.if',
   displayName: 'IF',
   description: 'Route data based on conditional logic. Compare values, check conditions, and send data down different workflow paths based on true/false results.',
-  category: 'Core Nodes',
+  category: 'Core',
   subcategory: 'Flow Control',
+
   properties: [
     {
       name: 'conditions',
       displayName: 'Conditions',
-      type: 'collection',
+      type: 'fixedCollection',
       required: true,
       default: {},
-      description: 'Define the conditions to evaluate',
+      description: 'The conditions to check. Data passes through when conditions are met.',
+      typeOptions: {
+        multipleValues: true
+      },
       options: [
         {
-      name: 'conditions',
-
-      displayName: 'Conditions',
-      type: 'fixedCollection',
-      required: false,
-      description: 'The conditions to check',
-          options: [
+          name: 'boolean',
+          displayName: 'Boolean',
+          values: [
             {
-              name: 'and',
-              displayName: 'AND',
-              values: [
-                {
-      name: 'leftValue',
-
-      displayName: 'Left Value',
-      type: 'string',
-      required: false,
-      default: '',
-                  description: 'The left value to compare',
-                  placeholder: '={{$json.status}}'
-                },
-                {
-      name: 'operation',
-
-      displayName: 'Operation',
-      type: 'options',
-      required: false,
-      default: 'equal',
-                  options: [
-                    { name: 'Equal', value: 'equal' },
-                    { name: 'Not Equal', value: 'notEqual' },
-                    { name: 'Larger', value: 'larger' },
-                    { name: 'Larger or Equal', value: 'largerEqual' },
-                    { name: 'Smaller', value: 'smaller' },
-                    { name: 'Smaller or Equal', value: 'smallerEqual' },
-                    { name: 'Contains', value: 'contains' },
-                    { name: 'Does not contain', value: 'notContains' },
-                    { name: 'Starts with', value: 'startsWith' },
-                    { name: 'Ends with', value: 'endsWith' },
-                    { name: 'Regex', value: 'regex' },
-                    { name: 'Is Empty', value: 'isEmpty' },
-                    { name: 'Is Not Empty', value: 'isNotEmpty' }
-                  ]
-                },
-                {
-      name: 'rightValue',
-
-      displayName: 'Right Value',
-      type: 'string',
-      required: false,
-      default: '',
-                  description: 'The right value to compare against',
-                  placeholder: 'success'
-    }
+              name: 'value1',
+              displayName: 'Value 1',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The first value to compare',
+              placeholder: '={{$json.fieldName}}'
+            },
+            {
+              name: 'operation',
+              displayName: 'Operation',
+              type: 'options',
+              required: true,
+              default: 'equal',
+              description: 'The comparison operation',
+              options: [
+                { name: 'exists', value: 'exists' },
+                { name: 'does not exist', value: 'notExists' },
+                { name: 'is empty', value: 'isEmpty' },
+                { name: 'is not empty', value: 'isNotEmpty' },
+                { name: 'is true', value: 'isTrue' },
+                { name: 'is false', value: 'isFalse' },
+                { name: 'is equal to', value: 'equal' },
+                { name: 'is not equal to', value: 'notEqual' }
               ]
+            },
+            {
+              name: 'value2',
+              displayName: 'Value 2',
+              type: 'string',
+              required: false,
+              default: '',
+              description: 'The second value to compare',
+              displayOptions: {
+                show: {
+                  operation: ['equal', 'notEqual']
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'string',
+          displayName: 'String',
+          values: [
+            {
+              name: 'value1',
+              displayName: 'Value 1',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The first value to compare',
+              placeholder: '={{$json.fieldName}}'
+            },
+            {
+              name: 'operation',
+              displayName: 'Operation',
+              type: 'options',
+              required: true,
+              default: 'equal',
+              description: 'The comparison operation',
+              options: [
+                { name: 'exists', value: 'exists' },
+                { name: 'does not exist', value: 'notExists' },
+                { name: 'is empty', value: 'isEmpty' },
+                { name: 'is not empty', value: 'isNotEmpty' },
+                { name: 'is equal to', value: 'equal' },
+                { name: 'is not equal to', value: 'notEqual' },
+                { name: 'contains', value: 'contains' },
+                { name: 'does not contain', value: 'notContains' },
+                { name: 'starts with', value: 'startsWith' },
+                { name: 'does not start with', value: 'notStartsWith' },
+                { name: 'ends with', value: 'endsWith' },
+                { name: 'does not end with', value: 'notEndsWith' },
+                { name: 'matches regex', value: 'regex' },
+                { name: 'does not match regex', value: 'notRegex' }
+              ]
+            },
+            {
+              name: 'value2',
+              displayName: 'Value 2',
+              type: 'string',
+              required: false,
+              default: '',
+              description: 'The second value to compare',
+              displayOptions: {
+                show: {
+                  operation: ['equal', 'notEqual', 'contains', 'notContains', 'startsWith', 'notStartsWith', 'endsWith', 'notEndsWith', 'regex', 'notRegex']
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'number',
+          displayName: 'Number',
+          values: [
+            {
+              name: 'value1',
+              displayName: 'Value 1',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The first value to compare',
+              placeholder: '={{$json.fieldName}}'
+            },
+            {
+              name: 'operation',
+              displayName: 'Operation',
+              type: 'options',
+              required: true,
+              default: 'equal',
+              description: 'The comparison operation',
+              options: [
+                { name: 'exists', value: 'exists' },
+                { name: 'does not exist', value: 'notExists' },
+                { name: 'is empty', value: 'isEmpty' },
+                { name: 'is not empty', value: 'isNotEmpty' },
+                { name: 'is equal to', value: 'equal' },
+                { name: 'is not equal to', value: 'notEqual' },
+                { name: 'is greater than', value: 'larger' },
+                { name: 'is less than', value: 'smaller' },
+                { name: 'is greater than or equal to', value: 'largerEqual' },
+                { name: 'is less than or equal to', value: 'smallerEqual' }
+              ]
+            },
+            {
+              name: 'value2',
+              displayName: 'Value 2',
+              type: 'string',
+              required: false,
+              default: '',
+              description: 'The second value to compare',
+              displayOptions: {
+                show: {
+                  operation: ['equal', 'notEqual', 'larger', 'smaller', 'largerEqual', 'smallerEqual']
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'dateTime',
+          displayName: 'Date & Time',
+          values: [
+            {
+              name: 'value1',
+              displayName: 'Value 1',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The first value to compare',
+              placeholder: '={{$json.fieldName}}'
+            },
+            {
+              name: 'operation',
+              displayName: 'Operation',
+              type: 'options',
+              required: true,
+              default: 'equal',
+              description: 'The comparison operation',
+              options: [
+                { name: 'exists', value: 'exists' },
+                { name: 'does not exist', value: 'notExists' },
+                { name: 'is empty', value: 'isEmpty' },
+                { name: 'is not empty', value: 'isNotEmpty' },
+                { name: 'is equal to', value: 'equal' },
+                { name: 'is not equal to', value: 'notEqual' },
+                { name: 'is after', value: 'after' },
+                { name: 'is before', value: 'before' },
+                { name: 'is after or equal to', value: 'afterEqual' },
+                { name: 'is before or equal to', value: 'beforeEqual' }
+              ]
+            },
+            {
+              name: 'value2',
+              displayName: 'Value 2',
+              type: 'string',
+              required: false,
+              default: '',
+              description: 'The second value to compare',
+              displayOptions: {
+                show: {
+                  operation: ['equal', 'notEqual', 'after', 'before', 'afterEqual', 'beforeEqual']
+                }
+              }
             }
           ]
         }
@@ -87,21 +233,9 @@ export const ifNode: NodeTypeInfo = {
         { name: 'ALL conditions must be true', value: 'all' },
         { name: 'ANY condition can be true', value: 'any' }
       ]
-    },
-    {
-      name: 'fallbackOutput',
-      displayName: 'Fallback Output',
-      type: 'options',
-      required: false,
-      default: 'noData',
-      description: 'What to output when condition is false',
-      options: [
-        { name: 'No Data', value: 'noData' },
-        { name: 'Input Data', value: 'inputData' },
-        { name: 'Empty Object', value: 'emptyObject' }
-      ]
     }
   ],
+
   inputs: [
     {
       type: 'main',
@@ -109,6 +243,7 @@ export const ifNode: NodeTypeInfo = {
       required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
@@ -121,38 +256,17 @@ export const ifNode: NodeTypeInfo = {
       description: 'Data when condition is false'
     }
   ],
+
   credentials: [],
   regularNode: true,
-  codeable: false,
-  triggerNode: false,
+  
+  version: [1, 1.1, 2],
   defaults: {
-    conditions: {
-      conditions: [
-        {
-          leftValue: '',
-          operation: 'equal',
-          rightValue: ''
-        }
-      ]
-    },
-    combineOperation: 'all',
-    fallbackOutput: 'noData'
+    name: 'IF'
   },
-  aiMetadata: {
-    aiOptimized: true,
-    integrationComplexity: 'low',
-    commonPatterns: [
-      'Filter data based on conditions',
-      'Route workflow paths conditionally',
-      'Error handling and validation',
-      'Status checking and branching'
-    ],
-    errorHandling: {
-      retryableErrors: [],
-      nonRetryableErrors: ['Invalid expression', 'Type mismatch'],
-      documentation: 'Most errors in IF nodes are due to incorrect expressions or data type mismatches'
-    }
-  },
+
+  aliases: ['condition', 'conditional', 'branch', 'filter', 'logic'],
+
   examples: [
     {
       name: 'Simple Status Check',
@@ -164,11 +278,34 @@ export const ifNode: NodeTypeInfo = {
             type: 'n8n-nodes-base.if',
             parameters: {
               conditions: {
-                conditions: [
+                string: [
                   {
-                    leftValue: '={{$json.status}}',
+                    value1: '={{$json.status}}',
                     operation: 'equal',
-                    rightValue: 'success'
+                    value2: 'success'
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'Numeric Comparison',
+      description: 'Filter data based on numeric values',
+      workflow: {
+        nodes: [
+          {
+            name: 'Age Filter',
+            type: 'n8n-nodes-base.if',
+            parameters: {
+              conditions: {
+                number: [
+                  {
+                    value1: '={{$json.age}}',
+                    operation: 'larger',
+                    value2: '18'
                   }
                 ]
               }
@@ -187,16 +324,18 @@ export const ifNode: NodeTypeInfo = {
             type: 'n8n-nodes-base.if',
             parameters: {
               conditions: {
-                conditions: [
+                number: [
                   {
-                    leftValue: '={{$json.age}}',
+                    value1: '={{$json.age}}',
                     operation: 'larger',
-                    rightValue: '18'
-                  },
+                    value2: '18'
+                  }
+                ],
+                string: [
                   {
-                    leftValue: '={{$json.status}}',
+                    value1: '={{$json.status}}',
                     operation: 'equal',
-                    rightValue: 'active'
+                    value2: 'active'
                   }
                 ]
               },
@@ -216,11 +355,11 @@ export const ifNode: NodeTypeInfo = {
             type: 'n8n-nodes-base.if',
             parameters: {
               conditions: {
-                conditions: [
+                string: [
                   {
-                    leftValue: '={{$json.message}}',
+                    value1: '={{$json.message}}',
                     operation: 'contains',
-                    rightValue: 'urgent'
+                    value2: 'urgent'
                   }
                 ]
               }
@@ -230,28 +369,50 @@ export const ifNode: NodeTypeInfo = {
       }
     },
     {
-      name: 'Error Handling',
-      description: 'Route errors to different handling paths',
+      name: 'Date Comparison',
+      description: 'Filter data based on date ranges',
       workflow: {
         nodes: [
           {
-            name: 'Error Router',
+            name: 'Date Filter',
             type: 'n8n-nodes-base.if',
             parameters: {
               conditions: {
-                conditions: [
+                dateTime: [
                   {
-                    leftValue: '={{$json.error}}',
-                    operation: 'isEmpty',
-                    rightValue: ''
+                    value1: '={{$json.createdAt}}',
+                    operation: 'after',
+                    value2: '2024-01-01'
                   }
                 ]
-              },
-              fallbackOutput: 'inputData'
+              }
             }
           }
         ]
       }
     }
-  ]
+  ],
+
+  aiMetadata: {
+    aiOptimized: true,
+    integrationComplexity: 'low',
+    commonPatterns: [
+      'Filter data based on conditions',
+      'Route workflow paths conditionally',
+      'Error handling and validation',
+      'Status checking and branching',
+      'Data quality checks',
+      'User permission filtering'
+    ],
+    errorHandling: {
+      retryableErrors: [],
+      nonRetryableErrors: ['Invalid expression', 'Type mismatch', 'Invalid regex pattern'],
+      documentation: 'Most errors in IF nodes are due to incorrect expressions or data type mismatches'
+    }
+  },
+
+  usageNotes: 'The If node is essential for creating conditional logic in workflows. Use appropriate data types for accurate comparisons and combine multiple conditions with AND/OR logic.',
+  integrationGuide: 'Select the correct data type (String, Number, Date & Time, Boolean, Array, Object) for your comparison. Use expressions to reference input data dynamically.'
 };
+
+export default ifNode;

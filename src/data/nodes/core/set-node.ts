@@ -1,11 +1,19 @@
+/**
+ * Edit Fields (Set) Node
+ * 
+ * Use the Edit Fields node to set workflow data. This node can set new data as well as 
+ * overwrite data that already exists. Supports both manual field mapping and JSON output modes.
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const setNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.set',
-  displayName: 'Set',
+  displayName: 'Edit Fields (Set)',
   description: 'Modify, add, or remove data from your workflow. Transform data fields, add new properties, rename fields, or restructure your data format.',
-  category: 'Core Nodes',
+  category: 'Core',
   subcategory: 'Data Transformation',
+
   properties: [
     {
       name: 'mode',
@@ -15,164 +23,149 @@ export const setNode: NodeTypeInfo = {
       default: 'manual',
       description: 'How to set the data',
       options: [
-        { name: 'Manual', value: 'manual', description: 'Manually define each field' },
-        { name: 'Expression', value: 'expression', description: 'Use JavaScript expressions' }
+        { 
+          name: 'Manual Mapping', 
+          value: 'manual', 
+          description: 'Edit fields using the GUI with drag and drop support' 
+        },
+        { 
+          name: 'JSON Output', 
+          value: 'jsonOutput', 
+          description: 'Write JSON that n8n adds to the input data' 
+        }
       ]
     },
     {
-      name: 'keepOnlySet',
-      displayName: 'Keep Only Set',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'If set to true, only the set fields will be kept and all others removed',
-      displayOptions: {
-        show: {
-          mode: ['manual']
-        }
-      }
-    },
-    {
       name: 'fields',
-      displayName: 'Fields',
-      type: 'collection',
+      displayName: 'Fields to Set',
+      type: 'fixedCollection',
       required: true,
       default: {},
-      description: 'The fields to set',
+      description: 'The fields to set in the data',
       displayOptions: {
         show: {
           mode: ['manual']
         }
       },
+      typeOptions: {
+        multipleValues: true,
+        sortable: true
+      },
       options: [
         {
-      name: 'values',
-
-      displayName: 'Values',
-      type: 'fixedCollection',
-      required: false,
-      description: 'The fields to set',
-          default: {},options: [
+          name: 'values',
+          displayName: 'Values',
+          values: [
             {
-              name: 'string',
-              displayName: 'String',
-              values: [
-                {
-      name: 'name',
-
-      displayName: 'Name',
-      type: 'string',
-      required: false,
-                  description: 'Name of the field to set',
-                  placeholder: 'propertyName'
-    },
-                {
-      name: 'value',
-
-      displayName: 'Value',
-      type: 'string',
-      required: false,
-      default: '',
-                  description: 'Value to set for the field',
-                  placeholder: '={{$json.originalField}}'
-                }
-              ]
+              name: 'name',
+              displayName: 'Name',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'Name of the field to set',
+              placeholder: 'fieldName'
             },
             {
-              name: 'number',
-              displayName: 'Number',
-              values: [
-                {
-      name: 'name',
-
-      displayName: 'Name',
-      type: 'string',
-      required: false,
-      default: '',
-                  description: 'Name of the field to set'
-    },
-                {
-      name: 'value',
-
-      displayName: 'Value',
-      type: 'number',
-      required: false,
-      default: 0,
-                  description: 'Number value to set'
-    }
-              ]
-            },
-            {
-              name: 'boolean',
-              displayName: 'Boolean',
-              values: [
-                {
-      name: 'name',
-
-      displayName: 'Name',
-      type: 'string',
-      required: false,
-      default: '',
-                  description: 'Name of the field to set'
-    },
-                {
-      name: 'value',
-
-      displayName: 'Value',
-      type: 'boolean',
-      required: false,
-      default: false,
-                  description: 'Boolean value to set'
-    }
-              ]
+              name: 'value',
+              displayName: 'Value',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'Value to set for the field',
+              placeholder: '={{$json.originalField}}'
             }
           ]
         }
       ]
     },
     {
-      name: 'jsCode',
-      displayName: 'JavaScript Code',
-      type: 'string',
+      name: 'jsonOutput',
+      displayName: 'JSON Output',
+      type: 'json',
       required: true,
-      default: 'return {\n  newField: $input.first().json.originalField,\n  timestamp: new Date().toISOString()\n};',
-      description: 'JavaScript code to transform the data',
+      default: '{\n  "newField": "={{ $json.existingField }}",\n  "timestamp": "={{ new Date().toISOString() }}"\n}',
+      description: 'JSON to add to the input data. Use expressions to access input values.',
       displayOptions: {
         show: {
-          mode: ['expression']
+          mode: ['jsonOutput']
         }
       },
       typeOptions: {
-        codeAutocomplete: 'javascript'
+        codeAutocomplete: 'json'
       }
+    },
+    {
+      name: 'keepOnlySet',
+      displayName: 'Keep Only Set Fields',
+      type: 'boolean',
+      required: false,
+      default: false,
+      description: 'If enabled, discard any input data not used in Fields to Set',
+      displayOptions: {
+        show: {
+          mode: ['manual']
+        }
+      }
+    },
+    {
+      name: 'includeInOutput',
+      displayName: 'Include in Output',
+      type: 'options',
+      required: false,
+      default: 'all',
+      description: 'Choose which input data to include in the output',
+      displayOptions: {
+        show: {
+          mode: ['jsonOutput']
+        }
+      },
+      options: [
+        { name: 'All Input Fields', value: 'all' },
+        { name: 'No Input Fields', value: 'none' },
+        { name: 'Selected Input Fields', value: 'selected' }
+      ]
     },
     {
       name: 'options',
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},description: 'Additional options',
+      default: {},
+      description: 'Additional options for the node',
       options: [
         {
-      name: 'dotNotation',
-
-      displayName: 'Dot Notation',
-      type: 'boolean',
-      required: false,
-          description: 'Use dot notation for nested fields (e.g., user.name)'
-    },
+          name: 'includeBinaryData',
+          displayName: 'Include Binary Data',
+          type: 'boolean',
+          required: false,
+          default: true,
+          description: 'Whether to include binary data in the output'
+        },
         {
-      name: 'ignoreConversionErrors',
-
-      displayName: 'Ignore Conversion Errors',
-      type: 'boolean',
-      required: false,
-      default: false,
-          description: 'Continue processing even if value conversion fails'
-    }
+          name: 'ignoreConversionErrors',
+          displayName: 'Ignore Type Conversion Errors',
+          type: 'boolean',
+          required: false,
+          default: false,
+          description: 'Ignore data type errors when mapping fields (Manual Mapping only)',
+          displayOptions: {
+            show: {
+              '/mode': ['manual']
+            }
+          }
+        },
+        {
+          name: 'dotNotation',
+          displayName: 'Support Dot Notation',
+          type: 'boolean',
+          required: false,
+          default: true,
+          description: 'Use dot notation for nested fields (e.g., user.name creates nested objects)'
+        }
       ]
     }
   ],
+
   inputs: [
     {
       type: 'main',
@@ -180,50 +173,30 @@ export const setNode: NodeTypeInfo = {
       required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
       displayName: 'Output',
-      description: 'The modified data'
+      description: 'The modified data with set fields'
     }
   ],
+
   credentials: [],
   regularNode: true,
   codeable: true,
-  triggerNode: false,
+  
+  version: [1, 2, 3, 3.1, 3.2, 3.3, 3.4],
   defaults: {
-    mode: 'manual',
-    keepOnlySet: false,
-    fields: {
-      values: [
-        {
-          name: 'newField',
-          value: '={{$json.existingField}}'
-        }
-      ]
-    }
+    name: 'Edit Fields (Set)'
   },
-  aiMetadata: {
-    aiOptimized: true,
-    integrationComplexity: 'low',
-    commonPatterns: [
-      'Add calculated fields to data',
-      'Rename or restructure data fields',
-      'Add timestamps or metadata',
-      'Format data for external APIs',
-      'Convert data types',
-      'Clean and normalize data'
-    ],
-    errorHandling: {
-      retryableErrors: [],
-      nonRetryableErrors: ['Invalid expression', 'Property access error'],
-      documentation: 'Errors typically occur due to invalid expressions or accessing non-existent properties'
-    }
-  },
+
+  aliases: ['set', 'transform', 'map', 'modify', 'edit', 'fields'],
+
   examples: [
     {
       name: 'Add Timestamp',
-      description: 'Add current timestamp to data',
+      description: 'Add current timestamp to incoming data',
       workflow: {
         nodes: [
           {
@@ -235,7 +208,11 @@ export const setNode: NodeTypeInfo = {
                 values: [
                   {
                     name: 'timestamp',
-                    value: '={{new Date().toISOString()}}'
+                    value: '={{ new Date().toISOString() }}'
+                  },
+                  {
+                    name: 'processedBy',
+                    value: 'n8n-workflow'
                   }
                 ]
               }
@@ -245,12 +222,12 @@ export const setNode: NodeTypeInfo = {
       }
     },
     {
-      name: 'Rename Fields',
-      description: 'Rename data fields and keep only selected ones',
+      name: 'Rename and Transform Fields',
+      description: 'Rename fields and keep only selected data',
       workflow: {
         nodes: [
           {
-            name: 'Rename Fields',
+            name: 'Transform Data',
             type: 'n8n-nodes-base.set',
             parameters: {
               mode: 'manual',
@@ -259,11 +236,15 @@ export const setNode: NodeTypeInfo = {
                 values: [
                   {
                     name: 'fullName',
-                    value: '={{$json.first_name}} {{$json.last_name}}'
+                    value: '={{ $json.firstName }} {{ $json.lastName }}'
                   },
                   {
                     name: 'email',
-                    value: '={{$json.email_address}}'
+                    value: '={{ $json.emailAddress }}'
+                  },
+                  {
+                    name: 'userId',
+                    value: '={{ $json.id }}'
                   }
                 ]
               }
@@ -273,28 +254,33 @@ export const setNode: NodeTypeInfo = {
       }
     },
     {
-      name: 'Data Transformation with Expression',
-      description: 'Use JavaScript to transform complex data structures',
+      name: 'Complex JSON Transformation',
+      description: 'Use JSON mode to create complex nested structures',
       workflow: {
         nodes: [
           {
-            name: 'Transform Data',
+            name: 'Create User Profile',
             type: 'n8n-nodes-base.set',
             parameters: {
-              mode: 'expression',
-              jsCode: `
-// Transform and calculate data
-const input = $input.first().json;
-return {
-  id: input.user_id,
-  profile: {
-    name: input.name.trim().toLowerCase(),
-    age: parseInt(input.age),
-    isAdult: parseInt(input.age) >= 18
+              mode: 'jsonOutput',
+              includeInOutput: 'selected',
+              jsonOutput: `{
+  "user": {
+    "id": "{{ $json.id }}",
+    "profile": {
+      "name": "{{ $json.name }}",
+      "email": "{{ $json.email }}",
+      "age": {{ $json.age }},
+      "isActive": {{ $json.status === 'active' }}
+    },
+    "metadata": {
+      "createdAt": "{{ $json.created }}",
+      "updatedAt": "{{ new Date().toISOString() }}",
+      "source": "api"
+    }
   },
-  processedAt: new Date().toISOString(),
-  source: 'automated'
-};`
+  "tags": ["{{ $json.department }}", "verified"]
+}`
             }
           }
         ]
@@ -302,11 +288,11 @@ return {
     },
     {
       name: 'Conditional Field Setting',
-      description: 'Set fields based on conditions',
+      description: 'Set fields based on conditions using expressions',
       workflow: {
         nodes: [
           {
-            name: 'Conditional Set',
+            name: 'Conditional Fields',
             type: 'n8n-nodes-base.set',
             parameters: {
               mode: 'manual',
@@ -314,11 +300,15 @@ return {
                 values: [
                   {
                     name: 'priority',
-                    value: '={{$json.urgent === true ? "high" : "normal"}}'
+                    value: '={{ $json.urgent === true ? "high" : "normal" }}'
                   },
                   {
                     name: 'category',
-                    value: '={{$json.type || "general"}}'
+                    value: '={{ $json.type || "general" }}'
+                  },
+                  {
+                    name: 'dueDate',
+                    value: '={{ $json.urgent ? new Date(Date.now() + 24*60*60*1000).toISOString() : new Date(Date.now() + 7*24*60*60*1000).toISOString() }}'
                   }
                 ]
               }
@@ -328,29 +318,32 @@ return {
       }
     },
     {
-      name: 'API Data Preparation',
-      description: 'Prepare data for external API calls',
+      name: 'Nested Object Creation',
+      description: 'Create nested objects using dot notation',
       workflow: {
         nodes: [
           {
-            name: 'API Prep',
+            name: 'Create Nested Structure',
             type: 'n8n-nodes-base.set',
             parameters: {
               mode: 'manual',
-              keepOnlySet: true,
               fields: {
                 values: [
                   {
-                    name: 'user_id',
-                    value: '={{$json.id}}'
+                    name: 'user.personal.firstName',
+                    value: '={{ $json.first_name }}'
                   },
                   {
-                    name: 'action',
-                    value: 'update_profile'
+                    name: 'user.personal.lastName',
+                    value: '={{ $json.last_name }}'
                   },
                   {
-                    name: 'data',
-                    value: '={{JSON.stringify({name: $json.name, email: $json.email})}}'
+                    name: 'user.contact.email',
+                    value: '={{ $json.email }}'
+                  },
+                  {
+                    name: 'user.contact.phone',
+                    value: '={{ $json.phone }}'
                   }
                 ]
               }
@@ -359,5 +352,30 @@ return {
         ]
       }
     }
-  ]
+  ],
+
+  aiMetadata: {
+    aiOptimized: true,
+    integrationComplexity: 'low',
+    commonPatterns: [
+      'Add calculated fields to data',
+      'Rename or restructure data fields',
+      'Add timestamps or metadata',
+      'Format data for external APIs',
+      'Convert data types',
+      'Clean and normalize data',
+      'Create nested object structures',
+      'Conditional field mapping'
+    ],
+    errorHandling: {
+      retryableErrors: [],
+      nonRetryableErrors: ['Invalid expression', 'Property access error', 'JSON syntax error'],
+      documentation: 'Errors typically occur due to invalid expressions, accessing non-existent properties, or malformed JSON'
+    }
+  },
+
+  usageNotes: 'The Edit Fields (Set) node is essential for data transformation. Use Manual Mapping for simple field operations or JSON Output for complex transformations. Drag and drop from the INPUT panel to quickly map fields.',
+  integrationGuide: 'Choose Manual Mapping for straightforward field setting with GUI support, or JSON Output for complex nested structures. Use expressions to access and transform input data dynamically.'
 };
+
+export default setNode;
