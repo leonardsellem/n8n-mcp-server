@@ -5,7 +5,7 @@
  * Outlook manager that communicates through Microsoft Teams.
  */
 
-import { NodeTypeInfo } from './node-types.js';
+// Removed unused import: NodeTypeInfo
 
 export interface WorkflowExample {
   name: string;

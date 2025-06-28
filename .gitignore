@@ -85,3 +85,6 @@ next-node-continuation.md
 reports/
 data/integrations/
 *.pdf
+
+# Windows specific artifacts
+nul

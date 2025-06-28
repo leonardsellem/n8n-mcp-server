@@ -6,7 +6,7 @@
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { dynamicNodeRegistry, allDiscoveredNodes, type DiscoveredNode } from '../data/index.js';
+import { dynamicNodeRegistry, allDiscoveredNodes } from '../data/index.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 
 export class NodeDiscoveryService {

@@ -429,7 +429,7 @@ export class DynamicNodeRegistry {
     this.nodes.forEach((node, nodeId) => {
       if (category && node.category !== category) return;
       
-      const searchText = this.searchIndex.get(nodeId) || [];
+      const _searchText = this.searchIndex.get(nodeId) || [];
       let score = 0;
       
       searchTerms.forEach(term => {
