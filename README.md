@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/leonardsellem-n8n-mcp-server-badge.png)](https://mseep.ai/app/leonardsellem-n8n-mcp-server)
+
 # n8n MCP Server
 
 [![npm version](https://badge.fury.io/js/%40leonardsellem%2Fn8n-mcp-server.svg)](https://badge.fury.io/js/%40leonardsellem%2Fn8n-mcp-server)
