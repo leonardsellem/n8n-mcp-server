@@ -1,524 +1,700 @@
 /**
- * Workflow Loader - Integration with Existing n8n Workflows
+ * Workflow Loader - Enhanced workflow loading and generation utilities
  * 
- * Loads and processes existing n8n workflows from specified directories,
- * making them available through the MCP server for the ultimate AI Outlook manager.
+ * Provides intelligent workflow loading, template generation, and optimization
+ * for AI agents working with n8n workflows.
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { promisify } from 'util';
+import { NodeTypeInfo } from '../data/node-types.js';
+import { DiscoveredNode, dynamicNodeRegistry } from '../data/dynamic-node-registry.js';
+import { NodeParameterValidator, ValidationResult } from '../validation/node-parameter-validator.js';
+import { performanceMonitor } from '../monitoring/performance-monitor.js';
 
-const readFile = promisify(fs.readFile);
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
-
-export interface N8nWorkflow {
-  id?: string;
+export interface WorkflowTemplate {
+  id: string;
   name: string;
-  description?: string;
-  tags?: string[];
-  nodes: N8nNode[];
-  connections: Record<string, any>;
-  active?: boolean;
-  settings?: Record<string, any>;
-  staticData?: Record<string, any>;
-  pinData?: Record<string, any>;
-  versionId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  author?: string;
-  category?: string;
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
-  useCase?: string;
-  benefits?: string[];
+  description: string;
+  category: 'automation' | 'integration' | 'data-processing' | 'ai-workflow' | 'monitoring';
+  complexity: 'simple' | 'medium' | 'complex';
+  nodes: WorkflowNodeTemplate[];
+  connections: WorkflowConnection[];
+  estimatedSetupTime: string;
+  requiredCredentials: string[];
+  useCases: string[];
+  aiOptimized: boolean;
 }
 
-export interface N8nNode {
+export interface WorkflowNodeTemplate {
   id: string;
   name: string;
   type: string;
-  typeVersion?: number;
   position: [number, number];
-  parameters?: Record<string, any>;
-  credentials?: Record<string, any>;
-  webhookId?: string;
-  disabled?: boolean;
+  parameters: Record<string, any>;
+  credentials?: string;
   notes?: string;
-  executeOnce?: boolean;
-  retryOnFail?: boolean;
-  maxTries?: number;
-  waitBetweenTries?: number;
-  alwaysOutputData?: boolean;
-  onError?: 'stopWorkflow' | 'continueRegularOutput' | 'continueErrorOutput';
 }
 
-export interface WorkflowMetadata {
-  filePath: string;
-  fileName: string;
-  directory: string;
-  fileSize: number;
-  lastModified: Date;
-  isAIRelated: boolean;
-  isOutlookRelated: boolean;
-  isTeamsRelated: boolean;
-  nodeTypes: string[];
-  complexity: 'simple' | 'moderate' | 'complex';
-  estimatedCategory: string;
+export interface WorkflowConnection {
+  from: {
+    nodeId: string;
+    outputIndex: number;
+  };
+  to: {
+    nodeId: string;
+    inputIndex: number;
+  };
+  outputName?: string;
+  inputName?: string;
+}
+
+export interface WorkflowGenerationOptions {
+  includeErrorHandling?: boolean;
+  optimizeForPerformance?: boolean;
+  addLogging?: boolean;
+  includeRetry?: boolean;
+  generateDocumentation?: boolean;
+  aiEnhanced?: boolean;
 }
 
 export class WorkflowLoader {
-  private workflows: Map<string, N8nWorkflow> = new Map();
-  private metadata: Map<string, WorkflowMetadata> = new Map();
-  
-  private readonly workflowDirectories = [
-    'F:\\n8n-mcp-setup\\mcp-server\\n8n-workflows',
-    'F:\\n8n-mcp-setup\\mcp-server\\n8n-free-templates',
-    'F:\\n8n-mcp-setup\\mcp-server\\awesome-n8n-templates'
-  ];
-
-  private readonly aiKeywords = [
-    'openai', 'gpt', 'ai', 'artificial intelligence', 'machine learning',
-    'chatgpt', 'claude', 'anthropic', 'sentiment', 'nlp', 'natural language'
-  ];
-
-  private readonly outlookKeywords = [
-    'outlook', 'email', 'microsoft', 'office365', 'exchange', 'mail'
-  ];
-
-  private readonly teamsKeywords = [
-    'teams', 'microsoft teams', 'collaboration', 'meeting', 'chat', 'channel'
-  ];
-
-  /**
-   * Load all workflows from the specified directories
-   */
-  async loadAllWorkflows(): Promise<void> {
-    console.log('🔄 Loading workflows from directories...');
-    
-    for (const directory of this.workflowDirectories) {
-      if (fs.existsSync(directory)) {
-        await this.loadWorkflowsFromDirectory(directory);
-      } else {
-        console.warn(`⚠️ Directory not found: ${directory}`);
-      }
-    }
-
-    console.log(`✅ Loaded ${this.workflows.size} workflows successfully`);
-  }
-
-  /**
-   * Load workflows from a specific directory
-   */
-  private async loadWorkflowsFromDirectory(directory: string): Promise<void> {
-    try {
-      const files = await this.getWorkflowFiles(directory);
-      
-      for (const filePath of files) {
-        try {
-          const workflow = await this.loadWorkflowFile(filePath);
-          if (workflow) {
-            const workflowId = this.generateWorkflowId(filePath);
-            this.workflows.set(workflowId, workflow);
-            
-            const metadata = await this.generateMetadata(filePath, workflow);
-            this.metadata.set(workflowId, metadata);
+  private static readonly TEMPLATES: WorkflowTemplate[] = [
+    {
+      id: 'email-automation',
+      name: 'Email Automation Workflow',
+      description: 'Automatically process and respond to emails based on content analysis',
+      category: 'automation',
+      complexity: 'medium',
+      nodes: [
+        {
+          id: 'trigger-1',
+          name: 'Email Trigger',
+          type: 'emailReadImap',
+          position: [100, 100],
+          parameters: {
+            mailbox: 'INBOX',
+            pollInterval: 300
+          },
+          credentials: 'imapApi'
+        },
+        {
+          id: 'analysis-1',
+          name: 'Content Analysis',
+          type: 'openai',
+          position: [300, 100],
+          parameters: {
+            operation: 'text',
+            prompt: 'Analyze this email and categorize it as: urgent, normal, or spam'
+          },
+          credentials: 'openAiApi'
+        },
+        {
+          id: 'condition-1',
+          name: 'Check Category',
+          type: 'if',
+          position: [500, 100],
+          parameters: {
+            conditions: {
+              string: [
+                {
+                  value1: '={{$json["category"]}}',
+                  value2: 'urgent',
+                  operation: 'equal'
+                }
+              ]
+            }
           }
-        } catch (error) {
-          console.error(`❌ Error loading workflow file ${filePath}:`, error);
         }
-      }
-    } catch (error) {
-      console.error(`❌ Error reading directory ${directory}:`, error);
+      ],
+      connections: [
+        {
+          from: { nodeId: 'trigger-1', outputIndex: 0 },
+          to: { nodeId: 'analysis-1', inputIndex: 0 }
+        },
+        {
+          from: { nodeId: 'analysis-1', outputIndex: 0 },
+          to: { nodeId: 'condition-1', inputIndex: 0 }
+        }
+      ],
+      estimatedSetupTime: '15-30 minutes',
+      requiredCredentials: ['imapApi', 'openAiApi'],
+      useCases: [
+        'Customer support automation',
+        'Email triage and prioritization',
+        'Automated email categorization'
+      ],
+      aiOptimized: true
+    },
+    {
+      id: 'data-sync',
+      name: 'Database Sync Workflow',
+      description: 'Synchronize data between different databases and services',
+      category: 'data-processing',
+      complexity: 'simple',
+      nodes: [
+        {
+          id: 'schedule-1',
+          name: 'Daily Sync',
+          type: 'cron',
+          position: [100, 100],
+          parameters: {
+            triggerTimes: {
+              hour: 2,
+              minute: 0
+            }
+          }
+        },
+        {
+          id: 'source-1',
+          name: 'Source Database',
+          type: 'postgres',
+          position: [300, 100],
+          parameters: {
+            operation: 'executeQuery',
+            query: 'SELECT * FROM users WHERE updated_at > $1'
+          },
+          credentials: 'postgresApi'
+        },
+        {
+          id: 'transform-1',
+          name: 'Transform Data',
+          type: 'set',
+          position: [500, 100],
+          parameters: {
+            values: {
+              id: '={{$json["user_id"]}}',
+              name: '={{$json["full_name"]}}',
+              email: '={{$json["email_address"]}}'
+            }
+          }
+        }
+      ],
+      connections: [
+        {
+          from: { nodeId: 'schedule-1', outputIndex: 0 },
+          to: { nodeId: 'source-1', inputIndex: 0 }
+        },
+        {
+          from: { nodeId: 'source-1', outputIndex: 0 },
+          to: { nodeId: 'transform-1', inputIndex: 0 }
+        }
+      ],
+      estimatedSetupTime: '10-20 minutes',
+      requiredCredentials: ['postgresApi'],
+      useCases: [
+        'Database synchronization',
+        'Data migration',
+        'ETL processes'
+      ],
+      aiOptimized: false
     }
+  ];
+
+  /**
+   * Load a workflow template by ID
+   */
+  static getWorkflowTemplate(templateId: string): WorkflowTemplate | null {
+    return this.TEMPLATES.find(template => template.id === templateId) || null;
   }
 
   /**
-   * Get all workflow files from a directory (recursive)
+   * Get all available workflow templates
    */
-  private async getWorkflowFiles(directory: string): Promise<string[]> {
-    const files: string[] = [];
+  static getAllTemplates(category?: string, complexity?: string): WorkflowTemplate[] {
+    let templates = [...this.TEMPLATES];
     
-    const items = await readdir(directory);
-    
-    for (const item of items) {
-      const fullPath = path.join(directory, item);
-      const stats = await stat(fullPath);
-      
-      if (stats.isDirectory()) {
-        // Recursive search in subdirectories
-        const subFiles = await this.getWorkflowFiles(fullPath);
-        files.push(...subFiles);
-      } else if (this.isWorkflowFile(item)) {
-        files.push(fullPath);
-      }
+    if (category) {
+      templates = templates.filter(t => t.category === category);
     }
     
-    return files;
-  }
-
-  /**
-   * Check if a file is a workflow file
-   */
-  private isWorkflowFile(fileName: string): boolean {
-    const workflowExtensions = ['.json', '.n8n'];
-    const lowerFileName = fileName.toLowerCase();
+    if (complexity) {
+      templates = templates.filter(t => t.complexity === complexity);
+    }
     
-    return workflowExtensions.some(ext => lowerFileName.endsWith(ext)) &&
-           !lowerFileName.includes('node_modules') &&
-           !lowerFileName.includes('.git');
+    return templates;
   }
 
   /**
-   * Load and parse a workflow file
+   * Generate a workflow from node types
    */
-  private async loadWorkflowFile(filePath: string): Promise<N8nWorkflow | null> {
-    try {
-      const content = await readFile(filePath, 'utf8');
-      const workflow = JSON.parse(content) as N8nWorkflow;
-      
-      // Validate workflow structure
-      if (!workflow.nodes || !Array.isArray(workflow.nodes)) {
-        console.warn(`⚠️ Invalid workflow structure in ${filePath}`);
-        return null;
+  static generateWorkflow(
+    nodeTypes: string[], 
+    options: WorkflowGenerationOptions = {}
+  ): any {
+    return performanceMonitor.wrapRequest(async () => {
+      const {
+        includeErrorHandling = true,
+        optimizeForPerformance = false,
+        addLogging = false,
+        includeRetry = false,
+        generateDocumentation = true,
+        aiEnhanced = false
+      } = options;
+
+      const workflow: any = {
+        name: 'Generated Workflow',
+        version: 1,
+        createdAt: new Date().toISOString(),
+        nodes: [] as any[],
+        connections: {} as any,
+        settings: {
+          executionOrder: 'v1'
+        }
+      };
+
+      // Generate nodes with intelligent positioning
+      const nodes = await this.createWorkflowNodes(nodeTypes, options);
+      workflow.nodes = nodes;
+
+      // Generate connections
+      workflow.connections = this.generateConnections(nodes);
+
+      // Add error handling if requested
+      if (includeErrorHandling) {
+        this.addErrorHandling(workflow);
       }
 
-      // Enhance workflow with additional metadata if missing
-      if (!workflow.name) {
-        workflow.name = path.basename(filePath, path.extname(filePath));
+      // Add logging if requested
+      if (addLogging) {
+        this.addLogging(workflow);
       }
 
-      if (!workflow.description) {
-        workflow.description = this.generateDescription(workflow);
+      // Add retry logic if requested
+      if (includeRetry) {
+        this.addRetryLogic(workflow);
       }
 
-      if (!workflow.tags) {
-        workflow.tags = this.generateTags(workflow);
+      // Add AI enhancements if requested
+      if (aiEnhanced) {
+        await this.addAIEnhancements(workflow);
       }
 
-      // Auto-categorize based on content
-      workflow.category = this.categorizeWorkflow(workflow);
-      workflow.difficulty = this.assessDifficulty(workflow);
-      workflow.useCase = this.generateUseCase(workflow);
-      workflow.benefits = this.generateBenefits(workflow);
+      // Add documentation if requested
+      if (generateDocumentation) {
+        workflow.meta = this.generateDocumentation(workflow, nodeTypes);
+      }
 
       return workflow;
-    } catch (error) {
-      console.error(`❌ Error parsing workflow file ${filePath}:`, error);
-      return null;
+    }, 'generateWorkflow');
+  }
+
+  /**
+   * Create workflow nodes with intelligent configuration
+   */
+  private static async createWorkflowNodes(
+    nodeTypes: string[], 
+    options: WorkflowGenerationOptions
+  ): Promise<any[]> {
+    const nodes: any[] = [];
+    const startY = 100;
+    const nodeSpacing = 200;
+
+    for (let i = 0; i < nodeTypes.length; i++) {
+      const nodeType = nodeTypes[i];
+      const nodeInfo = await this.getNodeInfo(nodeType);
+      
+      const node: any = {
+        id: `node-${i + 1}`,
+        name: nodeInfo?.displayName || this.formatNodeName(nodeType),
+        type: nodeType,
+        typeVersion: 1,
+        position: [100 + (i * nodeSpacing), startY + this.calculateVerticalOffset(i)],
+        parameters: await this.generateNodeParameters(nodeInfo, options)
+      };
+
+      // Add credentials if required
+      if (nodeInfo && this.requiresCredentials(nodeInfo)) {
+        node.credentials = this.suggestCredentials(nodeType);
+      }
+
+      // Add notes for documentation
+      if (options.generateDocumentation) {
+        node.notes = this.generateNodeNotes(nodeInfo);
+      }
+
+      nodes.push(node);
+    }
+
+    return nodes;
+  }
+
+  /**
+   * Get node information from the dynamic registry
+   */
+  private static async getNodeInfo(nodeType: string): Promise<DiscoveredNode | null> {
+    // Try to find the node in the dynamic registry
+    const allNodes = dynamicNodeRegistry.getAllNodes();
+    return allNodes.find(node => 
+      node.name.includes(nodeType) || 
+      node.displayName.toLowerCase().includes(nodeType.toLowerCase())
+    ) || null;
+  }
+
+  /**
+   * Generate intelligent node parameters
+   */
+  private static async generateNodeParameters(
+    nodeInfo: DiscoveredNode | null, 
+    options: WorkflowGenerationOptions
+  ): Promise<Record<string, any>> {
+    const parameters: Record<string, any> = {};
+
+    if (!nodeInfo) {
+      return parameters;
+    }
+
+    // Add common parameters based on node type
+    if (nodeInfo.triggerNode) {
+      parameters.pollTimes = {
+        item: [
+          {
+            mode: 'everyMinute'
+          }
+        ]
+      };
+    }
+
+    // Add AI-enhanced parameters if requested
+    if (options.aiEnhanced && nodeInfo.aiDescription) {
+      parameters.aiOptimized = true;
+      parameters.description = nodeInfo.aiDescription;
+    }
+
+    // Add performance optimizations if requested
+    if (options.optimizeForPerformance) {
+      parameters.continueOnFail = false;
+      parameters.retryOnFail = false;
+      parameters.waitBetween = 0;
+    }
+
+    return parameters;
+  }
+
+  /**
+   * Generate connections between nodes
+   */
+  private static generateConnections(nodes: any[]): Record<string, any> {
+    const connections: Record<string, any> = {};
+
+    for (let i = 0; i < nodes.length - 1; i++) {
+      const currentNode = nodes[i];
+      const nextNode = nodes[i + 1];
+
+      if (!connections[currentNode.name]) {
+        connections[currentNode.name] = {
+          main: []
+        };
+      }
+
+      connections[currentNode.name].main.push([
+        {
+          node: nextNode.name,
+          type: 'main',
+          index: 0
+        }
+      ]);
+    }
+
+    return connections;
+  }
+
+  /**
+   * Add error handling to workflow
+   */
+  private static addErrorHandling(workflow: any): void {
+    const errorHandlerNode = {
+      id: 'error-handler',
+      name: 'Error Handler',
+      type: 'set',
+      typeVersion: 1,
+      position: [100, 400],
+      parameters: {
+        values: {
+          errorMessage: '={{$json["error"]["message"]}}',
+          errorNode: '={{$json["error"]["node"]}}',
+          timestamp: '={{new Date().toISOString()}}'
+        }
+      },
+      onError: 'continueRegularOutput'
+    };
+
+    workflow.nodes.push(errorHandlerNode);
+
+    // Add error connections to existing nodes
+    workflow.nodes.forEach((node: any) => {
+      if (node.name !== 'Error Handler') {
+        node.onError = 'continueErrorOutput';
+        if (!workflow.connections[node.name]) {
+          workflow.connections[node.name] = {};
+        }
+        if (!workflow.connections[node.name].error) {
+          workflow.connections[node.name].error = [];
+        }
+        workflow.connections[node.name].error.push([
+          {
+            node: 'Error Handler',
+            type: 'main',
+            index: 0
+          }
+        ]);
+      }
+    });
+  }
+
+  /**
+   * Add logging to workflow
+   */
+  private static addLogging(workflow: any): void {
+    const loggerNode = {
+      id: 'logger',
+      name: 'Logger',
+      type: 'function',
+      typeVersion: 1,
+      position: [100, 300],
+      parameters: {
+        functionCode: `
+// Log workflow execution details
+const timestamp = new Date().toISOString();
+const nodeData = items[0].json;
+
+console.log(\`[\${timestamp}] Workflow execution:\`, {
+  node: $node.name,
+  data: nodeData,
+  itemCount: items.length
+});
+
+return items;
+`
+      }
+    };
+
+    workflow.nodes.push(loggerNode);
+  }
+
+  /**
+   * Add retry logic to workflow
+   */
+  private static addRetryLogic(workflow: any): void {
+    workflow.nodes.forEach((node: any) => {
+      if (node.type !== 'set' && node.type !== 'function') {
+        node.retryOnFail = true;
+        node.maxTries = 3;
+        node.waitBetween = 1000;
+      }
+    });
+  }
+
+  /**
+   * Add AI enhancements to workflow
+   */
+  private static async addAIEnhancements(workflow: any): Promise<void> {
+    // Add AI decision node for complex workflows
+    if (workflow.nodes.length > 3) {
+      const aiDecisionNode = {
+        id: 'ai-decision',
+        name: 'AI Decision Engine',
+        type: 'openai',
+        typeVersion: 1,
+        position: [workflow.nodes.length * 200, 100],
+        parameters: {
+          operation: 'text',
+          prompt: 'Analyze the workflow data and determine the best next action based on the results.',
+          maxTokens: 150,
+          temperature: 0.3
+        },
+        credentials: 'openAiApi'
+      };
+
+      workflow.nodes.push(aiDecisionNode);
     }
   }
 
   /**
-   * Generate workflow metadata
+   * Generate documentation for the workflow
    */
-  private async generateMetadata(filePath: string, workflow: N8nWorkflow): Promise<WorkflowMetadata> {
-    const stats = await stat(filePath);
-    const nodeTypes = workflow.nodes.map(node => node.type);
-    
-    const workflowText = JSON.stringify(workflow).toLowerCase();
-    
+  private static generateDocumentation(workflow: any, nodeTypes: string[]): any {
     return {
-      filePath,
-      fileName: path.basename(filePath),
-      directory: path.dirname(filePath),
-      fileSize: stats.size,
-      lastModified: stats.mtime,
-      isAIRelated: this.aiKeywords.some(keyword => workflowText.includes(keyword)),
-      isOutlookRelated: this.outlookKeywords.some(keyword => workflowText.includes(keyword)),
-      isTeamsRelated: this.teamsKeywords.some(keyword => workflowText.includes(keyword)),
-      nodeTypes: [...new Set(nodeTypes)],
-      complexity: this.assessComplexity(workflow),
-      estimatedCategory: this.categorizeWorkflow(workflow)
+      description: `Generated workflow using ${nodeTypes.length} nodes: ${nodeTypes.join(', ')}`,
+      nodeCount: workflow.nodes.length,
+      estimatedExecutionTime: this.estimateExecutionTime(workflow),
+      complexity: this.assessWorkflowComplexity(workflow),
+      requiredCredentials: this.extractRequiredCredentials(workflow),
+      useCases: this.generateUseCases(nodeTypes),
+      setupInstructions: this.generateSetupInstructions(workflow),
+      generatedAt: new Date().toISOString()
     };
   }
 
   /**
-   * Generate a unique ID for a workflow
+   * Validate a complete workflow
    */
-  private generateWorkflowId(filePath: string): string {
-    const relativePath = path.relative(process.cwd(), filePath);
-    return relativePath.replace(/[^a-zA-Z0-9]/g, '_');
+  static validateWorkflow(workflow: any): ValidationResult {
+    return NodeParameterValidator.validateWorkflow(workflow);
   }
 
   /**
-   * Generate description for workflow
+   * Optimize workflow for performance
    */
-  private generateDescription(workflow: N8nWorkflow): string {
-    const nodeTypes = [...new Set(workflow.nodes.map(node => node.type))];
-    const integrations = nodeTypes
-      .filter(type => type.includes('n8n-nodes-base.'))
-      .map(type => type.replace('n8n-nodes-base.', ''))
-      .join(', ');
+  static optimizeWorkflow(workflow: any): any {
+    const optimized = JSON.parse(JSON.stringify(workflow));
 
-    return `Workflow with ${workflow.nodes.length} nodes using: ${integrations}`;
-  }
+    // Remove unnecessary parameters
+    optimized.nodes.forEach((node: any) => {
+      if (node.parameters) {
+        // Remove default values
+        Object.keys(node.parameters).forEach(key => {
+          if (node.parameters[key] === '' || node.parameters[key] === null) {
+            delete node.parameters[key];
+          }
+        });
+      }
 
-  /**
-   * Generate tags for workflow
-   */
-  private generateTags(workflow: N8nWorkflow): string[] {
-    const tags: string[] = [];
-    const workflowText = JSON.stringify(workflow).toLowerCase();
-    
-    // Add tags based on node types
-    workflow.nodes.forEach(node => {
-      if (node.type.includes('microsoft')) tags.push('microsoft');
-      if (node.type.includes('google')) tags.push('google');
-      if (node.type.includes('slack')) tags.push('slack');
-      if (node.type.includes('webhook')) tags.push('webhook');
-      if (node.type.includes('trigger')) tags.push('trigger');
+      // Optimize execution settings
+      if (!node.continueOnFail) {
+        node.continueOnFail = false;
+      }
+      if (!node.alwaysOutputData) {
+        node.alwaysOutputData = false;
+      }
     });
 
-    // Add AI-related tags
-    if (this.aiKeywords.some(keyword => workflowText.includes(keyword))) {
-      tags.push('ai', 'automation');
-    }
-
-    // Add communication tags
-    if (this.outlookKeywords.some(keyword => workflowText.includes(keyword))) {
-      tags.push('email', 'communication');
-    }
-
-    if (this.teamsKeywords.some(keyword => workflowText.includes(keyword))) {
-      tags.push('collaboration', 'teams');
-    }
-
-    return [...new Set(tags)];
+    return optimized;
   }
 
   /**
-   * Categorize workflow based on content
+   * Helper methods
    */
-  private categorizeWorkflow(workflow: N8nWorkflow): string {
-    const workflowText = JSON.stringify(workflow).toLowerCase();
-    const nodeTypes = workflow.nodes.map(node => node.type.toLowerCase());
-
-    // AI & Productivity
-    if (this.aiKeywords.some(keyword => workflowText.includes(keyword)) ||
-        this.outlookKeywords.some(keyword => workflowText.includes(keyword)) ||
-        this.teamsKeywords.some(keyword => workflowText.includes(keyword))) {
-      return 'AI & Productivity';
-    }
-
-    // E-commerce
-    if (nodeTypes.some(type => 
-        type.includes('shopify') || type.includes('woocommerce') || 
-        type.includes('bigcommerce') || type.includes('stripe'))) {
-      return 'E-commerce';
-    }
-
-    // Marketing
-    if (nodeTypes.some(type => 
-        type.includes('mailchimp') || type.includes('hubspot') || 
-        type.includes('salesforce') || type.includes('analytics'))) {
-      return 'Marketing';
-    }
-
-    // Customer Support
-    if (nodeTypes.some(type => 
-        type.includes('zendesk') || type.includes('intercom') || 
-        type.includes('freshdesk'))) {
-      return 'Customer Support';
-    }
-
-    // Project Management
-    if (nodeTypes.some(type => 
-        type.includes('trello') || type.includes('asana') || 
-        type.includes('jira') || type.includes('notion'))) {
-      return 'Project Management';
-    }
-
-    // Development & DevOps
-    if (nodeTypes.some(type => 
-        type.includes('github') || type.includes('gitlab') || 
-        type.includes('docker') || type.includes('aws'))) {
-      return 'Development & DevOps';
-    }
-
-    return 'General Automation';
+  private static formatNodeName(nodeType: string): string {
+    return nodeType
+      .split(/[-_]/)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
-  /**
-   * Assess workflow difficulty
-   */
-  private assessDifficulty(workflow: N8nWorkflow): 'beginner' | 'intermediate' | 'advanced' {
-    const nodeCount = workflow.nodes.length;
-    const hasComplexNodes = workflow.nodes.some(node => 
-      node.type.includes('code') || 
-      node.type.includes('function') || 
-      node.type.includes('webhook')
-    );
-    const hasConditions = workflow.nodes.some(node => 
-      node.type.includes('if') || 
-      node.type.includes('switch')
-    );
-
-    if (nodeCount > 20 || hasComplexNodes) {
-      return 'advanced';
-    } else if (nodeCount > 8 || hasConditions) {
-      return 'intermediate';
-    }
-    
-    return 'beginner';
+  private static calculateVerticalOffset(index: number): number {
+    // Add some vertical variation to make workflows more visually appealing
+    return (index % 2) * 50;
   }
 
-  /**
-   * Assess workflow complexity
-   */
-  private assessComplexity(workflow: N8nWorkflow): 'simple' | 'moderate' | 'complex' {
-    const nodeCount = workflow.nodes.length;
-    const uniqueNodeTypes = new Set(workflow.nodes.map(node => node.type)).size;
-    
-    if (nodeCount > 15 || uniqueNodeTypes > 10) {
-      return 'complex';
-    } else if (nodeCount > 6 || uniqueNodeTypes > 5) {
-      return 'moderate';
-    }
-    
-    return 'simple';
+  private static requiresCredentials(nodeInfo: DiscoveredNode): boolean {
+    return nodeInfo.authRequired || false;
   }
 
-  /**
-   * Generate use case description
-   */
-  private generateUseCase(workflow: N8nWorkflow): string {
-    const category = this.categorizeWorkflow(workflow);
-    const nodeCount = workflow.nodes.length;
-    
-    const useCases: Record<string, string> = {
-      'AI & Productivity': 'Automate email management and team communication with AI-powered processing',
-      'E-commerce': 'Streamline online store operations and customer order processing',
-      'Marketing': 'Automate marketing campaigns and customer engagement workflows',
-      'Customer Support': 'Enhance customer service with automated ticket management and responses',
-      'Project Management': 'Coordinate project tasks and team collaboration efficiently',
-      'Development & DevOps': 'Automate development workflows and deployment processes',
-      'General Automation': 'Streamline business processes and data integration tasks'
+  private static suggestCredentials(nodeType: string): Record<string, string> {
+    const credentialMap: Record<string, string> = {
+      'gmail': 'gmailOAuth2',
+      'slack': 'slackOAuth2',
+      'github': 'githubOAuth2',
+      'openai': 'openAiApi',
+      'postgres': 'postgres'
     };
 
-    return useCases[category] || `Automate workflows with ${nodeCount} integrated steps`;
+    const credentialKey = Object.keys(credentialMap).find(key => 
+      nodeType.toLowerCase().includes(key)
+    );
+
+    return credentialKey ? { [credentialMap[credentialKey]]: credentialMap[credentialKey] } : {};
   }
 
-  /**
-   * Generate benefits list
-   */
-  private generateBenefits(workflow: N8nWorkflow): string[] {
-    const benefits: string[] = [
-      'Reduces manual work and human error',
-      'Improves process efficiency and speed',
-      'Enables 24/7 automated operations'
+  private static generateNodeNotes(nodeInfo: DiscoveredNode | null): string {
+    if (!nodeInfo) {
+      return 'Configure this node according to your requirements.';
+    }
+
+    let notes = nodeInfo.description;
+    
+    if (nodeInfo.authRequired) {
+      notes += '\n\n⚠️ This node requires authentication credentials.';
+    }
+    
+    if (nodeInfo.rateLimit) {
+      notes += '\n\n⏱️ This service has rate limits. Consider adding delays between requests.';
+    }
+    
+    if (nodeInfo.integrationComplexity === 'complex') {
+      notes += '\n\n🔧 This is a complex integration. Review documentation carefully.';
+    }
+
+    return notes;
+  }
+
+  private static estimateExecutionTime(workflow: any): string {
+    const nodeCount = workflow.nodes.length;
+    const hasApiCalls = workflow.nodes.some((node: any) => 
+      ['http', 'webhook', 'api'].some(term => node.type.toLowerCase().includes(term))
+    );
+
+    if (nodeCount <= 3) {
+      return hasApiCalls ? '5-15 seconds' : '1-5 seconds';
+    } else if (nodeCount <= 10) {
+      return hasApiCalls ? '15-60 seconds' : '5-15 seconds';
+    } else {
+      return hasApiCalls ? '1-5 minutes' : '15-60 seconds';
+    }
+  }
+
+  private static assessWorkflowComplexity(workflow: any): 'simple' | 'medium' | 'complex' {
+    const nodeCount = workflow.nodes.length;
+    const hasConditions = workflow.nodes.some((node: any) => node.type === 'if');
+    const hasLoops = workflow.nodes.some((node: any) => node.type === 'loop');
+
+    if (nodeCount <= 3 && !hasConditions && !hasLoops) {
+      return 'simple';
+    } else if (nodeCount <= 10 || hasConditions) {
+      return 'medium';
+    } else {
+      return 'complex';
+    }
+  }
+
+  private static extractRequiredCredentials(workflow: any): string[] {
+    const credentials = new Set<string>();
+    
+    workflow.nodes.forEach((node: any) => {
+      if (node.credentials) {
+        Object.keys(node.credentials).forEach(cred => credentials.add(cred));
+      }
+    });
+
+    return Array.from(credentials);
+  }
+
+  private static generateUseCases(nodeTypes: string[]): string[] {
+    const useCases: string[] = [];
+    
+    if (nodeTypes.some(type => type.includes('email'))) {
+      useCases.push('Email automation and processing');
+    }
+    
+    if (nodeTypes.some(type => type.includes('database') || type.includes('sql'))) {
+      useCases.push('Data synchronization and ETL');
+    }
+    
+    if (nodeTypes.some(type => type.includes('ai') || type.includes('openai'))) {
+      useCases.push('AI-powered content generation and analysis');
+    }
+    
+    if (nodeTypes.some(type => type.includes('webhook') || type.includes('http'))) {
+      useCases.push('API integration and webhook processing');
+    }
+
+    return useCases.length > 0 ? useCases : ['General workflow automation'];
+  }
+
+  private static generateSetupInstructions(workflow: any): string[] {
+    const instructions = [
+      'Import this workflow into your n8n instance',
+      'Configure the required credentials for authenticated nodes',
+      'Review and adjust node parameters according to your use case',
+      'Test the workflow with sample data'
     ];
 
-    const workflowText = JSON.stringify(workflow).toLowerCase();
-    
-    if (this.aiKeywords.some(keyword => workflowText.includes(keyword))) {
-      benefits.push('Leverages AI for intelligent decision making');
+    const credentials = this.extractRequiredCredentials(workflow);
+    if (credentials.length > 0) {
+      instructions.splice(1, 0, `Set up credentials for: ${credentials.join(', ')}`);
     }
 
-    if (workflow.nodes.some(node => node.type.includes('trigger'))) {
-      benefits.push('Real-time event-driven automation');
-    }
-
-    if (workflow.nodes.some(node => node.type.includes('webhook'))) {
-      benefits.push('Seamless integration with external systems');
-    }
-
-    return benefits;
-  }
-
-  /**
-   * Get all loaded workflows
-   */
-  getWorkflows(): Map<string, N8nWorkflow> {
-    return this.workflows;
-  }
-
-  /**
-   * Get workflows by category
-   */
-  getWorkflowsByCategory(category: string): N8nWorkflow[] {
-    return Array.from(this.workflows.values())
-      .filter(workflow => workflow.category === category);
-  }
-
-  /**
-   * Get AI-related workflows
-   */
-  getAIWorkflows(): N8nWorkflow[] {
-    const aiWorkflows: N8nWorkflow[] = [];
-    
-    for (const [id, metadata] of this.metadata.entries()) {
-      if (metadata.isAIRelated || metadata.isOutlookRelated || metadata.isTeamsRelated) {
-        const workflow = this.workflows.get(id);
-        if (workflow) {
-          aiWorkflows.push(workflow);
-        }
-      }
-    }
-    
-    return aiWorkflows;
-  }
-
-  /**
-   * Search workflows
-   */
-  searchWorkflows(query: string): N8nWorkflow[] {
-    const lowerQuery = query.toLowerCase();
-    return Array.from(this.workflows.values())
-      .filter(workflow => 
-        workflow.name.toLowerCase().includes(lowerQuery) ||
-        workflow.description?.toLowerCase().includes(lowerQuery) ||
-        workflow.tags?.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
-        workflow.useCase?.toLowerCase().includes(lowerQuery)
-      );
-  }
-
-  /**
-   * Get workflow metadata
-   */
-  getMetadata(): Map<string, WorkflowMetadata> {
-    return this.metadata;
-  }
-
-  /**
-   * Get workflow statistics
-   */
-  getStatistics() {
-    const totalWorkflows = this.workflows.size;
-    const aiRelated = Array.from(this.metadata.values())
-      .filter(meta => meta.isAIRelated).length;
-    const outlookRelated = Array.from(this.metadata.values())
-      .filter(meta => meta.isOutlookRelated).length;
-    const teamsRelated = Array.from(this.metadata.values())
-      .filter(meta => meta.isTeamsRelated).length;
-
-    const categories = Array.from(this.workflows.values())
-      .reduce((acc, workflow) => {
-        const category = workflow.category || 'Uncategorized';
-        acc[category] = (acc[category] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-    const difficulties = Array.from(this.workflows.values())
-      .reduce((acc, workflow) => {
-        const difficulty = workflow.difficulty || 'unknown';
-        acc[difficulty] = (acc[difficulty] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-    return {
-      totalWorkflows,
-      aiRelated,
-      outlookRelated,
-      teamsRelated,
-      categories,
-      difficulties,
-      directories: this.workflowDirectories.length
-    };
+    return instructions;
   }
 }
 
-// Export singleton instance
-export const workflowLoader = new WorkflowLoader();
-
-export default workflowLoader;
+export default WorkflowLoader;

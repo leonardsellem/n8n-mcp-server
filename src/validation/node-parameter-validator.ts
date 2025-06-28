@@ -1,686 +1,470 @@
 /**
- * Comprehensive Node Parameter Validator
+ * Node Parameter Validator - Enhanced validation for node configurations
  * 
- * Provides detailed validation for n8n node parameters, including:
- * - Required parameter checking
- * - Type validation  
- * - Value constraint validation
- * - Conditional parameter validation
- * - Best practice recommendations
+ * Provides comprehensive validation for n8n node parameters and configurations
+ * with AI-friendly error messages and suggestions.
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { allNodes } from '../data/index.js';
+import { DiscoveredNode } from '../data/dynamic-node-registry.js';
 
 export interface ValidationResult {
   valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationWarning[];
+  errors: string[];
+  warnings: string[];
   suggestions: string[];
-  score: number; // 0-100 validation score
-}
-
-export interface ValidationError {
-  parameter: string;
-  message: string;
   severity: 'error' | 'warning' | 'info';
-  suggestion?: string;
 }
 
-export interface ValidationWarning {
-  parameter: string;
-  message: string;
-  recommendation: string;
-}
-
-export interface ParameterDefinition {
-  name: string;
-  displayName: string;
-  type: string;
-  required?: boolean;
-  default?: any;
-  description?: string;
-  options?: Array<{ name: string; value?: any }>;
-  placeholder?: string;
-  typeOptions?: {
-    multipleValues?: boolean;
-    minValue?: number;
-    maxValue?: number;
-    numberPrecision?: number;
-    rows?: number;
-  };
-  displayOptions?: {
-    show?: { [key: string]: any[] };
-    hide?: { [key: string]: any[] };
-  };
+export interface NodeParameterValidationOptions {
+  strictMode?: boolean;
+  checkRequired?: boolean;
+  validateTypes?: boolean;
+  suggestAlternatives?: boolean;
 }
 
 export class NodeParameterValidator {
-  private nodeDefinitions: Map<string, NodeTypeInfo> = new Map();
+  private static readonly REQUIRED_FIELDS = ['name', 'displayName', 'description'];
+  private static readonly RECOMMENDED_FIELDS = ['version', 'category', 'properties'];
   
-  constructor() {
-    this.initializeNodeDefinitions();
-  }
-
-  private async initializeNodeDefinitions(): Promise<void> {
-    try {
-      allNodes.forEach((node: NodeTypeInfo) => {
-        this.nodeDefinitions.set(node.name, node);
-      });
-      console.log(`[NodeParameterValidator] Loaded ${allNodes.length} node definitions for validation`);
-    } catch (error) {
-      console.error('[NodeParameterValidator] Failed to load node definitions:', error);
-    }
-  }
-
   /**
-   * Validate node parameters comprehensively
+   * Validate a complete node configuration
    */
-  async validateNodeParameters(
-    nodeType: string, 
-    parameters: Record<string, any>
-  ): Promise<ValidationResult> {
-    const errors: ValidationError[] = [];
-    const warnings: ValidationWarning[] = [];
+  static validateNodeConfiguration(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    options: NodeParameterValidationOptions = {}
+  ): ValidationResult {
+    const {
+      strictMode = false,
+      checkRequired = true,
+      validateTypes = true,
+      suggestAlternatives = true
+    } = options;
+
+    const errors: string[] = [];
+    const warnings: string[] = [];
     const suggestions: string[] = [];
 
-    // Get node definition
-    const nodeDefinition = this.nodeDefinitions.get(nodeType);
-    if (!nodeDefinition) {
-      errors.push({
-        parameter: 'nodeType',
-        message: `Unknown node type: ${nodeType}`,
-        severity: 'error',
-        suggestion: 'Use the discover_nodes tool to find valid node types'
-      });
+    // Check if node is null or undefined
+    if (!node || typeof node !== 'object') {
       return {
         valid: false,
-        errors,
-        warnings,
-        suggestions,
-        score: 0
+        errors: ['Node configuration must be a valid object'],
+        warnings: [],
+        suggestions: ['Provide a proper node configuration object with required fields'],
+        severity: 'error'
       };
     }
 
-    // Enhanced validation for specific node types
-    await this.validateByNodeType(nodeType, parameters, errors, warnings, suggestions);
-    
-    // Validate parameters against node definition  
-    if (nodeDefinition.properties) {
-      for (const property of nodeDefinition.properties) {
-        await this.validateParameter(property, parameters, errors, warnings, suggestions);
-      }
+    // Validate required fields
+    if (checkRequired) {
+      this.validateRequiredFields(node, errors, warnings);
     }
 
-    // Check for unknown parameters
-    this.validateUnknownParameters(nodeDefinition, parameters, warnings);
+    // Validate field types
+    if (validateTypes) {
+      this.validateFieldTypes(node, errors, warnings);
+    }
 
-    // Generate best practice suggestions
-    this.generateBestPractices(nodeType, parameters, suggestions);
+    // Check recommended fields
+    this.validateRecommendedFields(node, warnings, suggestions);
 
-    // Calculate validation score
-    const score = this.calculateValidationScore(errors, warnings, suggestions);
+    // Validate node properties if present
+    if (node.properties && Array.isArray(node.properties)) {
+      this.validateNodeProperties(node.properties, errors, warnings, suggestions);
+    }
+
+    // Validate inputs/outputs
+    this.validateNodeConnections(node, warnings, suggestions);
+
+    // Strict mode additional checks
+    if (strictMode) {
+      this.performStrictValidation(node, errors, warnings, suggestions);
+    }
+
+    // Generate suggestions for improvements
+    if (suggestAlternatives) {
+      this.generateImprovementSuggestions(node, suggestions);
+    }
+
+    const valid = errors.length === 0;
+    const severity = errors.length > 0 ? 'error' : warnings.length > 0 ? 'warning' : 'info';
 
     return {
-      valid: errors.length === 0,
+      valid,
       errors,
       warnings,
       suggestions,
-      score
+      severity
     };
   }
 
   /**
-   * Node-specific validation rules
+   * Validate required fields
    */
-  private async validateByNodeType(
-    nodeType: string,
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): Promise<void> {
-    switch (nodeType) {
-      case 'n8n-nodes-base.webhook':
-        this.validateWebhookNode(parameters, errors, warnings, _suggestions);
-        break;
-      
-      case 'n8n-nodes-base.httpRequest':
-        this.validateHttpRequestNode(parameters, errors, warnings, _suggestions);
-        break;
-      
-      case 'n8n-nodes-base.function':
-        this.validateFunctionNode(parameters, errors, warnings, _suggestions);
-        break;
-      
-      case 'n8n-nodes-base.switch':
-        this.validateSwitchNode(parameters, errors, warnings, _suggestions);
-        break;
-      
-      case 'n8n-nodes-base.set':
-        this.validateSetNode(parameters, errors, warnings, _suggestions);
-        break;
-      
-      case 'n8n-nodes-base.scheduleTrigger':
-        this.validateScheduleTriggerNode(parameters, errors, warnings, _suggestions);
-        break;
-
-      default:
-        // Generic validation for unknown node types
-        this.validateGenericNode(parameters, errors, warnings, _suggestions);
-    }
-  }
-
-  /**
-   * Validate individual parameter
-   */
-  private async validateParameter(
-    paramDef: ParameterDefinition,
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): Promise<void> {
-    const value = parameters[paramDef.name];
-    
-    // Required parameter check
-    if (paramDef.required && (value === undefined || value === null || value === '')) {
-      errors.push({
-        parameter: paramDef.name,
-        message: `Required parameter '${paramDef.displayName || paramDef.name}' is missing`,
-        severity: 'error',
-        suggestion: paramDef.description || `Set a value for ${paramDef.displayName || paramDef.name}`
-      });
-      return;
-    }
-
-    // Skip validation if parameter is not provided and not required
-    if (value === undefined || value === null) {
-      return;
-    }
-
-    // Type validation
-    this.validateParameterType(paramDef, value, errors, warnings);
-
-    // Options validation
-    if (paramDef.options && paramDef.options.length > 0) {
-      this.validateParameterOptions(paramDef, value, errors, warnings);
-    }
-
-    // Type-specific validation
-    this.validateParameterConstraints(paramDef, value, errors, warnings);
-  }
-
-  /**
-   * Validate parameter type
-   */
-  private validateParameterType(
-    paramDef: ParameterDefinition,
-    value: any,
-    errors: ValidationError[],
-    _warnings: ValidationWarning[]
+  private static validateRequiredFields(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    errors: string[],
+    warnings: string[]
   ): void {
-    const expectedType = paramDef.type;
-    const actualType = typeof value;
-
-    switch (expectedType) {
-      case 'string':
-        if (actualType !== 'string') {
-          errors.push({
-            parameter: paramDef.name,
-            message: `Expected string, got ${actualType}`,
-            severity: 'error'
-          });
+    this.REQUIRED_FIELDS.forEach(field => {
+      if (!node[field as keyof typeof node]) {
+        if (field === 'name') {
+          errors.push('Node name is required and must be unique');
+        } else if (field === 'displayName') {
+          warnings.push('Display name is recommended for better user experience');
+        } else if (field === 'description') {
+          warnings.push('Description is recommended to explain node functionality');
         }
-        break;
+      }
+    });
 
-      case 'number':
-        if (actualType !== 'number' || isNaN(value)) {
-          errors.push({
-            parameter: paramDef.name,
-            message: `Expected number, got ${actualType}`,
-            severity: 'error'
-          });
-        }
-        break;
-
-      case 'boolean':
-        if (actualType !== 'boolean') {
-          errors.push({
-            parameter: paramDef.name,
-            message: `Expected boolean, got ${actualType}`,
-            severity: 'error'
-          });
-        }
-        break;
-
-      case 'json':
-      case 'object':
-        if (actualType !== 'object' || Array.isArray(value)) {
-          errors.push({
-            parameter: paramDef.name,
-            message: `Expected object, got ${actualType}`,
-            severity: 'error'
-          });
-        }
-        break;
-
-      case 'array':
-        if (!Array.isArray(value)) {
-          errors.push({
-            parameter: paramDef.name,
-            message: `Expected array, got ${actualType}`,
-            severity: 'error'
-          });
-        }
-        break;
-    }
-  }
-
-  /**
-   * Validate parameter options
-   */
-  private validateParameterOptions(
-    paramDef: ParameterDefinition,
-    value: any,
-    errors: ValidationError[],
-    _warnings: ValidationWarning[]
-  ): void {
-    const validValues = paramDef.options!
-      .map(opt => opt.value !== undefined ? opt.value : opt.name)
-      .filter(val => val !== undefined);
-    
-    if (validValues.length > 0 && !validValues.includes(value)) {
-      errors.push({
-        parameter: paramDef.name,
-        message: `Invalid value '${value}'. Valid options: ${validValues.join(', ')}`,
-        severity: 'error',
-        suggestion: `Use one of: ${validValues.join(', ')}`
-      });
-    }
-  }
-
-  /**
-   * Validate parameter constraints
-   */
-  private validateParameterConstraints(
-    paramDef: ParameterDefinition,
-    value: any,
-    errors: ValidationError[],
-    warnings: ValidationWarning[]
-  ): void {
-    const typeOptions = paramDef.typeOptions;
-    if (!typeOptions) return;
-
-    // Number constraints
-    if (paramDef.type === 'number') {
-      if (typeOptions.minValue !== undefined && value < typeOptions.minValue) {
-        errors.push({
-          parameter: paramDef.name,
-          message: `Value ${value} is below minimum ${typeOptions.minValue}`,
-          severity: 'error'
-        });
+    // Validate name format
+    if (node.name && typeof node.name === 'string') {
+      if (!node.name.match(/^[a-zA-Z0-9\-_.]+$/)) {
+        errors.push('Node name should contain only alphanumeric characters, hyphens, dots, and underscores');
       }
       
-      if (typeOptions.maxValue !== undefined && value > typeOptions.maxValue) {
-        errors.push({
-          parameter: paramDef.name,
-          message: `Value ${value} exceeds maximum ${typeOptions.maxValue}`,
-          severity: 'error'
-        });
-      }
-    }
-
-    // String length constraints
-    if (paramDef.type === 'string' && typeof value === 'string') {
-      if (value.length === 0 && paramDef.required) {
-        warnings.push({
-          parameter: paramDef.name,
-          message: 'Empty string provided for required parameter',
-          recommendation: 'Provide a meaningful value'
-        });
+      if (node.name.length < 3) {
+        errors.push('Node name should be at least 3 characters long');
       }
       
-      if (value.length > 10000) {
-        warnings.push({
-          parameter: paramDef.name,
-          message: 'Very long string value detected',
-          recommendation: 'Consider using a shorter value for better performance'
-        });
+      if (node.name.length > 100) {
+        warnings.push('Node name is quite long, consider shortening for better readability');
       }
     }
   }
 
   /**
-   * Node-specific validation methods
+   * Validate field types
    */
-  private validateWebhookNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
+  private static validateFieldTypes(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    errors: string[],
+    warnings: string[]
   ): void {
-    // Validate webhook path
-    if (parameters.path) {
-      if (typeof parameters.path !== 'string') {
-        errors.push({
-          parameter: 'path',
-          message: 'Webhook path must be a string',
-          severity: 'error'
-        });
-      } else {
-        // Check for valid path format
-        if (parameters.path.includes(' ')) {
-          warnings.push({
-            parameter: 'path',
-            message: 'Webhook path contains spaces',
-            recommendation: 'Use hyphens or underscores instead of spaces'
-          });
-        }
-        
-        if (parameters.path.length > 100) {
-          warnings.push({
-            parameter: 'path',
-            message: 'Very long webhook path',
-            recommendation: 'Use shorter, more descriptive paths'
-          });
-        }
+    // Validate name type
+    if (node.name && typeof node.name !== 'string') {
+      errors.push('Node name must be a string');
+    }
+
+    // Validate displayName type
+    if (node.displayName && typeof node.displayName !== 'string') {
+      errors.push('Display name must be a string');
+    }
+
+    // Validate description type
+    if (node.description && typeof node.description !== 'string') {
+      errors.push('Description must be a string');
+    }
+
+    // Validate version
+    if (node.version !== undefined) {
+      if (typeof node.version !== 'number' || node.version < 1) {
+        errors.push('Version must be a positive number');
       }
     }
 
-    // Validate HTTP method
-    if (parameters.httpMethod) {
-      const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
-      if (!validMethods.includes(parameters.httpMethod)) {
-        errors.push({
-          parameter: 'httpMethod',
-          message: `Invalid HTTP method: ${parameters.httpMethod}`,
-          severity: 'error',
-          suggestion: `Use one of: ${validMethods.join(', ')}`
-        });
-      }
+    // Validate properties array
+    if (node.properties && !Array.isArray(node.properties)) {
+      errors.push('Properties must be an array');
     }
 
-    _suggestions.push('Consider adding authentication for webhook security');
-    _suggestions.push('Set appropriate response mode for your use case');
-  }
-
-  private validateHttpRequestNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): void {
-    // Validate URL
-    if (parameters.url) {
-      if (typeof parameters.url !== 'string') {
-        errors.push({
-          parameter: 'url',
-          message: 'URL must be a string',
-          severity: 'error'
-        });
-      } else {
-        try {
-          new URL(parameters.url);
-        } catch {
-          errors.push({
-            parameter: 'url',
-            message: 'Invalid URL format',
-            severity: 'error',
-            suggestion: 'Provide a valid URL starting with http:// or https://'
-          });
-        }
-      }
-    }
-
-    // Validate method
-    if (parameters.method) {
-      const validMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
-      if (!validMethods.includes(parameters.method)) {
-        errors.push({
-          parameter: 'method',
-          message: `Invalid HTTP method: ${parameters.method}`,
-          severity: 'error'
-        });
-      }
-    }
-
-    _suggestions.push('Add appropriate timeout settings for reliability');
-    _suggestions.push('Consider adding retry logic for critical requests');
-  }
-
-  private validateFunctionNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): void {
-    if (parameters.functionCode) {
-      if (typeof parameters.functionCode !== 'string') {
-        errors.push({
-          parameter: 'functionCode',
-          message: 'Function code must be a string',
-          severity: 'error'
-        });
-      } else {
-        // Basic JavaScript syntax validation
-        try {
-          new Function(parameters.functionCode);
-        } catch (error) {
-          errors.push({
-            parameter: 'functionCode',
-            message: `JavaScript syntax error: ${(error as Error).message}`,
-            severity: 'error',
-            suggestion: 'Fix JavaScript syntax errors'
-          });
-        }
-
-        // Check for potential issues
-        if (parameters.functionCode.includes('while(true)')) {
-          warnings.push({
-            parameter: 'functionCode',
-            message: 'Infinite loop detected',
-            recommendation: 'Avoid infinite loops as they can hang the workflow'
-          });
-        }
-
-        if (parameters.functionCode.length > 5000) {
-          warnings.push({
-            parameter: 'functionCode',
-            message: 'Very long function code',
-            recommendation: 'Consider breaking down into smaller functions'
-          });
-        }
-      }
-    }
-
-    _suggestions.push('Use console.log() for debugging function behavior');
-    _suggestions.push('Handle errors gracefully with try-catch blocks');
-  }
-
-  private validateSwitchNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): void {
-    if (parameters.conditions && parameters.conditions.conditions) {
-      const conditions = parameters.conditions.conditions;
-      
-      if (!Array.isArray(conditions)) {
-        errors.push({
-          parameter: 'conditions',
-          message: 'Conditions must be an array',
-          severity: 'error'
-        });
-      } else if (conditions.length === 0) {
-        warnings.push({
-          parameter: 'conditions',
-          message: 'No conditions defined',
-          recommendation: 'Add at least one condition for the switch to be useful'
-        });
-      }
-
-      // Validate each condition
-      conditions.forEach((condition: any, index: number) => {
-        if (!condition.leftValue) {
-          warnings.push({
-            parameter: `conditions[${index}].leftValue`,
-            message: 'Empty left value in condition',
-            recommendation: 'Specify a value or expression to compare'
-          });
-        }
-        
-        if (!condition.operator || !condition.operator.operation) {
-          errors.push({
-            parameter: `conditions[${index}].operator`,
-            message: 'Missing operator in condition',
-            severity: 'error'
-          });
-        }
-      });
-    }
-
-    _suggestions.push('Add a fallback output for unmatched conditions');
-    _suggestions.push('Use meaningful condition descriptions for clarity');
-  }
-
-  private validateSetNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): void {
-    if (parameters.values) {
-      const values = parameters.values;
-      let hasValues = false;
-
-      ['string', 'number', 'boolean'].forEach(type => {
-        if (values[type] && Array.isArray(values[type]) && values[type].length > 0) {
-          hasValues = true;
-        }
-      });
-
-      if (!hasValues) {
-        warnings.push({
-          parameter: 'values',
-          message: 'No values configured',
-          recommendation: 'Add at least one value to set data'
-        });
-      }
-    }
-
-    _suggestions.push('Use descriptive names for set values');
-    _suggestions.push('Consider using expressions for dynamic values');
-  }
-
-  private validateScheduleTriggerNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    _suggestions: string[]
-  ): void {
-    if (parameters.rule && parameters.rule.interval) {
-      const intervals = parameters.rule.interval;
-      
-      if (!Array.isArray(intervals) || intervals.length === 0) {
-        errors.push({
-          parameter: 'rule.interval',
-          message: 'Schedule interval must be defined',
-          severity: 'error'
-        });
-      }
-    }
-
-    _suggestions.push('Consider timezone settings for scheduled workflows');
-    _suggestions.push('Test schedule triggers with appropriate intervals');
-  }
-
-  private validateGenericNode(
-    parameters: Record<string, any>,
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
-    suggestions: string[]
-  ): void {
-    // Generic validation for unknown node types
-    if (Object.keys(parameters).length === 0) {
-      warnings.push({
-        parameter: 'general',
-        message: 'No parameters configured',
-        recommendation: 'Review node documentation for required parameters'
-      });
-    }
-
-    suggestions.push('Refer to n8n documentation for node-specific configuration');
-  }
-
-  /**
-   * Check for unknown parameters
-   */
-  private validateUnknownParameters(
-    nodeDefinition: NodeTypeInfo,
-    parameters: Record<string, any>,
-    warnings: ValidationWarning[]
-  ): void {
-    const knownParams = new Set(
-      nodeDefinition.properties?.map(p => p.name) || []
-    );
-
-    Object.keys(parameters).forEach(paramName => {
-      if (!knownParams.has(paramName)) {
-        warnings.push({
-          parameter: paramName,
-          message: `Unknown parameter '${paramName}'`,
-          recommendation: 'Remove unknown parameters or check parameter name spelling'
-        });
+    // Validate boolean fields
+    const booleanFields = ['triggerNode', 'regularNode', 'webhookSupport'];
+    booleanFields.forEach(field => {
+      const value = node[field as keyof typeof node];
+      if (value !== undefined && typeof value !== 'boolean') {
+        warnings.push(`${field} should be a boolean value`);
       }
     });
   }
 
   /**
-   * Generate best practice suggestions
+   * Validate recommended fields
    */
-  private generateBestPractices(
-    nodeType: string,
-    parameters: Record<string, any>,
+  private static validateRecommendedFields(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    warnings: string[],
     suggestions: string[]
   ): void {
-    // Add general best practices
-    suggestions.push('Use descriptive node names for better workflow readability');
-    suggestions.push('Add error handling for critical workflow paths');
-    
-    // Node-specific best practices
-    if (nodeType.includes('trigger')) {
-      suggestions.push('Test trigger configurations before activating workflows');
+    // Check for recommended fields
+    if (!node.version) {
+      warnings.push('Version number is recommended for tracking changes');
+      suggestions.push('Add a version number starting from 1');
     }
-    
-    if (nodeType.includes('http')) {
-      suggestions.push('Implement proper authentication and rate limiting');
+
+    if (!node.category) {
+      warnings.push('Category helps organize nodes in the interface');
+      suggestions.push('Add a category like "action", "trigger", "core", or "cluster"');
+    }
+
+    // Check for enhanced fields in DiscoveredNode
+    const discoveredNode = node as Partial<DiscoveredNode>;
+    if (discoveredNode.category) {
+      if (!discoveredNode.useCases || discoveredNode.useCases.length === 0) {
+        suggestions.push('Add use cases to help AI agents understand when to use this node');
+      }
+
+      if (!discoveredNode.searchTags || discoveredNode.searchTags.length === 0) {
+        suggestions.push('Add search tags to improve node discoverability');
+      }
     }
   }
 
   /**
-   * Calculate validation score (0-100)
+   * Validate node properties
    */
-  private calculateValidationScore(
-    errors: ValidationError[],
-    warnings: ValidationWarning[],
+  private static validateNodeProperties(
+    properties: any[],
+    errors: string[],
+    warnings: string[],
     suggestions: string[]
-  ): number {
-    let score = 100;
+  ): void {
+    if (properties.length === 0) {
+      warnings.push('Node has no properties defined');
+      suggestions.push('Consider adding properties if the node needs configuration parameters');
+      return;
+    }
+
+    properties.forEach((prop, index) => {
+      if (!prop || typeof prop !== 'object') {
+        errors.push(`Property at index ${index} must be an object`);
+        return;
+      }
+
+      // Validate property name
+      if (!prop.name) {
+        errors.push(`Property at index ${index} must have a name`);
+      } else if (typeof prop.name !== 'string') {
+        errors.push(`Property name at index ${index} must be a string`);
+      }
+
+      // Validate property type
+      if (!prop.type) {
+        warnings.push(`Property '${prop.name || index}' should have a type specified`);
+      }
+
+      // Validate displayName
+      if (!prop.displayName) {
+        warnings.push(`Property '${prop.name || index}' should have a displayName for better UX`);
+      }
+
+      // Check for required properties without default values
+      if (prop.required && prop.default === undefined) {
+        suggestions.push(`Consider adding a default value for required property '${prop.name}'`);
+      }
+    });
+  }
+
+  /**
+   * Validate node connections (inputs/outputs)
+   */
+  private static validateNodeConnections(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    warnings: string[],
+    suggestions: string[]
+  ): void {
+    // Check inputs
+    if (!node.inputs || !Array.isArray(node.inputs) || node.inputs.length === 0) {
+      if (!node.triggerNode) {
+        warnings.push('Non-trigger nodes should typically have at least one input');
+        suggestions.push('Add an input definition for data flow');
+      }
+    }
+
+    // Check outputs
+    if (!node.outputs || !Array.isArray(node.outputs) || node.outputs.length === 0) {
+      warnings.push('Node should typically have at least one output');
+      suggestions.push('Add an output definition for data flow');
+    }
+
+    // Validate trigger node configuration
+    if (node.triggerNode === true) {
+      if (node.inputs && node.inputs.length > 0) {
+        warnings.push('Trigger nodes typically do not have inputs');
+      }
+      
+      if (!node.webhookSupport && !node.regularNode) {
+        suggestions.push('Consider specifying webhook support or trigger type for trigger nodes');
+      }
+    }
+  }
+
+  /**
+   * Perform strict validation
+   */
+  private static performStrictValidation(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    errors: string[],
+    warnings: string[],
+    suggestions: string[]
+  ): void {
+    // Strict description requirements
+    if (node.description && node.description.length < 20) {
+      warnings.push('Description should be more descriptive (at least 20 characters)');
+    }
+
+    // Strict naming conventions
+    if (node.name && !node.name.includes('.')) {
+      suggestions.push('Consider using namespaced names (e.g., "n8n-nodes-base.nodeName")');
+    }
+
+    // Check for common typos in field names
+    const commonTypos: Record<string, string> = {
+      'dispayName': 'displayName',
+      'descripion': 'description',
+      'porperties': 'properties',
+      'triger': 'trigger'
+    };
+
+    Object.keys(node).forEach(key => {
+      if (commonTypos[key]) {
+        errors.push(`Possible typo: '${key}' should be '${commonTypos[key]}'`);
+      }
+    });
+  }
+
+  /**
+   * Generate improvement suggestions
+   */
+  private static generateImprovementSuggestions(
+    node: Partial<NodeTypeInfo | DiscoveredNode>,
+    suggestions: string[]
+  ): void {
+    // Suggest authentication information
+    const discoveredNode = node as Partial<DiscoveredNode>;
+    if (discoveredNode.authRequired === undefined && node.name) {
+      if (this.likelyRequiresAuth(node.name)) {
+        suggestions.push('This node likely requires authentication - consider setting authRequired: true');
+      }
+    }
+
+    // Suggest rate limiting information
+    if (discoveredNode.rateLimit === undefined && node.name) {
+      if (this.likelyHasRateLimit(node.name)) {
+        suggestions.push('This service likely has rate limits - consider setting rateLimit: true');
+      }
+    }
+
+    // Suggest complexity assessment
+    if (discoveredNode.integrationComplexity === undefined) {
+      suggestions.push('Consider setting integration complexity (simple/medium/complex) to help users');
+    }
+
+    // Suggest AI description
+    if (!discoveredNode.aiDescription && node.description) {
+      suggestions.push('Consider adding an AI-friendly description for better agent understanding');
+    }
+  }
+
+  /**
+   * Check if a node likely requires authentication
+   */
+  private static likelyRequiresAuth(nodeName: string): boolean {
+    const authServices = [
+      'github', 'gitlab', 'slack', 'discord', 'google', 'microsoft',
+      'salesforce', 'hubspot', 'stripe', 'paypal', 'twitter', 'facebook'
+    ];
     
-    // Deduct points for errors
-    score -= errors.length * 20;
+    return authServices.some(service => 
+      nodeName.toLowerCase().includes(service)
+    );
+  }
+
+  /**
+   * Check if a service likely has rate limits
+   */
+  private static likelyHasRateLimit(nodeName: string): boolean {
+    const rateLimitedServices = [
+      'twitter', 'github', 'openai', 'google', 'salesforce', 'stripe'
+    ];
     
-    // Deduct points for warnings
-    score -= warnings.length * 5;
-    
-    // Bonus points for having suggestions (shows thorough analysis)
-    score += Math.min(suggestions.length * 2, 10);
-    
-    return Math.max(0, Math.min(100, score));
+    return rateLimitedServices.some(service => 
+      nodeName.toLowerCase().includes(service)
+    );
+  }
+
+  /**
+   * Validate a workflow configuration
+   */
+  static validateWorkflow(workflow: any): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    const suggestions: string[] = [];
+
+    if (!workflow || typeof workflow !== 'object') {
+      return {
+        valid: false,
+        errors: ['Workflow must be an object'],
+        warnings: [],
+        suggestions: ['Provide a valid workflow configuration'],
+        severity: 'error'
+      };
+    }
+
+    // Check required workflow fields
+    if (!workflow.nodes) {
+      errors.push('Workflow must have nodes');
+    } else if (!Array.isArray(workflow.nodes)) {
+      errors.push('Workflow nodes must be an array');
+    } else if (workflow.nodes.length === 0) {
+      warnings.push('Workflow has no nodes');
+    }
+
+    // Validate connections
+    if (!workflow.connections) {
+      warnings.push('Workflow should define connections between nodes');
+    }
+
+    // Validate version
+    if (!workflow.version) {
+      warnings.push('Workflow should have a version number');
+      suggestions.push('Add version: 1 to your workflow configuration');
+    }
+
+    const valid = errors.length === 0;
+    const severity = errors.length > 0 ? 'error' : warnings.length > 0 ? 'warning' : 'info';
+
+    return {
+      valid,
+      errors,
+      warnings,
+      suggestions,
+      severity
+    };
+  }
+
+  /**
+   * Get validation summary for reporting
+   */
+  static getValidationSummary(results: ValidationResult[]): string {
+    const totalNodes = results.length;
+    const validNodes = results.filter(r => r.valid).length;
+    const errorNodes = results.filter(r => r.errors.length > 0).length;
+    const warningNodes = results.filter(r => r.warnings.length > 0).length;
+
+    const totalErrors = results.reduce((sum, r) => sum + r.errors.length, 0);
+    const totalWarnings = results.reduce((sum, r) => sum + r.warnings.length, 0);
+    const totalSuggestions = results.reduce((sum, r) => sum + r.suggestions.length, 0);
+
+    return `
+📊 Node Validation Summary
+═══════════════════════════
+
+✅ Valid Nodes: ${validNodes}/${totalNodes} (${((validNodes/totalNodes)*100).toFixed(1)}%)
+❌ Nodes with Errors: ${errorNodes}
+⚠️  Nodes with Warnings: ${warningNodes}
+
+📋 Issue Breakdown:
+   • Total Errors: ${totalErrors}
+   • Total Warnings: ${totalWarnings}
+   • Total Suggestions: ${totalSuggestions}
+
+${validNodes === totalNodes ? '🎉 All nodes passed validation!' : '🔧 Some nodes need attention'}
+═══════════════════════════
+`;
   }
 }
 
-// Export singleton instance
-export const nodeParameterValidator = new NodeParameterValidator();
+export default NodeParameterValidator;
