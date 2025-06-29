@@ -1,11 +1,19 @@
+/**
+ * Switch Node
+ * 
+ * Route data to different outputs based on multiple conditions. Perfect for complex
+ * conditional logic with multiple branches and fallback options.
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const switchNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.switch',
   displayName: 'Switch',
-  description: 'Route workflow data to different outputs based on multiple conditions. Create multi-branch workflows with complex routing logic.',
-  category: 'Core Nodes',
+  description: 'Route data to different outputs based on multiple conditions. Handle complex conditional logic with multiple branches and fallback options.',
+  category: 'Core',
   subcategory: 'Flow Control',
+
   properties: [
     {
       name: 'mode',
@@ -13,33 +21,41 @@ export const switchNode: NodeTypeInfo = {
       type: 'options',
       required: true,
       default: 'expression',
-      description: 'How to determine the routing',
+      description: 'How to evaluate the conditions',
       options: [
-        { name: 'Expression', value: 'expression', description: 'Route based on expression results' },
-        { name: 'Rules', value: 'rules', description: 'Route based on defined rules' }
+        {
+          name: 'Expression',
+          value: 'expression',
+          description: 'Use expressions to evaluate conditions'
+        },
+        {
+          name: 'Rules',
+          value: 'rules',
+          description: 'Use simple rules to evaluate conditions'
+        }
       ]
     },
     {
-      name: 'output',
-      displayName: 'Output',
+      name: 'expression',
+      displayName: 'Expression',
       type: 'string',
       required: true,
-      default: '={{$json.category}}',
-      description: 'Expression that determines which output to use',
+      default: '',
+      description: 'Expression to evaluate for routing data',
+      placeholder: '{{ $json.status }}',
       displayOptions: {
         show: {
           mode: ['expression']
         }
-      },
-      placeholder: '={{$json.status}}'
+      }
     },
     {
       name: 'rules',
-      displayName: 'Routing Rules',
+      displayName: 'Rules',
       type: 'collection',
-      required: true,
+      required: false,
       default: {},
-      description: 'Rules to determine routing',
+      description: 'Rules to evaluate for routing data',
       displayOptions: {
         show: {
           mode: ['rules']
@@ -47,76 +63,102 @@ export const switchNode: NodeTypeInfo = {
       },
       options: [
         {
-      name: 'rules',
-
-      displayName: 'Rules',
-      type: 'fixedCollection',
-      required: false,
-      description: 'Routing rules to evaluate',
-          default: {},options: [
+          name: 'values',
+          displayName: 'Values',
+          type: 'fixedCollection',
+          required: false,
+          default: {},
+          description: 'Values to compare against',
+          options: [
             {
-              name: 'rule',
-              displayName: 'Rule',
+              name: 'rules',
+              displayName: 'Rules',
               values: [
                 {
-      name: 'output',
-
-      displayName: 'Output',
-      type: 'number',
-      required: false,
-                  description: 'Output index (0, 1, 2, etc.)'
-    },
-                {
-      name: 'conditions',
-
-      displayName: 'Conditions',
-      type: 'fixedCollection',
-      required: false,
-      description: 'Conditions for this rule',
-                  default: {},options: [
+                  name: 'conditions',
+                  displayName: 'Conditions',
+                  type: 'fixedCollection',
+                  required: false,
+                  default: {},
+                  typeOptions: {
+                    multipleValues: true
+                  },
+                  options: [
                     {
                       name: 'condition',
                       displayName: 'Condition',
                       values: [
                         {
-      name: 'leftValue',
-
-      displayName: 'Left Value',
-      type: 'string',
-      required: false,
-                          description: 'Value to compare',
-                          placeholder: '={{$json.status}}'
+                          name: 'leftValue',
+                          displayName: 'Left Value',
+                          type: 'string',
+                          required: true,
+                          default: '',
+                          description: 'Left side of the comparison',
+                          placeholder: '{{ $json.status }}'
                         },
                         {
-      name: 'operation',
-
-      displayName: 'Operation',
-      type: 'options',
-      required: false,
-      default: 'equal',
+                          name: 'operation',
+                          displayName: 'Operation',
+                          type: 'options',
+                          required: true,
+                          default: 'equal',
+                          description: 'Operation to perform',
                           options: [
                             { name: 'Equal', value: 'equal' },
                             { name: 'Not Equal', value: 'notEqual' },
-                            { name: 'Larger', value: 'larger' },
                             { name: 'Smaller', value: 'smaller' },
+                            { name: 'Smaller Equal', value: 'smallerEqual' },
+                            { name: 'Larger', value: 'larger' },
+                            { name: 'Larger Equal', value: 'largerEqual' },
                             { name: 'Contains', value: 'contains' },
-                            { name: 'Starts with', value: 'startsWith' },
-                            { name: 'Ends with', value: 'endsWith' },
-                            { name: 'Regex', value: 'regex' }
+                            { name: 'Not Contains', value: 'notContains' },
+                            { name: 'Starts With', value: 'startsWith' },
+                            { name: 'Not Starts With', value: 'notStartsWith' },
+                            { name: 'Ends With', value: 'endsWith' },
+                            { name: 'Not Ends With', value: 'notEndsWith' },
+                            { name: 'Regex', value: 'regex' },
+                            { name: 'Is Empty', value: 'isEmpty' },
+                            { name: 'Is Not Empty', value: 'isNotEmpty' }
                           ]
                         },
                         {
-      name: 'rightValue',
-
-      displayName: 'Right Value',
-      type: 'string',
-      required: false,
-      default: '',
-                          description: 'Value to compare against'
-    }
+                          name: 'rightValue',
+                          displayName: 'Right Value',
+                          type: 'string',
+                          required: false,
+                          default: '',
+                          description: 'Right side of the comparison',
+                          placeholder: 'completed',
+                          displayOptions: {
+                            hide: {
+                              operation: ['isEmpty', 'isNotEmpty']
+                            }
+                          }
+                        }
                       ]
                     }
                   ]
+                },
+                {
+                  name: 'combineOperation',
+                  displayName: 'Combine',
+                  type: 'options',
+                  required: false,
+                  default: 'AND',
+                  description: 'How to combine multiple conditions',
+                  options: [
+                    { name: 'AND', value: 'AND' },
+                    { name: 'OR', value: 'OR' }
+                  ]
+                },
+                {
+                  name: 'outputIndex',
+                  displayName: 'Output',
+                  type: 'number',
+                  required: true,
+                  default: 0,
+                  description: 'Index of the output to send data to'
                 }
               ]
             }
@@ -125,35 +167,65 @@ export const switchNode: NodeTypeInfo = {
       ]
     },
     {
+      name: 'outputs',
+      displayName: 'Outputs',
+      type: 'number',
+      required: true,
+      default: 4,
+      description: 'Number of outputs to create',
+      typeOptions: {
+        minValue: 1,
+        maxValue: 20
+      }
+    },
+    {
+      name: 'fallbackOutput',
+      displayName: 'Fallback Output',
+      type: 'options',
+      required: false,
+      default: 'extra',
+      description: 'Where to send data that doesn\'t match any condition',
+      options: [
+        {
+          name: 'Extra Output',
+          value: 'extra',
+          description: 'Send to an additional output'
+        },
+        {
+          name: 'No Output',
+          value: 'none',
+          description: 'Don\'t output unmatched data'
+        }
+      ]
+    },
+    {
       name: 'options',
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},description: 'Additional switch options',
+      default: {},
+      description: 'Additional options',
       options: [
         {
-      name: 'fallbackOutput',
-
-      displayName: 'Fallback Output',
-      type: 'number',
-      required: false,
-          description: 'Output to use when no rules match (-1 for no output)',
-          typeOptions: {
-            minValue: -1
-    }
+          name: 'allMatchingOutputs',
+          displayName: 'Output to All Matching Outputs',
+          type: 'boolean',
+          required: false,
+          default: false,
+          description: 'Send data to all matching outputs instead of just the first one'
         },
         {
-      name: 'allMatchingOutputs',
-
-      displayName: 'All Matching Outputs',
-      type: 'boolean',
-      required: false,
-      default: false,
-          description: 'Send data to all matching outputs, not just the first'
-    }
+          name: 'ignoreCase',
+          displayName: 'Ignore Case',
+          type: 'boolean',
+          required: false,
+          default: false,
+          description: 'Ignore case when comparing strings'
+        }
       ]
     }
   ],
+
   inputs: [
     {
       type: 'main',
@@ -161,186 +233,235 @@ export const switchNode: NodeTypeInfo = {
       required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output 0',
-      description: 'First routing output'
-    },
-    {
-      type: 'main',
       displayName: 'Output 1',
-      description: 'Second routing output'
+      description: 'First output branch'
     },
     {
       type: 'main',
       displayName: 'Output 2',
-      description: 'Third routing output'
+      description: 'Second output branch'
     },
     {
       type: 'main',
       displayName: 'Output 3',
-      description: 'Fourth routing output'
+      description: 'Third output branch'
+    },
+    {
+      type: 'main',
+      displayName: 'Output 4',
+      description: 'Fourth output branch'
+    },
+    {
+      type: 'main',
+      displayName: 'Fallback',
+      description: 'Fallback output for unmatched data'
     }
   ],
+
   credentials: [],
   regularNode: true,
-  codeable: false,
-  triggerNode: false,
+  
+  version: [1, 2, 3],
   defaults: {
-    mode: 'expression',
-    output: '={{$json.category}}',
-    options: {
-      fallbackOutput: -1,
-      allMatchingOutputs: false
-    }
+    name: 'Switch'
   },
+
+  aliases: ['switch', 'route', 'condition', 'branch', 'case'],
+
+  examples: [
+    {
+      name: 'Route by Status',
+      description: 'Route data based on status field to different processing branches',
+      workflow: {
+        nodes: [
+          {
+            name: 'Route by Status',
+            type: 'n8n-nodes-base.switch',
+            parameters: {
+              mode: 'expression',
+              expression: '{{ $json.status }}',
+              outputs: 3,
+              fallbackOutput: 'extra'
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'Complex Conditional Routing',
+      description: 'Use multiple conditions to route data with AND/OR logic',
+      workflow: {
+        nodes: [
+          {
+            name: 'Complex Routing',
+            type: 'n8n-nodes-base.switch',
+            parameters: {
+              mode: 'rules',
+              rules: {
+                values: {
+                  rules: [
+                    {
+                      conditions: {
+                        condition: [
+                          {
+                            leftValue: '{{ $json.priority }}',
+                            operation: 'equal',
+                            rightValue: 'high'
+                          },
+                          {
+                            leftValue: '{{ $json.department }}',
+                            operation: 'equal',
+                            rightValue: 'urgent'
+                          }
+                        ]
+                      },
+                      combineOperation: 'AND',
+                      outputIndex: 0
+                    }
+                  ]
+                }
+              },
+              outputs: 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'E-commerce Order Processing',
+      description: 'Route orders based on value and customer type',
+      workflow: {
+        nodes: [
+          {
+            name: 'Order Router',
+            type: 'n8n-nodes-base.switch',
+            parameters: {
+              mode: 'rules',
+              rules: {
+                values: {
+                  rules: [
+                    {
+                      conditions: {
+                        condition: [
+                          {
+                            leftValue: '{{ $json.order_value }}',
+                            operation: 'larger',
+                            rightValue: '1000'
+                          }
+                        ]
+                      },
+                      outputIndex: 0
+                    },
+                    {
+                      conditions: {
+                        condition: [
+                          {
+                            leftValue: '{{ $json.customer_type }}',
+                            operation: 'equal',
+                            rightValue: 'premium'
+                          }
+                        ]
+                      },
+                      outputIndex: 1
+                    }
+                  ]
+                }
+              },
+              outputs: 3,
+              options: {
+                allMatchingOutputs: true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'API Response Handler',
+      description: 'Handle different API response codes with appropriate actions',
+      workflow: {
+        nodes: [
+          {
+            name: 'Response Handler',
+            type: 'n8n-nodes-base.switch',
+            parameters: {
+              mode: 'expression',
+              expression: '{{ $json.statusCode }}',
+              outputs: 4,
+              fallbackOutput: 'extra'
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'Data Validation Router',
+      description: 'Route data based on validation results',
+      workflow: {
+        nodes: [
+          {
+            name: 'Validation Router',
+            type: 'n8n-nodes-base.switch',
+            parameters: {
+              mode: 'rules',
+              rules: {
+                values: {
+                  rules: [
+                    {
+                      conditions: {
+                        condition: [
+                          {
+                            leftValue: '{{ $json.email }}',
+                            operation: 'regex',
+                            rightValue: '^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'
+                          },
+                          {
+                            leftValue: '{{ $json.name }}',
+                            operation: 'isNotEmpty'
+                          }
+                        ]
+                      },
+                      combineOperation: 'AND',
+                      outputIndex: 0
+                    }
+                  ]
+                }
+              },
+              outputs: 2,
+              fallbackOutput: 'extra'
+            }
+          }
+        ]
+      }
+    }
+  ],
+
   aiMetadata: {
     aiOptimized: true,
     integrationComplexity: 'medium',
     commonPatterns: [
-      'Route data by category or type',
-      'Multi-branch workflows based on status',
-      'Content routing for different processing',
-      'Error handling with multiple paths',
-      'Priority-based routing',
-      'Complex conditional workflows'
-    ],
-    prerequisites: [
-      'Understanding of workflow branching',
-      'Knowledge of expression syntax'
+      'Route data based on status or category fields',
+      'Handle different API response codes',
+      'Process orders based on value or customer type',
+      'Validate data and route to appropriate handlers',
+      'Implement complex business logic with multiple conditions',
+      'Create multi-path workflows based on data content',
+      'Handle error conditions with fallback routes',
+      'Implement approval workflows with different paths'
     ],
     errorHandling: {
-      retryableErrors: [],
-      nonRetryableErrors: ['Invalid expression', 'Output index out of range'],
-      documentation: 'Switch node errors typically occur from invalid expressions or incorrect output configuration'
+      retryableErrors: ['Expression evaluation error'],
+      nonRetryableErrors: ['Invalid output index', 'Malformed expression'],
+      documentation: 'Switch node errors typically occur due to invalid expressions or output configurations'
     }
   },
-  examples: [
-    {
-      name: 'Route by Status',
-      description: 'Route data to different outputs based on status field',
-      workflow: {
-        nodes: [
-          {
-            name: 'Status Router',
-            type: 'n8n-nodes-base.switch',
-            parameters: {
-              mode: 'expression',
-              output: '={{$json.status === "urgent" ? 0 : $json.status === "normal" ? 1 : 2}}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Multi-Rule Routing',
-      description: 'Use multiple rules to route data',
-      workflow: {
-        nodes: [
-          {
-            name: 'Rule-based Router',
-            type: 'n8n-nodes-base.switch',
-            parameters: {
-              mode: 'rules',
-              rules: {
-                rules: [
-                  {
-                    output: 0,
-                    conditions: {
-                      condition: [
-                        {
-                          leftValue: '={{$json.priority}}',
-                          operation: 'equal',
-                          rightValue: 'high'
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    output: 1,
-                    conditions: {
-                      condition: [
-                        {
-                          leftValue: '={{$json.type}}',
-                          operation: 'equal',
-                          rightValue: 'customer'
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              options: {
-                fallbackOutput: 2
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Content Type Router',
-      description: 'Route different content types to specialized processors',
-      workflow: {
-        nodes: [
-          {
-            name: 'Content Router',
-            type: 'n8n-nodes-base.switch',
-            parameters: {
-              mode: 'expression',
-              output: '={{$json.contentType === "image" ? 0 : $json.contentType === "video" ? 1 : $json.contentType === "text" ? 2 : 3}}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Error Severity Router',
-      description: 'Route errors to different handling paths based on severity',
-      workflow: {
-        nodes: [
-          {
-            name: 'Error Router',
-            type: 'n8n-nodes-base.switch',
-            parameters: {
-              mode: 'rules',
-              rules: {
-                rules: [
-                  {
-                    output: 0,
-                    conditions: {
-                      condition: [
-                        {
-                          leftValue: '={{$json.severity}}',
-                          operation: 'equal',
-                          rightValue: 'critical'
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    output: 1,
-                    conditions: {
-                      condition: [
-                        {
-                          leftValue: '={{$json.severity}}',
-                          operation: 'equal',
-                          rightValue: 'warning'
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              options: {
-                fallbackOutput: 2,
-                allMatchingOutputs: false
-              }
-            }
-          }
-        ]
-      }
-    }
-  ]
+
+  usageNotes: 'The Switch node allows you to route data to different outputs based on conditions. Use expression mode for simple routing or rules mode for complex conditional logic. Configure fallback output to handle unmatched data.',
+  integrationGuide: 'Use Switch nodes to implement complex decision trees in your workflows. Combine multiple conditions with AND/OR logic for sophisticated routing. Consider using the "Output to All Matching Outputs" option when data should be processed by multiple branches.'
 };
+
+export default switchNode;
