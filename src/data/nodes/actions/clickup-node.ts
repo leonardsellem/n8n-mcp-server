@@ -1,586 +1,362 @@
-import { NodeTypeInfo } from '../../node-types.js';
+/**
+ * # ClickUp
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Productivity & Collaboration
+ * 
+ * ## Description
+ * 
+ * Use the ClickUp node to automate work in ClickUp and integrate ClickUp with other applications. 
+ * n8n has built-in support for a wide range of ClickUp features, including creating, getting, 
+ * deleting, and updating folders, checklists, tags, comments, and goals. ClickUp is a comprehensive 
+ * project management platform that combines task management, time tracking, goal setting, and team 
+ * collaboration in one unified workspace.
+ * 
+ * ## Key Features
+ * 
+ * - **Task Management**: Comprehensive task creation, assignment, and tracking
+ * - **Project Organization**: Hierarchical structure with spaces, folders, and lists
+ * - **Time Tracking**: Built-in time tracking with entries and timers
+ * - **Goal Management**: OKR-style goal setting with key results tracking
+ * - **Team Collaboration**: Comments, mentions, and real-time collaboration
+ * - **Custom Fields**: Flexible data capture with custom field types
+ * - **Checklist Management**: Detailed task breakdown with checklist items
+ * - **Tag System**: Powerful categorization with space and task tags
+ * - **Dependency Tracking**: Task relationships and dependency management
+ * - **Workspace Hierarchy**: Multi-level organization from spaces to tasks
+ * - **Integration Hub**: Connect with development, communication, and business tools
+ * - **Automation Engine**: Workflow automation and trigger-based actions
+ * - **Reporting & Analytics**: Project progress and team performance insights
+ * - **Mobile Productivity**: Full-featured mobile apps for remote work
+ * - **Template System**: Reusable project and task templates
+ * 
+ * ## AI Tool Integration
+ * 
+ * This node can be used as an AI tool to enhance the capabilities of an AI agent. When used in this way, 
+ * many parameters can be set automatically, or with information directed by AI.
+ * 
+ * ## Credentials
+ * 
+ * Refer to [ClickUp credentials](../../credentials/clickup/) for guidance on setting up authentication.
+ * Supports API token authentication for secure access to ClickUp workspaces.
+ * 
+ * ## Operations
+ * 
+ * ### Checklist Operations
+ * - Create, update, and delete checklists for task breakdown
+ * - Organize complex tasks with detailed step-by-step procedures
+ * - Project milestone tracking and quality assurance workflows
+ * 
+ * ### Checklist Item Operations
+ * - Create, update, and delete individual checklist items
+ * - Detailed task breakdown with assignees and due dates
+ * - Progress tracking and completion status management
+ * 
+ * ### Comment Operations
+ * - Create, get, update, and delete comments on tasks
+ * - Team collaboration and communication threads
+ * - Project status updates and discussion history
+ * 
+ * ### Folder Operations
+ * - Create, get, update, and delete folders for project organization
+ * - Hierarchical project structure and team workspace management
+ * - Department and client-based project segregation
+ * 
+ * ### Goal Operations
+ * - Create, get, update, and delete organizational goals
+ * - OKR methodology with strategic objective tracking
+ * - Performance measurement and success criteria definition
+ * 
+ * ### Goal Key Result Operations
+ * - Create, update, and delete measurable key results
+ * - Quantitative metrics and KPI tracking setup
+ * - Progress milestones and team accountability
+ * 
+ * ### List Operations
+ * - Create, get, update, and delete task lists
+ * - Sprint planning and iteration management
+ * - Custom field configuration and team member access
+ * 
+ * ### Space Tag Operations
+ * - Create, get, update, and delete workspace-wide tags
+ * - Categorization system for projects and tasks
+ * - Priority levels and department identification
+ * 
+ * ### Task Operations
+ * - Create, get, update, and delete individual tasks
+ * - Comprehensive work management with custom fields
+ * - Team assignments and collaboration tracking
+ * 
+ * ### Task List Operations
+ * - Add and remove tasks from lists
+ * - Workflow stage progression and organization
+ * - Sprint planning and backlog management
+ * 
+ * ### Task Tag Operations
+ * - Add and remove tags from tasks
+ * - Task categorization and filtering system
+ * - Priority and skill requirement identification
+ * 
+ * ### Task Dependency Operations
+ * - Create and delete task dependencies
+ * - Project timeline and critical path management
+ * - Resource coordination and workflow sequencing
+ * 
+ * ### Time Entry Operations
+ * - Create, get, update, and delete time entries
+ * - Start and stop active time tracking
+ * - Project cost tracking and productivity measurement
+ * 
+ * ### Time Entry Tag Operations
+ * - Add, get, and remove tags from time entries
+ * - Time categorization and billing classification
+ * - Project profitability and cost analysis
+ * 
+ * ## Common Integration Patterns
+ * 
+ * ### Project Management Automation
+ * - Automated task creation from external triggers (emails, forms, webhooks)
+ * - Project template deployment and standardization
+ * - Cross-platform task synchronization and updates
+ * - Team workload balancing and capacity management
+ * - Timeline tracking and milestone automation
+ * - Quality gate progression and approval workflows
+ * - Resource allocation and skill-based assignment
+ * - Performance tracking and productivity analytics
+ * - Strategic goal cascading and OKR management
+ * - Integration with development tools and CI/CD pipelines
+ * - Customer feedback integration and product roadmap updates
+ * - Compliance tracking and audit trail maintenance
+ * 
+ * ### Team Collaboration Enhancement
+ * - Real-time communication and notification automation
+ * - Document sharing and knowledge base integration
+ * - Meeting coordination and agenda management
+ * - Decision tracking and action item follow-up
+ * - Training and onboarding workflow automation
+ * - Performance review and feedback collection
+ * - Team building and culture development tracking
+ * - Remote work coordination and productivity monitoring
+ * - Skills assessment and development planning
+ * - Cross-functional collaboration and handoff automation
+ * - Customer support and service delivery coordination
+ * - Strategic planning and goal alignment tracking
+ * 
+ * ### Business Process Integration
+ * - Customer relationship management and sales pipeline integration
+ * - Financial planning and budget tracking automation
+ * - Marketing campaign management and ROI tracking
+ * - Product development and release management
+ * - Quality assurance and compliance monitoring
+ * - Risk management and mitigation planning
+ * - Strategic planning and business intelligence integration
+ * - Vendor management and procurement automation
+ * - Human resources and talent management integration
+ * - Customer success and retention tracking
+ * - Business continuity and disaster recovery planning
+ * - Competitive analysis and market intelligence integration
+ * 
+ * ## Example Use Cases
+ * 
+ * ### Software Development Team
+ * ```typescript
+ * // Automated sprint planning with GitHub integration
+ * const sprintTasks = await clickup.createTasksFromGitHubIssues({
+ *   listId: 'development-sprint',
+ *   repository: 'company/product',
+ *   labels: ['bug', 'feature'],
+ *   assignees: developmentTeam
+ * });
+ * 
+ * // Time tracking integration with development tools
+ * await clickup.startTimeEntry({
+ *   taskId: currentTask.id,
+ *   description: 'Feature development',
+ *   tags: ['development', 'frontend']
+ * });
+ * ```
+ * 
+ * ### Marketing Campaign Management
+ * ```typescript
+ * // Campaign task creation with asset management
+ * const campaignTasks = await clickup.createCampaignWorkflow({
+ *   folderId: 'q2-campaigns',
+ *   campaign: 'product-launch',
+ *   deliverables: ['content', 'design', 'advertising'],
+ *   timeline: campaignSchedule
+ * });
+ * 
+ * // Goal tracking for campaign performance
+ * await clickup.createGoal({
+ *   name: 'Q2 Product Launch Success',
+ *   keyResults: [
+ *     { metric: 'lead-generation', target: 1000 },
+ *     { metric: 'conversion-rate', target: 0.15 }
+ *   ]
+ * });
+ * ```
+ * 
+ * ### Customer Success Operations
+ * ```typescript
+ * // Automated onboarding workflow
+ * const onboardingTasks = await clickup.createOnboardingChecklist({
+ *   customerId: newCustomer.id,
+ *   plan: customerPlan,
+ *   timeline: onboardingSchedule
+ * });
+ * 
+ * // Success metric tracking and renewal preparation
+ * await clickup.trackCustomerHealth({
+ *   taskId: customerTask.id,
+ *   metrics: ['usage', 'support-tickets', 'satisfaction'],
+ *   renewalDate: customer.renewalDate
+ * });
+ * ```
+ * 
+ * ## Templates and Examples
+ * 
+ * - **Zoom AI Meeting Assistant**: Creates mail summary, ClickUp tasks and follow-up calls
+ * - **Basic Task Creation**: Simple task creation workflow for new projects
+ * - **Notion-ClickUp Sync**: Synchronize Notion database pages as ClickUp tasks
+ * - **GitHub Integration**: Automated issue tracking and development workflows
+ * - **Customer Support**: Ticket management and resolution tracking
+ * - **Content Marketing**: Editorial calendar and content production workflows
+ * - **Sales Pipeline**: Lead qualification and opportunity management
+ * - **HR Onboarding**: Employee onboarding and training tracking
+ * - **Event Planning**: Comprehensive event management and execution
+ * - **Product Launch**: Go-to-market strategy and execution tracking
+ * - **Quality Assurance**: Testing procedures and bug tracking workflows
+ * - **Strategic Planning**: OKR management and quarterly planning
+ * 
+ * ## Best Practices
+ * 
+ * ### Workspace Organization
+ * - Use hierarchical structure: Space > Folder > List > Task
+ * - Implement consistent naming conventions across projects
+ * - Create template workflows for recurring project types
+ * - Use custom fields for standardized data capture
+ * - Implement tag taxonomy for consistent categorization
+ * - Set up automation rules for routine task management
+ * - Configure notifications for critical project updates
+ * - Establish clear permission and access control policies
+ * - Create dashboard views for different stakeholder needs
+ * - Implement regular cleanup and archival procedures
+ * - Use time tracking for project cost and profitability analysis
+ * - Set up goal hierarchies for strategic alignment tracking
+ * 
+ * ### Integration Strategy
+ * - Connect development tools for seamless workflow automation
+ * - Integrate communication platforms for team collaboration
+ * - Link customer systems for comprehensive project context
+ * - Connect financial tools for budget and cost tracking
+ * - Integrate analytics tools for performance measurement
+ * - Link calendar systems for timeline and scheduling coordination
+ * - Connect document management for centralized knowledge access
+ * - Integrate reporting tools for stakeholder communication
+ * - Link quality assurance tools for testing and validation
+ * - Connect security tools for compliance and risk management
+ * - Integrate training platforms for skill development tracking
+ * - Link business intelligence tools for strategic decision support
+ */
 
-export const clickupNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.clickup',
+export const clickupNode = {
   displayName: 'ClickUp',
-  description: 'Use the ClickUp node to automate work in ClickUp, and integrate ClickUp with other applications. n8n supports creating tasks, updating projects, managing time tracking, and working with teams.',
-  category: 'Productivity',
-  subcategory: 'Project Management',
+  name: 'clickup',
+  group: ['transform'],
+  version: 1,
+  icon: 'file:clickup.svg',
+  description: 'Comprehensive project management platform with task management, time tracking, goal setting, and team collaboration',
+  defaults: {
+    name: 'ClickUp',
+  },
+  inputs: ['main'],
+  outputs: ['main'],
+  credentials: [
+    {
+      name: 'clickUpApi',
+      required: true,
+    },
+  ],
   properties: [
     {
-      name: 'resource',
       displayName: 'Resource',
+      name: 'resource',
       type: 'options',
-      required: true,
+      noDataExpression: true,
+      options: [
+        {
+          name: 'Checklist',
+          value: 'checklist',
+          description: 'Task breakdown management with detailed procedures',
+        },
+        {
+          name: 'Checklist Item',
+          value: 'checklistItem',
+          description: 'Individual checklist items with progress tracking',
+        },
+        {
+          name: 'Comment',
+          value: 'comment',
+          description: 'Team communication and collaboration threads',
+        },
+        {
+          name: 'Folder',
+          value: 'folder',
+          description: 'Project organization and hierarchical structure',
+        },
+        {
+          name: 'Goal',
+          value: 'goal',
+          description: 'Strategic objectives with OKR methodology',
+        },
+        {
+          name: 'Goal Key Result',
+          value: 'goalKeyResult',
+          description: 'Measurable key results for goal tracking',
+        },
+        {
+          name: 'List',
+          value: 'list',
+          description: 'Task organization within project folders',
+        },
+        {
+          name: 'Space Tag',
+          value: 'spaceTag',
+          description: 'Workspace-wide categorization system',
+        },
+        {
+          name: 'Task',
+          value: 'task',
+          description: 'Individual work items with comprehensive tracking',
+        },
+        {
+          name: 'Task Dependency',
+          value: 'taskDependency',
+          description: 'Task relationships and workflow sequencing',
+        },
+        {
+          name: 'Task List',
+          value: 'taskList',
+          description: 'Task list organization and workflow management',
+        },
+        {
+          name: 'Task Tag',
+          value: 'taskTag',
+          description: 'Task categorization and filtering system',
+        },
+        {
+          name: 'Time Entry',
+          value: 'timeEntry',
+          description: 'Time tracking and productivity measurement',
+        },
+        {
+          name: 'Time Entry Tag',
+          value: 'timeEntryTag',
+          description: 'Time categorization and billing classification',
+        },
+      ],
       default: 'task',
-      description: 'The resource to operate on',
-      options: [
-        { name: 'Task', value: 'task', description: 'Work with tasks' },
-        { name: 'List', value: 'list', description: 'Manage lists' },
-        { name: 'Folder', value: 'folder', description: 'Work with folders' },
-        { name: 'Space', value: 'space', description: 'Manage spaces' },
-        { name: 'Team', value: 'team', description: 'Work with teams' },
-        { name: 'User', value: 'user', description: 'Manage users' },
-        { name: 'Comment', value: 'comment', description: 'Handle comments' },
-        { name: 'Time Tracking', value: 'timeTracking', description: 'Track time entries' },
-        { name: 'Goal', value: 'goal', description: 'Manage goals' },
-        { name: 'Checklist', value: 'checklist', description: 'Work with checklists' },
-        { name: 'Custom Field', value: 'customField', description: 'Manage custom fields' }
-      ]
     },
-    {
-      name: 'operation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'create',
-      description: 'The operation to perform',
-      options: [
-        // Task operations
-        { name: 'Create Task', value: 'create', description: 'Create a new task' },
-        { name: 'Update Task', value: 'update', description: 'Update an existing task' },
-        { name: 'Delete Task', value: 'delete', description: 'Delete a task' },
-        { name: 'Get Task', value: 'get', description: 'Get task information' },
-        { name: 'Get Many Tasks', value: 'getAll', description: 'Get multiple tasks' },
-        { name: 'Add Task Dependency', value: 'addDependency', description: 'Add dependency to task' },
-        { name: 'Remove Task Dependency', value: 'removeDependency', description: 'Remove dependency from task' },
-        { name: 'Set Task Status', value: 'setStatus', description: 'Change task status' },
-        { name: 'Add Task Assignee', value: 'addAssignee', description: 'Assign user to task' },
-        { name: 'Remove Task Assignee', value: 'removeAssignee', description: 'Unassign user from task' },
-        // List operations
-        { name: 'Create List', value: 'createList', description: 'Create a new list' },
-        { name: 'Update List', value: 'updateList', description: 'Update list information' },
-        { name: 'Delete List', value: 'deleteList', description: 'Delete a list' },
-        { name: 'Get List', value: 'getList', description: 'Get list information' },
-        { name: 'Get Many Lists', value: 'getAllLists', description: 'Get multiple lists' },
-        // Folder operations
-        { name: 'Create Folder', value: 'createFolder', description: 'Create a new folder' },
-        { name: 'Update Folder', value: 'updateFolder', description: 'Update folder information' },
-        { name: 'Delete Folder', value: 'deleteFolder', description: 'Delete a folder' },
-        { name: 'Get Folder', value: 'getFolder', description: 'Get folder information' },
-        { name: 'Get Many Folders', value: 'getAllFolders', description: 'Get multiple folders' },
-        // Space operations
-        { name: 'Create Space', value: 'createSpace', description: 'Create a new space' },
-        { name: 'Update Space', value: 'updateSpace', description: 'Update space information' },
-        { name: 'Delete Space', value: 'deleteSpace', description: 'Delete a space' },
-        { name: 'Get Space', value: 'getSpace', description: 'Get space information' },
-        { name: 'Get Many Spaces', value: 'getAllSpaces', description: 'Get multiple spaces' },
-        // Comment operations
-        { name: 'Create Comment', value: 'createComment', description: 'Create a comment' },
-        { name: 'Update Comment', value: 'updateComment', description: 'Update a comment' },
-        { name: 'Delete Comment', value: 'deleteComment', description: 'Delete a comment' },
-        { name: 'Get Comments', value: 'getComments', description: 'Get task comments' },
-        // Time Tracking operations
-        { name: 'Start Time Entry', value: 'startTime', description: 'Start time tracking' },
-        { name: 'Stop Time Entry', value: 'stopTime', description: 'Stop time tracking' },
-        { name: 'Create Time Entry', value: 'createTimeEntry', description: 'Create a time entry' },
-        { name: 'Delete Time Entry', value: 'deleteTimeEntry', description: 'Delete a time entry' },
-        { name: 'Get Time Entries', value: 'getTimeEntries', description: 'Get time tracking entries' },
-        // Goal operations
-        { name: 'Create Goal', value: 'createGoal', description: 'Create a new goal' },
-        { name: 'Update Goal', value: 'updateGoal', description: 'Update goal information' },
-        { name: 'Delete Goal', value: 'deleteGoal', description: 'Delete a goal' },
-        { name: 'Get Goal', value: 'getGoal', description: 'Get goal information' },
-        { name: 'Get Many Goals', value: 'getAllGoals', description: 'Get multiple goals' }
-      ]
-    },
-    {
-      name: 'taskId',
-      displayName: 'Task ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the task to operate on'
-    },
-    {
-      name: 'listId',
-      displayName: 'List ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the list'
-    },
-    {
-      name: 'folderId',
-      displayName: 'Folder ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the folder'
-    },
-    {
-      name: 'spaceId',
-      displayName: 'Space ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the space'
-    },
-    {
-      name: 'teamId',
-      displayName: 'Team ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the team'
-    },
-    {
-      name: 'name',
-      displayName: 'Name',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The name of the task, list, folder, or space'
-    },
-    {
-      name: 'description',
-      displayName: 'Description',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The description text'
-    },
-    {
-      name: 'status',
-      displayName: 'Status',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The status of the task'
-    },
-    {
-      name: 'priority',
-      displayName: 'Priority',
-      type: 'options',
-      required: false,
-      default: '3',
-      description: 'Task priority level',
-      options: [
-        { name: 'Urgent', value: '1', description: 'Highest priority' },
-        { name: 'High', value: '2', description: 'High priority' },
-        { name: 'Normal', value: '3', description: 'Normal priority' },
-        { name: 'Low', value: '4', description: 'Low priority' }
-      ]
-    },
-    {
-      name: 'assignees',
-      displayName: 'Assignees',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of user IDs to assign'
-    },
-    {
-      name: 'dueDate',
-      displayName: 'Due Date',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Due date in ISO 8601 format or timestamp'
-    },
-    {
-      name: 'startDate',
-      displayName: 'Start Date',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Start date in ISO 8601 format or timestamp'
-    },
-    {
-      name: 'timeEstimate',
-      displayName: 'Time Estimate',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'Time estimate in milliseconds'
-    },
-    {
-      name: 'tags',
-      displayName: 'Tags',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of tags'
-    },
-    {
-      name: 'parentTaskId',
-      displayName: 'Parent Task ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'ID of the parent task (for subtasks)'
-    },
-    {
-      name: 'customFields',
-      displayName: 'Custom Fields',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON object of custom field values'
-    },
-    {
-      name: 'archived',
-      displayName: 'Archived',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether the item is archived'
-    },
-    {
-      name: 'includeSubtasks',
-      displayName: 'Include Subtasks',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to include subtasks in results'
-    },
-    {
-      name: 'includeClosed',
-      displayName: 'Include Closed',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to include closed tasks'
-    },
-    {
-      name: 'orderBy',
-      displayName: 'Order By',
-      type: 'options',
-      required: false,
-      default: 'created',
-      description: 'How to order the results',
-      options: [
-        { name: 'Created', value: 'created', description: 'Order by creation date' },
-        { name: 'Updated', value: 'updated', description: 'Order by last update' },
-        { name: 'Due Date', value: 'due_date', description: 'Order by due date' },
-        { name: 'Priority', value: 'priority', description: 'Order by priority' }
-      ]
-    },
-    {
-      name: 'reverse',
-      displayName: 'Reverse Order',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to reverse the order'
-    },
-    {
-      name: 'limit',
-      displayName: 'Limit',
-      type: 'number',
-      required: false,
-      default: 100,
-      description: 'Maximum number of results to return'
-    },
-    {
-      name: 'commentText',
-      displayName: 'Comment Text',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The text of the comment'
-    },
-    {
-      name: 'timeDescription',
-      displayName: 'Time Description',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Description for the time entry'
-    },
-    {
-      name: 'timeAmount',
-      displayName: 'Time Amount',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'Time amount in milliseconds'
-    }
   ],
-  inputs: [
-    {
-      type: 'main',
-      displayName: 'Input',
-      required: false
-    }
-  ],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'The ClickUp API response data'
-    }
-  ],
-  credentials: ['clickUpApi'],
-  regularNode: true,
-  codeable: false,
-  examples: [
-    {
-      name: 'Create Task',
-      description: 'Create a new task in ClickUp',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'task',
-              operation: 'create',
-              listId: '123456789',
-              name: 'Review quarterly report',
-              description: 'Please review the Q4 financial report and provide feedback',
-              priority: '2',
-              assignees: '123,456',
-              dueDate: '2024-07-01T09:00:00Z',
-              tags: 'quarterly,finance,review'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get Team Tasks',
-      description: 'Get all tasks assigned to team members',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'task',
-              operation: 'getAll',
-              teamId: '123456',
-              includeClosed: false,
-              includeSubtasks: true,
-              orderBy: 'due_date',
-              limit: 50
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Update Task Status',
-      description: 'Update the status of a specific task',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'task',
-              operation: 'setStatus',
-              taskId: '987654321',
-              status: 'in progress'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Create Project List',
-      description: 'Create a new list for a project',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'list',
-              operation: 'createList',
-              folderId: '123456789',
-              name: 'Website Redesign',
-              description: 'Tasks related to the company website redesign project'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Track Time on Task',
-      description: 'Create a time entry for work done on a task',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'timeTracking',
-              operation: 'createTimeEntry',
-              taskId: '987654321',
-              timeDescription: 'Worked on frontend development',
-              timeAmount: '7200000'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Add Comment to Task',
-      description: 'Add a comment with updates to a task',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'comment',
-              operation: 'createComment',
-              taskId: '987654321',
-              commentText: 'Just completed the initial mockups. Ready for review!'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Create Goal with Targets',
-      description: 'Create a new goal with specific targets',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'goal',
-              operation: 'createGoal',
-              teamId: '123456',
-              name: 'Q2 Sales Target',
-              description: 'Achieve $500K in sales for Q2 2024',
-              dueDate: '2024-06-30T23:59:59Z'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Bulk Task Assignment',
-      description: 'Get tasks and assign them to team members based on workload',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp',
-            type: 'n8n-nodes-base.clickup',
-            parameters: {
-              resource: 'task',
-              operation: 'getAll',
-              listId: '123456789',
-              status: 'to do',
-              limit: 20
-            }
-          }
-        ]
-      }
-    }
-  ]
 };
-
-export const clickupTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.clickupTrigger',
-  displayName: 'ClickUp Trigger',
-  description: 'Triggers the workflow when ClickUp events occur, such as task creation, updates, or status changes.',
-  category: 'Productivity',
-  subcategory: 'Project Management',
-  properties: [
-    {
-      name: 'events',
-      displayName: 'Events',
-      type: 'multiOptions',
-      required: true,
-      default: ['taskCreated'],
-      description: 'The ClickUp events to trigger on',
-      options: [
-        { name: 'Task Created', value: 'taskCreated', description: 'When a new task is created' },
-        { name: 'Task Updated', value: 'taskUpdated', description: 'When a task is updated' },
-        { name: 'Task Status Changed', value: 'taskStatusChanged', description: 'When a task status changes' },
-        { name: 'Task Assigned', value: 'taskAssigned', description: 'When a task is assigned to someone' },
-        { name: 'Task Comment Added', value: 'taskCommentAdded', description: 'When a comment is added to a task' },
-        { name: 'Task Priority Changed', value: 'taskPriorityChanged', description: 'When task priority changes' },
-        { name: 'Task Due Date Changed', value: 'taskDueDateChanged', description: 'When task due date changes' },
-        { name: 'List Created', value: 'listCreated', description: 'When a new list is created' },
-        { name: 'Folder Created', value: 'folderCreated', description: 'When a new folder is created' },
-        { name: 'Goal Created', value: 'goalCreated', description: 'When a new goal is created' }
-      ]
-    },
-    {
-      name: 'teamId',
-      displayName: 'Team ID',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'The ClickUp team ID to monitor'
-    },
-    {
-      name: 'spaceId',
-      displayName: 'Space ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Specific space ID to monitor (optional)'
-    },
-    {
-      name: 'listId',
-      displayName: 'List ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Specific list ID to monitor (optional)'
-    }
-  ],
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when ClickUp events occur'
-    }
-  ],
-  credentials: ['clickUpApi'],
-  triggerNode: true,
-  polling: false,
-  webhookSupport: true,
-  examples: [
-    {
-      name: 'Task Created Alert',
-      description: 'Trigger when new tasks are created in a specific list',
-      workflow: {
-        nodes: [
-          {
-            name: 'ClickUp Trigger',
-            type: 'n8n-nodes-base.clickupTrigger',
-            parameters: {
-              events: ['taskCreated'],
-              teamId: '123456',
-              listId: '789012345'
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes as an array for easier importing
-export const clickupNodes: NodeTypeInfo[] = [clickupNode, clickupTriggerNode];
-
-// Export ClickUp priority levels
-export const clickupPriorities = {
-  '1': 'Urgent',
-  '2': 'High',
-  '3': 'Normal',
-  '4': 'Low'
-};
-
-// Export common ClickUp operations
-export const clickupOperations = [
-  'create_task',
-  'update_task',
-  'get_tasks',
-  'create_list',
-  'track_time',
-  'add_comment',
-  'set_status',
-  'assign_task',
-  'create_goal',
-  'get_spaces'
-];

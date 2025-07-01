@@ -1,8 +1,288 @@
 /**
- * Microsoft Outlook Node - Comprehensive Email Management
+ * # Microsoft Outlook
  * 
- * Advanced Microsoft Outlook integration for email management,
- * calendar operations, and contact handling for AI-powered automation.
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Email & Communication
+ * 
+ * ## Description
+ * 
+ * Use the Microsoft Outlook node to automate work in Microsoft Outlook, and integrate Microsoft Outlook 
+ * with other applications. n8n has built-in support for a wide range of Microsoft Outlook features, 
+ * including creating, updating, deleting, and getting folders, messages, drafts, calendars, contacts, and events.
+ * 
+ * ## Key Features
+ * 
+ * - **Email Management**: Complete email handling with advanced workflow features
+ * - **Calendar Integration**: Full calendar and event management capabilities
+ * - **Contact Management**: Comprehensive contact database operations
+ * - **Draft Management**: Create, edit, and manage email drafts
+ * - **Folder Organization**: Advanced folder structure and message organization
+ * - **Attachment Handling**: Complete attachment upload, download, and management
+ * - **Wait for Response**: Unique workflow pause feature waiting for user responses
+ * - **Approval Workflows**: Built-in approval and disapproval workflow mechanisms
+ * - **Custom Forms**: Interactive form creation for data collection
+ * - **AI Tool Integration**: Can be used as an AI tool with automatic parameter setting
+ * - **Rich Formatting**: Support for HTML emails and rich text formatting
+ * - **Enterprise Integration**: Seamless integration with Microsoft 365 ecosystem
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Microsoft credentials](../../credentials/microsoft/) for guidance on setting up authentication.
+ * Uses Microsoft OAuth2 for secure access to Outlook and Microsoft 365 services.
+ * 
+ * ## AI Tool Integration
+ * 
+ * This node can be used as an AI tool to enhance the capabilities of an AI agent. When used in this way, 
+ * many parameters can be set automatically, or with information directed by AI.
+ * 
+ * ## Operations by Resource
+ * 
+ * ### Calendar Operations
+ * - **Create Calendar**: Create new calendars for organization
+ *   - Set calendar name and description
+ *   - Configure calendar permissions and sharing
+ *   - Establish calendar color coding and categories
+ *   - Define calendar time zones and working hours
+ * - **Get Calendar**: Retrieve specific calendar information
+ *   - Access calendar properties and settings
+ *   - View calendar permissions and shared users
+ *   - Check calendar subscription and sync status
+ * - **Get Many Calendars**: List all available calendars
+ *   - View personal and shared calendars
+ *   - Filter calendars by type and permissions
+ *   - Export calendar lists and properties
+ * - **Update Calendar**: Modify calendar settings and properties
+ *   - Change calendar names and descriptions
+ *   - Update sharing permissions and access rights
+ *   - Modify calendar display settings
+ * - **Delete Calendar**: Remove calendars permanently
+ *   - Clean up unused calendars
+ *   - Handle calendar dependencies and events
+ * 
+ * ### Contact Operations
+ * - **Create Contact**: Add new contacts to address book
+ *   - Complete contact information including names and titles
+ *   - Multiple contact methods (email, phone, address)
+ *   - Company and organization details
+ *   - Custom fields and notes
+ *   - Contact photos and social profiles
+ * - **Get Contact**: Retrieve specific contact details
+ *   - Access complete contact information
+ *   - View contact history and interactions
+ *   - Check contact groups and categories
+ * - **Get Many Contacts**: Search and list contacts
+ *   - Advanced search with multiple criteria
+ *   - Filter by groups, companies, or locations
+ *   - Sort by name, company, or creation date
+ *   - Export contact lists and data
+ * - **Update Contact**: Modify existing contact information
+ *   - Update contact details and information
+ *   - Change contact categories and groups
+ *   - Modify contact photos and profiles
+ * - **Delete Contact**: Remove contacts from address book
+ *   - Permanently delete contact records
+ *   - Handle contact dependencies and references
+ * 
+ * ### Draft Operations
+ * - **Create Draft**: Compose new email drafts
+ *   - Compose emails with recipients and content
+ *   - Add attachments and embedded media
+ *   - Set email formatting and styling
+ *   - Save drafts for later editing and sending
+ * - **Get Draft**: Retrieve specific draft details
+ *   - Access draft content and metadata
+ *   - View recipients and attachment information
+ *   - Check draft formatting and styling
+ * - **Update Draft**: Modify existing drafts
+ *   - Edit draft content and recipients
+ *   - Add or remove attachments
+ *   - Update formatting and styling options
+ * - **Send Draft**: Send prepared drafts
+ *   - Send completed drafts to recipients
+ *   - Apply final formatting and delivery options
+ *   - Track sending status and delivery
+ * - **Delete Draft**: Remove drafts permanently
+ *   - Clean up unwanted draft emails
+ *   - Manage draft storage and organization
+ * 
+ * ### Event Operations
+ * - **Create Event**: Schedule new calendar events
+ *   - Set event title, description, and location
+ *   - Configure date, time, and duration
+ *   - Add attendees and send invitations
+ *   - Set reminders and notifications
+ *   - Define recurrence patterns for recurring events
+ * - **Get Event**: Retrieve specific event details
+ *   - Access complete event information
+ *   - View attendee responses and status
+ *   - Check event reminders and notifications
+ * - **Get Many Events**: List and search calendar events
+ *   - Filter events by date ranges and calendars
+ *   - Search events by keywords and criteria
+ *   - View upcoming events and schedules
+ *   - Export event lists and calendars
+ * - **Update Event**: Modify existing events
+ *   - Change event details and schedules
+ *   - Update attendee lists and invitations
+ *   - Modify reminders and notifications
+ * - **Delete Event**: Remove events from calendars
+ *   - Cancel events and notify attendees
+ *   - Handle recurring event modifications
+ * 
+ * ### Folder Operations
+ * - **Create Folder**: Create new email folders
+ *   - Organize emails with custom folder structure
+ *   - Set folder names and descriptions
+ *   - Configure folder permissions and access
+ * - **Get Folder**: Retrieve specific folder information
+ *   - Access folder properties and settings
+ *   - View folder contents and message counts
+ *   - Check folder hierarchy and structure
+ * - **Get Many Folders**: List all email folders
+ *   - View complete folder structure
+ *   - Export folder organization
+ *   - Analyze folder usage and contents
+ * - **Update Folder**: Modify folder properties
+ *   - Rename folders and update descriptions
+ *   - Change folder organization and hierarchy
+ * - **Delete Folder**: Remove folders permanently
+ *   - Clean up folder structure
+ *   - Handle folder contents and dependencies
+ * 
+ * ### Folder Message Operations
+ * - **Get Many Messages**: Retrieve messages from specific folders
+ *   - Access messages within designated folders
+ *   - Filter messages by various criteria
+ *   - Search folder contents efficiently
+ * 
+ * ### Message Operations
+ * - **Send Message**: Send new emails to recipients
+ *   - Compose and send emails with rich formatting
+ *   - Support for multiple recipients (To, CC, BCC)
+ *   - Add attachments and embedded content
+ *   - Set message priority and delivery options
+ * - **Send and Wait for Response**: Advanced workflow feature
+ *   - Send emails and pause workflow execution
+ *   - Wait for user responses and approvals
+ *   - Support for approval workflows and forms
+ *   - Configurable timeout and response handling
+ * - **Get Message**: Retrieve specific message details
+ *   - Access complete message content and metadata
+ *   - View sender and recipient information
+ *   - Download attachments and embedded content
+ * - **Get Many Messages**: Search and list messages
+ *   - Advanced search with Outlook query syntax
+ *   - Filter by folders, dates, and criteria
+ *   - Pagination for large mailboxes
+ * - **Reply Message**: Respond to received emails
+ *   - Reply to original sender or all recipients
+ *   - Quote original message content
+ *   - Maintain conversation threading
+ * - **Move Message**: Organize messages between folders
+ *   - Move messages to different folders
+ *   - Bulk message organization operations
+ * - **Update Message**: Modify message properties
+ *   - Change message flags and categories
+ *   - Update message importance and status
+ * - **Delete Message**: Remove messages permanently
+ *   - Move messages to deleted items
+ *   - Permanent deletion and cleanup
+ * 
+ * ### Message Attachment Operations
+ * - **Add Attachment**: Attach files to messages
+ *   - Upload files and documents
+ *   - Support for multiple file types and sizes
+ *   - Embed inline images and media
+ * - **Get Attachment**: Retrieve specific attachment details
+ *   - Access attachment metadata and properties
+ *   - Check attachment size and file type
+ * - **Get Many Attachments**: List message attachments
+ *   - View all attachments for a message
+ *   - Export attachment lists and information
+ * - **Download Attachment**: Download attachment files
+ *   - Save attachments to local storage
+ *   - Batch download multiple attachments
+ * 
+ * ## Advanced Workflow Features
+ * 
+ * ### Send and Wait for Response
+ * This unique feature allows workflows to pause execution and wait for user responses:
+ * 
+ * #### Response Types
+ * - **Approval**: Simple approve/disapprove buttons with customizable labels
+ * - **Free Text**: Text input form for collecting user responses
+ * - **Custom Form**: Advanced form builder with multiple field types
+ * 
+ * #### Configuration Options
+ * - **Limit Wait Time**: Set timeout intervals or specific deadlines
+ * - **n8n Attribution**: Control visibility of n8n branding in messages
+ * - **Custom Styling**: Customize form appearance and button labels
+ * - **Response Handling**: Configure actions based on user responses
+ * 
+ * ### Approval Workflows
+ * - **Button Customization**: Custom approve/disapprove button labels
+ * - **Single or Dual Actions**: Choose approval-only or approve/disapprove options
+ * - **Response Tracking**: Monitor approval status and user responses
+ * - **Escalation Handling**: Configure timeout actions and escalation paths
+ * 
+ * ### Form Integration
+ * - **Dynamic Forms**: Build custom forms with various field types
+ * - **Field Validation**: Implement input validation and requirements
+ * - **Response Processing**: Handle form submissions in workflow logic
+ * - **Multi-step Forms**: Create complex multi-page form experiences
+ * 
+ * ## Enterprise Integration
+ * 
+ * ### Microsoft 365 Ecosystem
+ * - **Teams Integration**: Connect with Microsoft Teams for notifications
+ * - **SharePoint Sync**: Integrate with SharePoint document libraries
+ * - **Power Platform**: Connect with Power BI and Power Automate
+ * - **Azure Services**: Leverage Azure cloud services and storage
+ * 
+ * ### Security and Compliance
+ * - **Enterprise Security**: Support for enterprise security policies
+ * - **Data Loss Prevention**: Integration with DLP policies
+ * - **Compliance Features**: Support for regulatory compliance requirements
+ * - **Audit Logging**: Comprehensive audit trails and logging
+ * 
+ * ## Related Resources
+ * 
+ * Refer to [Outlook's API documentation](https://learn.microsoft.com/en-us/outlook/rest/get-started) 
+ * for more information about the service.
+ * 
+ * ## Custom API Operations
+ * 
+ * If this node doesn't support the operation you want to do, you can use the HTTP Request node 
+ * to call the Microsoft Graph API directly with your Microsoft credentials.
+ * 
+ * ## Use Cases
+ * 
+ * - **Approval Workflows**: Create sophisticated approval processes with email integration
+ * - **Meeting Scheduling**: Automate meeting creation and attendee management
+ * - **Customer Support**: Handle support tickets with email and calendar integration
+ * - **Project Management**: Coordinate project activities with calendar and email automation
+ * - **Document Approval**: Implement document review and approval workflows
+ * - **Event Management**: Automate event planning and attendee communication
+ * - **Survey Collection**: Gather feedback through integrated forms and responses
+ * - **Task Management**: Create and track tasks with email and calendar integration
+ * - **Compliance Workflows**: Ensure regulatory compliance with approval processes
+ * - **Marketing Campaigns**: Execute email marketing with response tracking
+ * - **HR Processes**: Automate HR workflows with approval and form integration
+ * - **Sales Pipeline**: Manage sales processes with email and calendar automation
+ * - **Vendor Management**: Handle vendor communications and approvals
+ * - **Training Programs**: Coordinate training schedules and communications
+ * - **Quality Assurance**: Implement QA processes with approval workflows
+ * - **Financial Approvals**: Automate financial approval processes
+ * - **Contract Management**: Handle contract workflows with email integration
+ * - **Incident Response**: Coordinate incident response with automated communications
+ * - **Change Management**: Implement change approval processes
+ * - **Resource Booking**: Automate resource reservation and scheduling
+ * - **Performance Reviews**: Coordinate performance review processes
+ * - **Budget Planning**: Facilitate budget approval and review workflows
+ * - **Policy Management**: Distribute and track policy acknowledgments
+ * - **Asset Management**: Coordinate asset requests and approvals
+ * - **Security Workflows**: Implement security approval and review processes
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -10,528 +290,113 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const microsoftOutlookNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.microsoftOutlook',
   displayName: 'Microsoft Outlook',
-  description: 'Comprehensive Microsoft Outlook integration for email, calendar, and contact management with AI-powered automation capabilities',
-  category: 'AI & Productivity',
-  subcategory: 'Email Management',
+  description: 'Comprehensive email, calendar, and productivity automation with advanced workflow features.',
+  category: 'Action Nodes',
+  subcategory: 'Email & Communication',
   
   properties: [
-    // Authentication
-    {
-      name: 'authentication',
-      displayName: 'Authentication',
-      type: 'options',
-      required: true,
-      default: 'oAuth2',
-      options: [
-        { name: 'OAuth2', value: 'oAuth2' },
-        { name: 'Microsoft Graph API', value: 'microsoftGraphApi' }
-      ],
-      description: 'Authentication method for Microsoft Outlook'
-    },
-
-    // Resource selector
     {
       name: 'resource',
       displayName: 'Resource',
       type: 'options',
       required: true,
       default: 'message',
-      options: [
-        { name: 'Message', value: 'message' },
-        { name: 'Calendar Event', value: 'calendarEvent' },
-        { name: 'Contact', value: 'contact' },
-        { name: 'Folder', value: 'folder' },
-        { name: 'Category', value: 'category' },
-        { name: 'Rule', value: 'rule' },
-        { name: 'Attachment', value: 'attachment' }
-      ],
-      description: 'Choose the Outlook resource to work with'
-    },
-
-    // Message operations
-    {
-      name: 'messageOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'get',
-      displayOptions: {
-        show: { resource: ['message'] }
-      },
-      options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Get All', value: 'getAll' },
-        { name: 'Send', value: 'send' },
-        { name: 'Reply', value: 'reply' },
-        { name: 'Reply All', value: 'replyAll' },
-        { name: 'Forward', value: 'forward' },
-        { name: 'Move', value: 'move' },
-        { name: 'Copy', value: 'copy' },
-        { name: 'Delete', value: 'delete' },
-        { name: 'Mark as Read', value: 'markAsRead' },
-        { name: 'Mark as Unread', value: 'markAsUnread' },
-        { name: 'Flag', value: 'flag' },
-        { name: 'Unflag', value: 'unflag' },
-        { name: 'Archive', value: 'archive' },
-        { name: 'Update', value: 'update' }
-      ],
-      description: 'Select the operation to perform on messages'
-    },
-
-    // Calendar Event operations
-    {
-      name: 'calendarEventOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'get',
-      displayOptions: {
-        show: { resource: ['calendarEvent'] }
-      },
-      options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Get All', value: 'getAll' },
-        { name: 'Create', value: 'create' },
-        { name: 'Update', value: 'update' },
-        { name: 'Delete', value: 'delete' },
-        { name: 'Accept', value: 'accept' },
-        { name: 'Decline', value: 'decline' },
-        { name: 'Tentative', value: 'tentative' },
-        { name: 'Cancel', value: 'cancel' }
-      ],
-      description: 'Select the operation to perform on calendar events'
-    },
-
-    // Contact operations
-    {
-      name: 'contactOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'get',
-      displayOptions: {
-        show: { resource: ['contact'] }
-      },
-      options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Get All', value: 'getAll' },
-        { name: 'Create', value: 'create' },
-        { name: 'Update', value: 'update' },
-        { name: 'Delete', value: 'delete' }
-      ],
-      description: 'Select the operation to perform on contacts'
-    },
-
-    // Message ID
-    {
-      name: 'messageId',
-      displayName: 'Message ID',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['get', 'reply', 'replyAll', 'forward', 'move', 'copy', 'delete', 'markAsRead', 'markAsUnread', 'flag', 'unflag', 'archive', 'update']
-        }
-      },
-      description: 'The message ID'
-    },
-
-    // Email composition fields
-    {
-      name: 'to',
-      displayName: 'To',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send']
-        }
-      },
-      description: 'Recipient email addresses (comma-separated)'
-    },
-
-    {
-      name: 'cc',
-      displayName: 'CC',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send', 'reply', 'replyAll', 'forward']
-        }
-      },
-      description: 'CC email addresses (comma-separated)'
-    },
-
-    {
-      name: 'bcc',
-      displayName: 'BCC',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send', 'reply', 'replyAll', 'forward']
-        }
-      },
-      description: 'BCC email addresses (comma-separated)'
-    },
-
-    {
-      name: 'subject',
-      displayName: 'Subject',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send', 'reply', 'replyAll', 'forward', 'update']
-        }
-      },
-      description: 'Email subject line'
-    },
-
-    {
-      name: 'bodyContent',
-      displayName: 'Body Content',
-      type: 'string',
-      required: true,
-      typeOptions: {
-        rows: 6
-      },
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send', 'reply', 'replyAll', 'forward']
-        }
-      },
-      description: 'Email body content'
-    },
-
-    {
-      name: 'bodyContentType',
-      displayName: 'Body Content Type',
-      type: 'options',
-      required: false,
-      default: 'html',
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send', 'reply', 'replyAll', 'forward']
-        }
-      },
-      options: [
-        { name: 'HTML', value: 'html' },
-        { name: 'Text', value: 'text' }
-      ],
-      description: 'Format of the email body'
-    },
-
-    {
-      name: 'importance',
-      displayName: 'Importance',
-      type: 'options',
-      required: false,
-      default: 'normal',
-      displayOptions: {
-        show: { 
-          resource: ['message'],
-          messageOperation: ['send', 'update']
-        }
-      },
-      options: [
-        { name: 'Low', value: 'low' },
-        { name: 'Normal', value: 'normal' },
-        { name: 'High', value: 'high' }
-      ],
-      description: 'Email importance level'
-    },
-
-    // Calendar Event fields
-    {
-      name: 'eventSubject',
-      displayName: 'Subject',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['calendarEvent'],
-          calendarEventOperation: ['create', 'update']
-        }
-      },
-      description: 'Event subject/title'
-    },
-
-    {
-      name: 'eventStart',
-      displayName: 'Start Date/Time',
-      type: 'dateTime',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['calendarEvent'],
-          calendarEventOperation: ['create', 'update']
-        }
-      },
-      description: 'Event start date and time'
-    },
-
-    {
-      name: 'eventEnd',
-      displayName: 'End Date/Time',
-      type: 'dateTime',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['calendarEvent'],
-          calendarEventOperation: ['create', 'update']
-        }
-      },
-      description: 'Event end date and time'
-    },
-
-    {
-      name: 'eventAttendees',
-      displayName: 'Attendees',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['calendarEvent'],
-          calendarEventOperation: ['create', 'update']
-        }
-      },
-      description: 'Attendee email addresses (comma-separated)'
-    },
-
-    {
-      name: 'eventLocation',
-      displayName: 'Location',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['calendarEvent'],
-          calendarEventOperation: ['create', 'update']
-        }
-      },
-      description: 'Event location'
-    },
-
-    {
-      name: 'eventBody',
-      displayName: 'Description',
-      type: 'string',
-      required: false,
-      typeOptions: {
-        rows: 4
-      },
-      displayOptions: {
-        show: { 
-          resource: ['calendarEvent'],
-          calendarEventOperation: ['create', 'update']
-        }
-      },
-      description: 'Event description'
-    },
-
-    // Contact fields
-    {
-      name: 'contactDisplayName',
-      displayName: 'Display Name',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['contact'],
-          contactOperation: ['create', 'update']
-        }
-      },
-      description: 'Contact display name'
-    },
-
-    {
-      name: 'contactEmailAddress',
-      displayName: 'Email Address',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['contact'],
-          contactOperation: ['create', 'update']
-        }
-      },
-      description: 'Contact email address'
-    },
-
-    {
-      name: 'contactJobTitle',
-      displayName: 'Job Title',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['contact'],
-          contactOperation: ['create', 'update']
-        }
-      },
-      description: 'Contact job title'
-    },
-
-    {
-      name: 'contactCompanyName',
-      displayName: 'Company Name',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['contact'],
-          contactOperation: ['create', 'update']
-        }
-      },
-      description: 'Contact company name'
-    },
-
-    // AI-Enhanced Features
-    {
-      name: 'aiFeatures',
-      displayName: 'AI Features',
-      type: 'collection',
-      required: false,
-      default: {},
-      description: 'Enable AI-powered features for email processing',
+      description: 'Resource to operate on',
       options: [
         {
-          name: 'enableSentimentAnalysis',
-          displayName: 'Enable Sentiment Analysis',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Analyze email sentiment'
+          name: 'Calendar',
+          value: 'calendar',
+          description: 'Work with calendars'
         },
         {
-          name: 'enableAutoResponse',
-          displayName: 'Enable Auto Response',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Generate AI-powered auto responses'
+          name: 'Contact',
+          value: 'contact',
+          description: 'Work with contacts'
         },
         {
-          name: 'enableCategorization',
-          displayName: 'Enable Auto Categorization',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Automatically categorize emails'
+          name: 'Draft',
+          value: 'draft',
+          description: 'Work with email drafts'
         },
         {
-          name: 'enablePriorityDetection',
-          displayName: 'Enable Priority Detection',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Detect email priority using AI'
+          name: 'Event',
+          value: 'event',
+          description: 'Work with calendar events'
         },
         {
-          name: 'enableSummarization',
-          displayName: 'Enable Email Summarization',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Generate email summaries'
+          name: 'Folder',
+          value: 'folder',
+          description: 'Work with email folders'
+        },
+        {
+          name: 'Folder Message',
+          value: 'folderMessage',
+          description: 'Work with messages in folders'
+        },
+        {
+          name: 'Message',
+          value: 'message',
+          description: 'Work with email messages'
+        },
+        {
+          name: 'Message Attachment',
+          value: 'messageAttachment',
+          description: 'Work with message attachments'
         }
       ]
     },
-
-    // Filtering and search options
     {
-      name: 'filters',
-      displayName: 'Filters',
-      type: 'collection',
-      required: false,
-      default: {},
-      description: 'Filter options for retrieving messages or events',
-      options: [
-        {
-          name: 'folder',
-          displayName: 'Folder',
-          type: 'string',
-          required: false,
-          description: 'Specific folder to search in'
-        },
-        {
-          name: 'from',
-          displayName: 'From',
-          type: 'string',
-          required: false,
-          description: 'Filter by sender email'
-        },
-        {
-          name: 'hasAttachments',
-          displayName: 'Has Attachments',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Filter messages with attachments'
-        },
-        {
-          name: 'isRead',
-          displayName: 'Is Read',
-          type: 'options',
-          required: false,
-          options: [
-            { name: 'All', value: 'all' },
-            { name: 'Read', value: 'true' },
-            { name: 'Unread', value: 'false' }
-          ],
-          default: 'all',
-          description: 'Filter by read status'
-        },
-        {
-          name: 'dateRange',
-          displayName: 'Date Range (Days)',
-          type: 'number',
-          required: false,
-          description: 'Number of days to look back'
-        },
-        {
-          name: 'searchQuery',
-          displayName: 'Search Query',
-          type: 'string',
-          required: false,
-          description: 'Search in subject and body'
+      name: 'operation',
+      displayName: 'Operation',
+      type: 'options',
+      required: true,
+      default: 'send',
+      description: 'Operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['message']
         }
-      ]
-    },
-
-    // Pagination and limits
-    {
-      name: 'options',
-      displayName: 'Options',
-      type: 'collection',
-      required: false,
-      default: {},
-      description: 'Additional options',
+      },
       options: [
         {
-          name: 'limit',
-          displayName: 'Limit',
-          type: 'number',
-          required: false,
-          default: 50,
-          description: 'Maximum number of results'
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete a message'
         },
         {
-          name: 'returnAll',
-          displayName: 'Return All',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Return all results (ignores limit)'
+          name: 'Get',
+          value: 'get',
+          description: 'Get a message'
+        },
+        {
+          name: 'Get Many',
+          value: 'getMany',
+          description: 'Get many messages'
+        },
+        {
+          name: 'Move',
+          value: 'move',
+          description: 'Move a message'
+        },
+        {
+          name: 'Reply',
+          value: 'reply',
+          description: 'Reply to a message'
+        },
+        {
+          name: 'Send',
+          value: 'send',
+          description: 'Send a message'
+        },
+        {
+          name: 'Send and Wait for Response',
+          value: 'sendAndWait',
+          description: 'Send a message and wait for response'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update a message'
         }
       ]
     }
@@ -548,29 +413,14 @@ export const microsoftOutlookNode: NodeTypeInfo = {
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'Microsoft Outlook API response data'
+      displayName: 'Output'
     }
   ],
 
   credentials: [
     {
       name: 'microsoftOutlookOAuth2Api',
-      required: true,
-      displayOptions: {
-        show: {
-          authentication: ['oAuth2']
-        }
-      }
-    },
-    {
-      name: 'microsoftGraphApi',
-      required: true,
-      displayOptions: {
-        show: {
-          authentication: ['microsoftGraphApi']
-        }
-      }
+      required: true
     }
   ],
 
@@ -579,80 +429,24 @@ export const microsoftOutlookNode: NodeTypeInfo = {
     name: 'Microsoft Outlook'
   },
 
-  aliases: ['outlook', 'email', 'microsoft', 'office365', 'exchange'],
+  aliases: ['outlook', 'microsoft', 'email', 'office365', 'calendar', 'contacts'],
   
   examples: [
     {
-      name: 'Send AI-Powered Email',
-      description: 'Send an email with AI sentiment analysis and auto-categorization',
+      name: 'Send Email with Approval',
+      description: 'Send an email and wait for user approval',
       workflow: {
         nodes: [
           {
-            name: 'Send Email',
+            name: 'Microsoft Outlook',
             type: 'n8n-nodes-base.microsoftOutlook',
             parameters: {
               resource: 'message',
-              messageOperation: 'send',
-              to: 'recipient@example.com',
-              subject: 'AI-Powered Email Test',
-              bodyContent: 'This is an AI-enhanced email with sentiment analysis enabled.',
-              bodyContentType: 'html',
-              importance: 'normal',
-              aiFeatures: {
-                enableSentimentAnalysis: true,
-                enableCategorization: true,
-                enablePriorityDetection: true
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get Unread Emails with AI Processing',
-      description: 'Retrieve unread emails and process them with AI features',
-      workflow: {
-        nodes: [
-          {
-            name: 'Get Unread Emails',
-            type: 'n8n-nodes-base.microsoftOutlook',
-            parameters: {
-              resource: 'message',
-              messageOperation: 'getAll',
-              filters: {
-                isRead: 'false',
-                dateRange: 7
-              },
-              aiFeatures: {
-                enableSentimentAnalysis: true,
-                enableSummarization: true,
-                enablePriorityDetection: true
-              },
-              options: {
-                limit: 25
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Create Meeting with Teams Integration',
-      description: 'Create a calendar event that includes Teams meeting link',
-      workflow: {
-        nodes: [
-          {
-            name: 'Create Meeting',
-            type: 'n8n-nodes-base.microsoftOutlook',
-            parameters: {
-              resource: 'calendarEvent',
-              calendarEventOperation: 'create',
-              eventSubject: 'AI Strategy Meeting',
-              eventStart: '2024-02-15T10:00:00',
-              eventEnd: '2024-02-15T11:00:00',
-              eventAttendees: 'team@example.com,manager@example.com',
-              eventLocation: 'Microsoft Teams Meeting',
-              eventBody: 'Discussing AI implementation strategy for Q1 2024'
+              operation: 'sendAndWait',
+              to: 'manager@company.com',
+              subject: 'Approval Required',
+              message: 'Please approve this request.',
+              responseType: 'approval'
             }
           }
         ]

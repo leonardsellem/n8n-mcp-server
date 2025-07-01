@@ -1,11 +1,104 @@
+/**
+ * # Merge
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Core Nodes
+ * **Subcategory**: Data Processing
+ * 
+ * ## Description
+ * 
+ * Use the Merge node to combine data from multiple streams, once data of all streams is available.
+ * The node waits for execution of all connected inputs before processing.
+ * 
+ * ## Key Features
+ * 
+ * - **Multiple Modes**: Append, Combine, SQL Query, Choose Branch
+ * - **Flexible Combining**: By matching fields, position, or all possible combinations
+ * - **SQL Support**: Custom SQL queries for complex merging operations (v1.49.0+)
+ * - **Join Operations**: Inner, outer, left, and right join equivalents
+ * - **Multiple Inputs**: Support for more than two inputs (v1.49.0+)
+ * - **Clash Handling**: Configure how to handle field conflicts and nested data
+ * - **Type Tolerance**: Fuzzy compare option for different data types
+ * - **Advanced Options**: Multiple match handling, unpaired items inclusion
+ * 
+ * ## Merge Modes
+ * 
+ * ### Append Mode
+ * - Keep data from all inputs, outputting items one after another
+ * - Choose number of inputs to combine sequentially
+ * - Simple concatenation of data streams
+ * 
+ * ### Combine Mode
+ * Four different combination strategies:
+ * 
+ * #### Matching Fields
+ * - Compare items by field values
+ * - **Output Types**:
+ *   - **Keep Matches**: Inner join - merge matching items only
+ *   - **Keep Non-Matches**: Merge items that don't match
+ *   - **Keep Everything**: Outer join - merge all items
+ *   - **Enrich Input 1**: Left join - keep all Input 1, add matching Input 2
+ *   - **Enrich Input 2**: Right join - keep all Input 2, add matching Input 1
+ * 
+ * #### Position
+ * - Combine items based on their order/index
+ * - Item at index 0 in Input 1 merges with item at index 0 in Input 2
+ * - Option to include unpaired items
+ * 
+ * #### All Possible Combinations
+ * - Output all possible item combinations
+ * - Merges fields with the same name
+ * - Creates cartesian product of inputs
+ * 
+ * ### SQL Query Mode (v1.49.0+)
+ * - Write custom SQL queries for complex merging
+ * - Data available as tables: input1, input2, input3, etc.
+ * - Full AlaSQL support for complex operations
+ * 
+ * ### Choose Branch Mode
+ * - Select which input to keep
+ * - Options: Input 1 data, Input 2 data, or single empty item
+ * - Useful for conditional data flow control
+ * 
+ * ## Advanced Options
+ * 
+ * ### Clash Handling
+ * - **Field Value Clashes**: Choose which input takes priority
+ * - **Nested Field Merging**: Deep merge vs shallow merge options
+ * - **Add Input Numbers**: Append input number to field names
+ * 
+ * ### Additional Options
+ * - **Fuzzy Compare**: Tolerate type differences (treats "3" and 3 as same)
+ * - **Disable Dot Notation**: Prevent parent.child field access
+ * - **Multiple Matches**: Include all matches or first match only
+ * - **Include Unpaired Items**: Keep items without matches in position mode
+ * 
+ * ## Version History
+ * 
+ * - **v0.194.0**: Major overhaul with new modes and options
+ * - **v1.49.0**: Added SQL Query mode and multiple inputs support
+ * 
+ * ## Use Cases
+ * 
+ * - Combining data from multiple APIs or databases
+ * - Joining datasets on common fields (user ID, email, etc.)
+ * - Merging user profiles with preferences or settings
+ * - Concatenating results from parallel workflow branches
+ * - Creating lookup tables and enriching data
+ * - Data validation by comparing multiple sources
+ * - Complex data transformations with SQL
+ * - Synchronizing data from different systems
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const mergeNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.merge',
   displayName: 'Merge',
-  description: 'Combine data from multiple workflow branches or inputs. Merge datasets, wait for multiple operations to complete, or join data based on common fields.',
+  description: 'Combine data from multiple streams using append, field matching, position, SQL queries, or branch selection.',
   category: 'Core Nodes',
   subcategory: 'Data Processing',
+  
   properties: [
     {
       name: 'mode',
@@ -13,119 +106,184 @@ export const mergeNode: NodeTypeInfo = {
       type: 'options',
       required: true,
       default: 'append',
-      description: 'How to merge the data',
-      options: [
-        { name: 'Append', value: 'append', description: 'Combine all data items into one list' },
-        { name: 'Pass-through', value: 'passThrough', description: 'Keep data separate by input' },
-        { name: 'Wait', value: 'wait', description: 'Wait for all inputs to have data' },
-        { name: 'Merge by Key', value: 'mergeByKey', description: 'Join data based on matching field values' },
-        { name: 'Merge by Index', value: 'mergeByIndex', description: 'Combine items with same array position' }
-      ]
-    },
-    {
-      name: 'joinMode',
-      displayName: 'Join Mode',
-      type: 'options',
-      required: false,
-      default: 'inner',
-      description: 'How to join the data when merging by key',
-      displayOptions: {
-        show: {
-          mode: ['mergeByKey']
-        }
-      },
-      options: [
-        { name: 'Inner Join', value: 'inner', description: 'Only items with matching keys in all inputs' },
-        { name: 'Left Join', value: 'left', description: 'All items from first input, matching from others' },
-        { name: 'Outer Join', value: 'outer', description: 'All items from all inputs' }
-      ]
-    },
-    {
-      name: 'propertyName1',
-      displayName: 'Key Field Input 1',
-      type: 'string',
-      required: false,
-      default: 'id',
-      description: 'Field name to use for matching in first input',
-      displayOptions: {
-        show: {
-          mode: ['mergeByKey']
-        }
-      },
-      placeholder: 'id'
-    },
-    {
-      name: 'propertyName2',
-      displayName: 'Key Field Input 2',
-      type: 'string',
-      required: false,
-      default: 'id',
-      description: 'Field name to use for matching in second input',
-      displayOptions: {
-        show: {
-          mode: ['mergeByKey']
-        }
-      },
-      placeholder: 'id'
-    },
-    {
-      name: 'outputDataFrom',
-      displayName: 'Output Data From',
-      type: 'options',
-      required: false,
-      default: 'both',
-      description: 'Which input data to include in output',
-      displayOptions: {
-        show: {
-          mode: ['mergeByKey']
-        }
-      },
-      options: [
-        { name: 'Both Inputs', value: 'both' },
-        { name: 'Input 1', value: 'input1' },
-        { name: 'Input 2', value: 'input2' }
-      ]
-    },
-    {
-      name: 'options',
-      displayName: 'Options',
-      type: 'collection',
-      required: false,
-      default: {},description: 'Additional merge options',
+      description: 'How to merge the data from different inputs',
       options: [
         {
-      name: 'clashHandling',
-      displayName: 'Property Name Clash',
-      type: 'options',
-      required: false,
-          description: 'How to handle properties with the same name',
-          options: [
-            { name: 'Prefer Input 1', value: 'input1'
-    },
-            { name: 'Prefer Input 2', value: 'input2' },
-            { name: 'Prefix Input 1', value: 'prefixInput1' },
-            { name: 'Prefix Input 2', value: 'prefixInput2' }
-          ]
+          name: 'Append',
+          value: 'append',
+          description: 'Keep data from all inputs, one after another'
         },
         {
-      name: 'includeUnmatched',
-      displayName: 'Include Unmatched',
-      type: 'boolean',
-      required: false,
-      default: false,
-          description: 'Include items without matches (only for merge by key)'
-    },
+          name: 'Combine',
+          value: 'combine',
+          description: 'Combine data from inputs using various strategies'
+        },
         {
-      name: 'waitTimeoutMs',
-      displayName: 'Wait Timeout (ms)',
-      type: 'number',
+          name: 'SQL Query',
+          value: 'sql',
+          description: 'Use custom SQL query to merge data'
+        },
+        {
+          name: 'Choose Branch',
+          value: 'chooseBranch',
+          description: 'Choose which input to keep'
+        }
+      ]
+    },
+    {
+      name: 'combineBy',
+      displayName: 'Combine By',
+      type: 'options',
       required: false,
-      default: 3000,
-          description: 'Maximum time to wait for data (wait mode only)'
-    }
+      default: 'combineByFields',
+      description: 'How to combine the inputs',
+      displayOptions: {
+        show: {
+          mode: ['combine']
+        }
+      },
+      options: [
+        {
+          name: 'Matching Fields',
+          value: 'combineByFields',
+          description: 'Combine items with matching field values'
+        },
+        {
+          name: 'Position',
+          value: 'combineByPosition',
+          description: 'Combine items based on their position/index'
+        },
+        {
+          name: 'All Possible Combinations',
+          value: 'multiplex',
+          description: 'Create all possible combinations of items'
+        }
+      ]
+    },
+    {
+      name: 'fieldsToMatch',
+      displayName: 'Fields to Match',
+      type: 'fixedCollection',
+      required: false,
+      default: {},
+      description: 'Fields to match for combining',
+      displayOptions: {
+        show: {
+          mode: ['combine'],
+          combineBy: ['combineByFields']
+        }
+      },
+      typeOptions: {
+        multipleValues: true
+      },
+      options: [
+        {
+          name: 'field',
+          displayName: 'Field Pair',
+          values: [
+            {
+              name: 'input1Field',
+              displayName: 'Input 1 Field',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'Field name from Input 1'
+            },
+            {
+              name: 'input2Field',
+              displayName: 'Input 2 Field',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'Field name from Input 2'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'outputType',
+      displayName: 'Output Type',
+      type: 'options',
+      required: false,
+      default: 'keepMatches',
+      description: 'What to output',
+      displayOptions: {
+        show: {
+          mode: ['combine'],
+          combineBy: ['combineByFields']
+        }
+      },
+      options: [
+        {
+          name: 'Keep Matches',
+          value: 'keepMatches',
+          description: 'Keep only items that match (inner join)'
+        },
+        {
+          name: 'Keep Non-Matches',
+          value: 'keepNonMatches',
+          description: 'Keep only items that don\'t match'
+        },
+        {
+          name: 'Keep Everything',
+          value: 'keepEverything',
+          description: 'Keep all items (outer join)'
+        },
+        {
+          name: 'Enrich Input 1',
+          value: 'enrichInput1',
+          description: 'Keep all Input 1, add matching Input 2 (left join)'
+        },
+        {
+          name: 'Enrich Input 2',
+          value: 'enrichInput2',
+          description: 'Keep all Input 2, add matching Input 1 (right join)'
+        }
+      ]
+    },
+    {
+      name: 'sqlQuery',
+      displayName: 'SQL Query',
+      type: 'string',
+      required: false,
+      default: 'SELECT * FROM input1 LEFT JOIN input2 ON input1.id = input2.id',
+      description: 'SQL query to merge the data. Inputs are available as input1, input2, etc.',
+      displayOptions: {
+        show: {
+          mode: ['sql']
+        }
+      }
+    },
+    {
+      name: 'output',
+      displayName: 'Output',
+      type: 'options',
+      required: false,
+      default: 'input1',
+      description: 'Which input to output',
+      displayOptions: {
+        show: {
+          mode: ['chooseBranch']
+        }
+      },
+      options: [
+        {
+          name: 'Input 1 Data',
+          value: 'input1'
+        },
+        {
+          name: 'Input 2 Data',
+          value: 'input2'
+        },
+        {
+          name: 'A Single, Empty Item',
+          value: 'empty'
+        }
       ]
     }
   ],
+
   inputs: [
     {
       type: 'main',
@@ -138,53 +296,31 @@ export const mergeNode: NodeTypeInfo = {
       required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Merged',
-      description: 'The merged data from both inputs'
+      displayName: 'Merged'
     }
   ],
+
   credentials: [],
-  regularNode: true,
-  codeable: false,
-  triggerNode: false,
+
+  version: [2, 3],
   defaults: {
-    mode: 'append',
-    joinMode: 'inner',
-    propertyName1: 'id',
-    propertyName2: 'id',
-    outputDataFrom: 'both'
+    name: 'Merge'
   },
-  aiMetadata: {
-    aiOptimized: true,
-    integrationComplexity: 'medium',
-    commonPatterns: [
-      'Combine data from parallel API calls',
-      'Join user data with profile information',
-      'Merge search results from multiple sources',
-      'Wait for multiple async operations',
-      'Aggregate data from different workflows',
-      'Synchronize multiple data streams'
-    ],
-    prerequisites: [
-      'Multiple workflow branches or inputs',
-      'Understanding of data joining concepts'
-    ],
-    errorHandling: {
-      retryableErrors: ['Timeout waiting for input'],
-      nonRetryableErrors: ['Key field not found', 'Invalid join configuration'],
-      documentation: 'Common issues include missing key fields and timeout waiting for data'
-    }
-  },
+
+  aliases: ['join', 'combine', 'union', 'concat'],
+  
   examples: [
     {
-      name: 'Simple Data Append',
-      description: 'Combine all data items from multiple inputs',
+      name: 'Append Two Data Sets',
+      description: 'Simple concatenation of two data streams',
       workflow: {
         nodes: [
           {
-            name: 'Merge Data',
+            name: 'Merge',
             type: 'n8n-nodes-base.merge',
             parameters: {
               mode: 'append'
@@ -194,79 +330,25 @@ export const mergeNode: NodeTypeInfo = {
       }
     },
     {
-      name: 'Join User Data by ID',
-      description: 'Merge user profiles with user activities using ID field',
+      name: 'Join by Matching Field',
+      description: 'Combine data based on matching ID fields',
       workflow: {
         nodes: [
           {
-            name: 'Join by User ID',
+            name: 'Merge',
             type: 'n8n-nodes-base.merge',
             parameters: {
-              mode: 'mergeByKey',
-              joinMode: 'inner',
-              propertyName1: 'userId',
-              propertyName2: 'user_id',
-              outputDataFrom: 'both'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Wait for Multiple APIs',
-      description: 'Wait for multiple API calls to complete before proceeding',
-      workflow: {
-        nodes: [
-          {
-            name: 'Wait for APIs',
-            type: 'n8n-nodes-base.merge',
-            parameters: {
-              mode: 'wait',
-              options: {
-                waitTimeoutMs: 5000
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Left Join with Missing Data',
-      description: 'Keep all records from first input, add matching data from second',
-      workflow: {
-        nodes: [
-          {
-            name: 'Left Join',
-            type: 'n8n-nodes-base.merge',
-            parameters: {
-              mode: 'mergeByKey',
-              joinMode: 'left',
-              propertyName1: 'id',
-              propertyName2: 'customer_id',
-              outputDataFrom: 'both',
-              options: {
-                clashHandling: 'prefixInput2',
-                includeUnmatched: true
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Merge by Array Position',
-      description: 'Combine items at the same array index from both inputs',
-      workflow: {
-        nodes: [
-          {
-            name: 'Merge by Position',
-            type: 'n8n-nodes-base.merge',
-            parameters: {
-              mode: 'mergeByIndex',
-              outputDataFrom: 'both',
-              options: {
-                clashHandling: 'input1'
-              }
+              mode: 'combine',
+              combineBy: 'combineByFields',
+              fieldsToMatch: {
+                field: [
+                  {
+                    input1Field: 'id',
+                    input2Field: 'userId'
+                  }
+                ]
+              },
+              outputType: 'keepMatches'
             }
           }
         ]
@@ -274,3 +356,5 @@ export const mergeNode: NodeTypeInfo = {
     }
   ]
 };
+
+export default mergeNode;

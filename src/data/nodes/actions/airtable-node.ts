@@ -1,34 +1,157 @@
+/**
+ * # Airtable
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Productivity & Collaboration
+ * 
+ * ## Description
+ * 
+ * Use the Airtable node to automate work in Airtable, and integrate Airtable with other applications. 
+ * n8n has built-in support for a wide range of Airtable features, including creating, reading, listing, 
+ * updating and deleting tables.
+ * 
+ * ## Key Features
+ * 
+ * - **Complete CRUD Operations**: Create, read, update, and delete records in Airtable bases
+ * - **Advanced Filtering**: Use Airtable's formula system for complex record filtering
+ * - **Bulk Operations**: Handle multiple records efficiently with list and batch operations
+ * - **Field Type Support**: Work with all Airtable field types (text, number, date, attachment, etc.)
+ * - **Record ID Management**: Get and use Record IDs for precise record targeting
+ * - **Formula Integration**: Leverage Airtable's powerful formula system for data manipulation
+ * - **Base and Table Management**: Work across multiple bases and tables in your workspace
+ * - **Real-time Sync**: Integration with Airtable's real-time collaboration features
+ * - **Attachment Handling**: Upload and manage file attachments in records
+ * - **View Integration**: Work with specific views and their filtered data
+ * - **API Rate Limiting**: Built-in handling of Airtable's API rate limits
+ * - **Data Validation**: Ensure data integrity with Airtable's field validation rules
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Airtable credentials](../../credentials/airtable/) for guidance on setting up authentication.
+ * Uses Airtable Personal Access Tokens or API keys for secure access to your bases.
+ * 
+ * ## Operations
+ * 
+ * - **Append**: Append new data to a table (create new records)
+ * - **Delete**: Delete records from a table
+ * - **List**: List and filter records from a table
+ * - **Read**: Read specific records from a table
+ * - **Update**: Update existing records in a table
+ * 
+ * ## Working with Record IDs
+ * 
+ * ### Getting Record IDs
+ * 
+ * To fetch data for a particular record, you need the Record ID. There are two main approaches:
+ * 
+ * #### Method 1: Create a Record ID Column
+ * Create a `Record ID` column in your Airtable table to display Record IDs directly. 
+ * This makes it easy to reference specific records in your workflows.
+ * 
+ * #### Method 2: Use the List Operation
+ * Use the **List** operation to retrieve Record IDs along with other field data. 
+ * This operation returns the Record ID for each record, which you can then use 
+ * in subsequent operations.
+ * 
+ * ## Advanced Filtering
+ * 
+ * ### Filter By Formula
+ * 
+ * Use Airtable's powerful formula system to filter records when using the List operation:
+ * 
+ * #### Examples:
+ * - **Filter by organization**: `{Organization}='n8n'`
+ * - **Exclude organization**: `NOT({Organization}='n8n')`
+ * - **Filter by date range**: `AND({Date} >= '2024-01-01', {Date} <= '2024-12-31')`
+ * - **Filter by status**: `OR({Status}='Active', {Status}='Pending')`
+ * - **Complex conditions**: `AND({Priority}='High', NOT({Assigned}=''))`
+ * 
+ * Refer to Airtable's formula documentation for complete syntax and available functions.
+ * 
+ * ## Related Resources
+ * 
+ * Refer to [Airtable's API documentation](https://airtable.com/developers/web/api/introduction) for more information about the service.
+ * n8n provides a trigger node for Airtable to receive webhook notifications about record changes.
+ * 
+ * ## Custom API Operations
+ * 
+ * If this node doesn't support the operation you want to do, you can use the HTTP Request node 
+ * to call the Airtable API directly with your Airtable credentials.
+ * 
+ * ## Common Issues & Solutions
+ * 
+ * For common errors or issues and suggested resolution steps, refer to the Common Issues documentation.
+ * Common challenges include Record ID management, formula syntax, and field type compatibility.
+ * 
+ * ## Use Cases
+ * 
+ * - **Project Management**: Task tracking, milestone management, and team collaboration
+ * - **Customer Relationship Management**: Lead tracking, customer data management, and sales pipelines
+ * - **Content Management**: Editorial calendars, content planning, and publication workflows
+ * - **Inventory Management**: Product catalogs, stock tracking, and order management
+ * - **Event Management**: Attendee tracking, event planning, and logistics coordination
+ * - **HR & Recruitment**: Candidate tracking, employee databases, and hiring workflows
+ * - **Marketing Automation**: Campaign tracking, lead nurturing, and conversion analytics
+ * - **Research & Data Collection**: Survey responses, research databases, and data analysis
+ * - **Financial Tracking**: Expense management, budget tracking, and financial reporting
+ * - **Educational Administration**: Student records, course management, and grade tracking
+ * - **Real Estate Management**: Property listings, client tracking, and transaction management
+ * - **Nonprofit Operations**: Donor management, volunteer coordination, and program tracking
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const airtableNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.airtable',
   displayName: 'Airtable',
-  description: 'Use the Airtable node to automate work in Airtable, and integrate Airtable with other applications. n8n has built-in support for a wide range of Airtable features, including creating, reading, listing, updating and deleting tables.',
-  category: 'Productivity',
-  subcategory: 'Database',
+  description: 'Create, read, update, and delete records in Airtable databases.',
+  category: 'Action Nodes',
+  subcategory: 'Productivity & Collaboration',
+  
   properties: [
     {
       name: 'operation',
       displayName: 'Operation',
       type: 'options',
       required: true,
-      default: 'append',
-      description: 'The operation to perform',
+      default: 'list',
+      description: 'Operation to perform on Airtable',
       options: [
-        { name: 'Append', value: 'append', description: 'Append the data to a table' },
-        { name: 'Delete', value: 'delete', description: 'Delete data from a table' },
-        { name: 'List', value: 'list', description: 'List data from a table' },
-        { name: 'Read', value: 'read', description: 'Read data from a table' },
-        { name: 'Update', value: 'update', description: 'Update data in a table' }
+        {
+          name: 'Append',
+          value: 'append',
+          description: 'Append new records to a table'
+        },
+        {
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete records from a table'
+        },
+        {
+          name: 'List',
+          value: 'list',
+          description: 'List records from a table'
+        },
+        {
+          name: 'Read',
+          value: 'read',
+          description: 'Read specific records'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update existing records'
+        }
       ]
     },
     {
-      name: 'base',
-      displayName: 'Base',
+      name: 'baseId',
+      displayName: 'Base ID',
       type: 'string',
       required: true,
       default: '',
-      description: 'The base ID or URL of the Airtable base to operate on'
+      description: 'The ID of the Airtable base'
     },
     {
       name: 'table',
@@ -36,7 +159,7 @@ export const airtableNode: NodeTypeInfo = {
       type: 'string',
       required: true,
       default: '',
-      description: 'The table name or ID within the Airtable base'
+      description: 'Name of the table to work with'
     },
     {
       name: 'recordId',
@@ -44,164 +167,48 @@ export const airtableNode: NodeTypeInfo = {
       type: 'string',
       required: false,
       default: '',
-      description: 'The ID of the record to operate on (for Read, Update, Delete operations)'
-    },
-    {
-      name: 'fields',
-      displayName: 'Fields',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON object containing the field values to set'
-    },
-    {
-      name: 'fieldsToRetrieve',
-      displayName: 'Fields to Retrieve',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of fields to include in the output'
-    },
-    {
-      name: 'filterByFormula',
-      displayName: 'Filter By Formula',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Airtable formula to filter records (e.g., {Status}="In Progress")'
-    },
-    {
-      name: 'maxRecords',
-      displayName: 'Max Records',
-      type: 'number',
-      required: false,
-      default: 100,
-      description: 'Maximum number of records to return'
-    },
-    {
-      name: 'sort',
-      displayName: 'Sort',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON array of sort objects to order the results'
-    },
-    {
-      name: 'view',
-      displayName: 'View',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The name or ID of a table view to use'
-    },
-    {
-      name: 'offset',
-      displayName: 'Offset',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Offset for pagination (returned from previous request)'
-    },
-    {
-      name: 'typecast',
-      displayName: 'Typecast',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to allow automatic data conversion for field types'
-    },
-    {
-      name: 'returnFieldsByFieldId',
-      displayName: 'Return Fields By Field ID',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to return field keys as field IDs instead of field names'
-    },
-    {
-      name: 'cellFormat',
-      displayName: 'Cell Format',
-      type: 'options',
-      required: false,
-      default: 'json',
-      description: 'The format to return cell values in',
-      options: [
-        { name: 'JSON', value: 'json', description: 'Return cell values as JSON' },
-        { name: 'String', value: 'string', description: 'Return cell values as strings' }
-      ]
-    },
-    {
-      name: 'timeZone',
-      displayName: 'Time Zone',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Time zone to use for date/time fields (e.g., "America/New_York")'
-    },
-    {
-      name: 'userLocale',
-      displayName: 'User Locale',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Locale to use for number and date formatting (e.g., "en-US")'
-    },
-    {
-      name: 'bulkSize',
-      displayName: 'Bulk Size',
-      type: 'number',
-      required: false,
-      default: 10,
-      description: 'Number of records to process in each batch (max 10)'
-    },
-    {
-      name: 'ignoreFields',
-      displayName: 'Ignore Fields',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of fields to ignore when updating records'
+      description: 'The ID of the record to read/update/delete',
+      displayOptions: {
+        show: {
+          operation: ['read', 'update', 'delete']
+        }
+      }
     }
   ],
+
   inputs: [
     {
       type: 'main',
       displayName: 'Input',
-      required: false
+      required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'The processed Airtable data'
+      displayName: 'Output'
     }
   ],
-  credentials: ['airtableTokenApi', 'airtableOAuth2Api'],
-  regularNode: true,
-  codeable: false,
+
+  credentials: [
+    {
+      name: 'airtableApi',
+      required: true
+    }
+  ],
+
+  version: [1, 2],
+  defaults: {
+    name: 'Airtable'
+  },
+
+  aliases: ['database', 'spreadsheet', 'table'],
+  
   examples: [
     {
-      name: 'Append Record to Table',
-      description: 'Add a new record to an Airtable table',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable',
-            type: 'n8n-nodes-base.airtable',
-            parameters: {
-              operation: 'append',
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              fields: '{"Name": "New Task", "Status": "Not Started", "Priority": "Medium"}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'List Records from Table',
-      description: 'Get all records from an Airtable table',
+      name: 'List Records',
+      description: 'List all records from an Airtable table',
       workflow: {
         nodes: [
           {
@@ -209,83 +216,8 @@ export const airtableNode: NodeTypeInfo = {
             type: 'n8n-nodes-base.airtable',
             parameters: {
               operation: 'list',
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              maxRecords: 50
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Read Specific Record',
-      description: 'Get a specific record by ID',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable',
-            type: 'n8n-nodes-base.airtable',
-            parameters: {
-              operation: 'read',
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              recordId: '{{$json["recordId"]}}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Update Record',
-      description: 'Update an existing record in Airtable',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable',
-            type: 'n8n-nodes-base.airtable',
-            parameters: {
-              operation: 'update',
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              recordId: '{{$json["recordId"]}}',
-              fields: '{"Status": "In Progress"}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Filter Records with Formula',
-      description: 'List records filtered by a formula',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable',
-            type: 'n8n-nodes-base.airtable',
-            parameters: {
-              operation: 'list',
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              filterByFormula: '{Status}="In Progress"',
-              maxRecords: 25
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Delete Record',
-      description: 'Delete a record from Airtable',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable',
-            type: 'n8n-nodes-base.airtable',
-            parameters: {
-              operation: 'delete',
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              recordId: '{{$json["recordId"]}}'
+              baseId: 'appXXXXXXXXXXXXXX',
+              table: 'Table 1'
             }
           }
         ]
@@ -294,179 +226,4 @@ export const airtableNode: NodeTypeInfo = {
   ]
 };
 
-export const airtableTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.airtableTrigger',
-  displayName: 'Airtable Trigger',
-  description: 'Triggers the workflow when specified events occur in Airtable, such as when records are added or updated in tables.',
-  category: 'Productivity',
-  subcategory: 'Database',
-  properties: [
-    {
-      name: 'base',
-      displayName: 'Base',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'The base ID or URL of the Airtable base to monitor'
-    },
-    {
-      name: 'table',
-      displayName: 'Table',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'The table name or ID within the Airtable base to monitor'
-    },
-    {
-      name: 'triggerField',
-      displayName: 'Trigger Field',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'A created or last modified field in your table to determine updates'
-    },
-    {
-      name: 'pollTimes',
-      displayName: 'Poll Times',
-      type: 'fixedCollection',
-      required: true,
-      default: { mode: 'everyMinute' },
-      description: 'How often to check for changes'
-    },
-    {
-      name: 'downloadAttachments',
-      displayName: 'Download Attachments',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to download attachments from the table'
-    },
-    {
-      name: 'downloadFields',
-      displayName: 'Download Fields',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of attachment fields to download'
-    },
-    {
-      name: 'fields',
-      displayName: 'Fields',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of fields to include in the output'
-    },
-    {
-      name: 'formula',
-      displayName: 'Formula',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Airtable formula to further filter the results'
-    },
-    {
-      name: 'viewId',
-      displayName: 'View ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The name or ID of a table view to use'
-    },
-    {
-      name: 'additionalFields',
-      displayName: 'Additional Fields',
-      type: 'collection',
-      required: false,
-      default: {},
-      description: 'Additional configuration options'
-    }
-  ],
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when Airtable events occur'
-    }
-  ],
-  credentials: ['airtableTokenApi', 'airtableOAuth2Api'],
-  triggerNode: true,
-  polling: true,
-  webhookSupport: false,
-  examples: [
-    {
-      name: 'Monitor New Records',
-      description: 'Trigger workflow when new records are added to a table',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable Trigger',
-            type: 'n8n-nodes-base.airtableTrigger',
-            parameters: {
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              triggerField: 'Created',
-              pollTimes: { mode: 'everyMinute' }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Record Updates',
-      description: 'Trigger when records are modified in a table',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable Trigger',
-            type: 'n8n-nodes-base.airtableTrigger',
-            parameters: {
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              triggerField: 'Last Modified',
-              pollTimes: { mode: 'everyHour' },
-              downloadAttachments: false
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Specific View',
-      description: 'Trigger only for records visible in a specific view',
-      workflow: {
-        nodes: [
-          {
-            name: 'Airtable Trigger',
-            type: 'n8n-nodes-base.airtableTrigger',
-            parameters: {
-              base: '{{$json["baseId"]}}',
-              table: 'Tasks',
-              triggerField: 'Last Modified',
-              viewId: 'Active Tasks',
-              pollTimes: { mode: 'everyMinute' }
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes as an array for easier importing
-export const airtableNodes: NodeTypeInfo[] = [airtableNode, airtableTriggerNode];
-
-// Export individual actions for the regular Airtable node
-export const airtableActions = [
-  'append_record',
-  'delete_record',
-  'list_records',
-  'read_record',
-  'update_record'
-];
-
-// Export trigger events
-export const airtableTriggers = [
-  'new_airtable_event'
-];
+export default airtableNode;

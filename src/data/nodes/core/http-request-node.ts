@@ -1,9 +1,38 @@
 /**
- * HTTP Request Node
+ * # HTTP Request
+ * 
+ * **Status**: Active  
+ * **Category**: Core Nodes
+ * **Subcategory**: Data
+ * 
+ * ## Description
  * 
  * The HTTP Request node is one of the most versatile nodes in n8n. It allows you to make HTTP requests 
- * to query data from any app or service with a REST API. Supports all common HTTP methods and 
- * comprehensive authentication options.
+ * to query data from any app or service with a REST API. You can use the HTTP Request node as a regular 
+ * node or attached to an AI agent to use as a tool.
+ * 
+ * ## Key Features
+ * 
+ * - All HTTP methods: GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS
+ * - Multiple authentication types: Basic, OAuth1/2, Header, Query, Digest, Custom
+ * - Predefined credential support for known services
+ * - Comprehensive body formats: JSON, Form-Data, URLEncoded, Raw, Binary Files
+ * - Query parameters and custom headers
+ * - Advanced options: Pagination, Batching, SSL settings, Redirects, Proxy
+ * - Response optimization for AI tools
+ * - Import cURL commands directly
+ * - Built-in pagination variables and response handling
+ * 
+ * ## Use Cases
+ * 
+ * - REST API integrations with external services
+ * - Custom operations for existing n8n nodes
+ * - Webhook sending and API calls
+ * - File uploads and downloads
+ * - Data synchronization between systems
+ * - API monitoring and health checks
+ * - AI agent web scraping and data fetching
+ * - Authentication testing and API exploration
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -11,8 +40,8 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const httprequestNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.httpRequest',
   displayName: 'HTTP Request',
-  description: 'Make HTTP requests to REST APIs and web services. Supports all HTTP methods, authentication, headers, query parameters, and request body configurations.',
-  category: 'Core',
+  description: 'Make HTTP requests to query data from any app or service with a REST API. Supports all HTTP methods, authentication, headers, and advanced options.',
+  category: 'Core Nodes',
   subcategory: 'Data',
   
   properties: [

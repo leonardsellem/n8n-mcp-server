@@ -1,8 +1,69 @@
 /**
- * Wait Node
+ * # Wait
  * 
- * Pause workflow execution for a specified duration or until a specific time.
- * Perfect for rate limiting, scheduling delays, and controlling workflow timing.
+ * **Status**: ✅ Active
+ * **Category**: Core Nodes
+ * **Subcategory**: Flow Control
+ * 
+ * ## Description
+ * 
+ * Use the Wait node to pause your workflow's execution. When the workflow pauses it offloads the execution data to the database. 
+ * When the resume condition is met, the workflow reloads the data and the execution continues.
+ * 
+ * ## Key Features
+ * 
+ * - **Four Resume Conditions**: Time interval, specific time, webhook call, form submission
+ * - **Database Offloading**: Execution data saved to database during wait (>65 seconds)
+ * - **Unique URLs**: Generated $execution.resumeUrl for webhook integrations
+ * - **Authentication Support**: Basic Auth, Header Auth, JWT Auth for webhooks
+ * - **Custom Forms**: Multi-field forms with validation and various input types
+ * - **Timeout Limits**: Optional maximum wait times with auto-resume
+ * - **Server Time**: Always uses n8n server time regardless of timezone settings
+ * - **Memory Efficiency**: Short waits (<65 seconds) keep execution in memory
+ * 
+ * ## Resume Conditions
+ * 
+ * ### After Time Interval
+ * - Wait for specified amount of time (seconds, minutes, hours, days)
+ * - Short waits (<65 seconds) don't offload to database
+ * - Uses server time regardless of workflow timezone
+ * 
+ * ### At Specified Time
+ * - Wait until specific date and time
+ * - Uses date/time picker for configuration
+ * - Always uses server timezone
+ * 
+ * ### On Webhook Call
+ * - Generate unique resume URL per execution
+ * - Support for authentication (Basic, Header, JWT, None)
+ * - Configurable HTTP methods and response codes
+ * - Optional timeout limits and IP whitelisting
+ * - Custom response data and headers
+ * 
+ * ### On Form Submitted
+ * - Custom form with configurable fields
+ * - Various field types (text, number, date, dropdown, etc.)
+ * - Field validation and required field support
+ * - Custom form title and description
+ * - Multiple response options
+ * 
+ * ## Time-Based Operations
+ * 
+ * - Wait times less than 65 seconds keep execution in memory
+ * - Longer waits offload execution data to database
+ * - Server time always used (ignores workflow timezone)
+ * - Timezone settings don't affect Wait node timing
+ * 
+ * ## Use Cases
+ * 
+ * - Rate limiting API calls and preventing quota exhaustion
+ * - Manual approval workflows with webhook triggers
+ * - Scheduled execution at specific times
+ * - Data collection via custom forms
+ * - Batch processing with controlled delays
+ * - Workflow coordination and timing control
+ * - Human-in-the-loop processes
+ * - Third-party integration callbacks
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -10,8 +71,8 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const waitNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.wait',
   displayName: 'Wait',
-  description: 'Pause workflow execution for a specified duration or until a specific time. Perfect for rate limiting, scheduling delays, and controlling workflow timing.',
-  category: 'Core',
+  description: 'Pause workflow execution until a time interval, specific time, webhook call, or form submission.',
+  category: 'Core Nodes',
   subcategory: 'Flow Control',
 
   properties: [
@@ -94,13 +155,52 @@ export const waitNode: NodeTypeInfo = {
       }
     },
     {
-      name: 'webhookSuffix',
-      displayName: 'Webhook Suffix',
-      type: 'string',
+      name: 'authentication',
+      displayName: 'Authentication',
+      type: 'options',
       required: false,
-      default: '',
-      description: 'Optional suffix for the webhook URL',
-      placeholder: 'my-webhook-id',
+      default: 'none',
+      description: 'Authentication method for webhook calls',
+      displayOptions: {
+        show: {
+          resume: ['webhook']
+        }
+      },
+      options: [
+        { name: 'Basic Auth', value: 'basicAuth' },
+        { name: 'Header Auth', value: 'headerAuth' },
+        { name: 'JWT Auth', value: 'jwtAuth' },
+        { name: 'None', value: 'none' }
+      ]
+    },
+    {
+      name: 'httpMethod',
+      displayName: 'HTTP Method',
+      type: 'options',
+      required: false,
+      default: 'GET',
+      description: 'HTTP method the webhook should accept',
+      displayOptions: {
+        show: {
+          resume: ['webhook']
+        }
+      },
+      options: [
+        { name: 'GET', value: 'GET' },
+        { name: 'POST', value: 'POST' },
+        { name: 'PUT', value: 'PUT' },
+        { name: 'PATCH', value: 'PATCH' },
+        { name: 'DELETE', value: 'DELETE' },
+        { name: 'HEAD', value: 'HEAD' }
+      ]
+    },
+    {
+      name: 'responseCode',
+      displayName: 'Response Code',
+      type: 'number',
+      required: false,
+      default: 200,
+      description: 'HTTP response code to return',
       displayOptions: {
         show: {
           resume: ['webhook']
@@ -108,15 +208,46 @@ export const waitNode: NodeTypeInfo = {
       }
     },
     {
-      name: 'approvalRequired',
-      displayName: 'Approval Required',
-      type: 'boolean',
+      name: 'respond',
+      displayName: 'Respond',
+      type: 'options',
       required: false,
-      default: false,
-      description: 'Require approval to continue workflow execution',
+      default: 'immediately',
+      description: 'When and how to respond to the webhook',
       displayOptions: {
         show: {
-          resume: ['webhook', 'form']
+          resume: ['webhook']
+        }
+      },
+      options: [
+        { name: 'Immediately', value: 'immediately' },
+        { name: 'When Last Node Finishes', value: 'lastNode' },
+        { name: 'Using Respond to Webhook Node', value: 'responseNode' }
+      ]
+    },
+    {
+      name: 'formTitle',
+      displayName: 'Form Title',
+      type: 'string',
+      required: false,
+      default: 'Please provide the following information:',
+      description: 'Title to display at the top of the form',
+      displayOptions: {
+        show: {
+          resume: ['form']
+        }
+      }
+    },
+    {
+      name: 'formDescription',
+      displayName: 'Form Description',
+      type: 'string',
+      required: false,
+      default: '',
+      description: 'Description to display beneath the form title',
+      displayOptions: {
+        show: {
+          resume: ['form']
         }
       }
     },

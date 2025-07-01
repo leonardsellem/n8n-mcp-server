@@ -1,8 +1,63 @@
 /**
- * Code Node
+ * # Code
  * 
- * Execute custom JavaScript or Python code within your workflow. Perfect for custom
- * data transformations, complex calculations, and advanced logic implementation.
+ * **Status**: ✅ Active
+ * **Category**: Core Nodes
+ * **Subcategory**: Data Transformation
+ * 
+ * ## Description
+ * 
+ * Use the Code node to write custom JavaScript or Python and run it as a step in your workflow.
+ * The Code node replaces the Function and Function Item nodes from version 0.198.0.
+ * 
+ * ## Key Features
+ * 
+ * - **Dual Language Support**: JavaScript (Node.js) and Python (Pyodide/WebAssembly)
+ * - **Two Execution Modes**: Run once for all items or once per item
+ * - **Built-in Methods**: Access to n8n's built-in variables and methods ($input, $vars, etc.)
+ * - **Promise Support**: Async/await and Promise handling in JavaScript
+ * - **Console Logging**: Debug with console.log() output visible in browser
+ * - **External Libraries**: Limited npm modules (self-hosted) or crypto/moment (Cloud)
+ * - **AI Assistance**: ChatGPT integration for code generation (Cloud only)
+ * - **Keyboard Shortcuts**: Full code editor with autocomplete and multi-cursor support
+ * 
+ * ## Language Support
+ * 
+ * ### JavaScript
+ * - Full Node.js support with built-in modules
+ * - Promise and async/await support
+ * - Console logging for debugging
+ * - External npm modules (self-hosted only)
+ * - Built-in crypto and moment modules (Cloud)
+ * 
+ * ### Python
+ * - Pyodide (CPython to WebAssembly port)
+ * - Limited to Pyodide-included packages
+ * - Slower execution due to compilation steps
+ * - Built-in methods with underscore prefix (_input, _vars)
+ * 
+ * ## Execution Modes
+ * 
+ * - **Run Once for All Items**: Execute code once with all input items
+ * - **Run Once for Each Item**: Execute code separately for each input item
+ * 
+ * ## Limitations
+ * 
+ * - Cannot access file system (use Read/Write File From Disk node)
+ * - Cannot make HTTP requests (use HTTP Request node)
+ * - External modules limited on n8n Cloud
+ * - Python slower than JavaScript due to compilation
+ * 
+ * ## Use Cases
+ * 
+ * - Custom data transformations and calculations
+ * - Complex business logic implementation
+ * - Data filtering, sorting, and aggregation
+ * - API response processing and formatting
+ * - Custom validation and data quality checks
+ * - Mathematical computations and statistical analysis
+ * - String manipulation and text processing
+ * - Date/time calculations and formatting
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -10,8 +65,8 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const codeNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.code',
   displayName: 'Code',
-  description: 'Execute custom JavaScript or Python code within your workflow. Perfect for custom data transformations, complex calculations, and advanced logic implementation.',
-  category: 'Core',
+  description: 'Write custom JavaScript or Python code to transform data, implement business logic, and perform complex calculations.',
+  category: 'Core Nodes',
   subcategory: 'Data Transformation',
 
   properties: [

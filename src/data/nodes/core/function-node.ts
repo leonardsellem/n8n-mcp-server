@@ -1,288 +1,194 @@
+/**
+ * # Function
+ * 
+ * **Status**: ⚠️ Deprecated (Replaced by Code node from v0.198.0)
+ * **Category**: Core Nodes
+ * **Subcategory**: Data Processing
+ * 
+ * ## Deprecation Notice
+ * 
+ * ⚠️ **DEPRECATED**: The Function node has been replaced by the **Code node** from version 0.198.0 onwards.
+ * For new workflows, please use the Code node instead. Existing Function nodes will continue to work,
+ * but it's recommended to migrate to the Code node for better features and ongoing support.
+ * 
+ * ## Migration Path
+ * 
+ * **Use Code node instead** - The Code node provides:
+ * - Better JavaScript and Python support
+ * - Improved error handling and debugging
+ * - AI assistance for code generation (Cloud users)
+ * - Modern code editor with syntax highlighting
+ * - Better performance and stability
+ * 
+ * ## Description
+ * 
+ * The Function node allowed you to write custom JavaScript functions to process data.
+ * This legacy node has been superseded by the more powerful and feature-rich Code node.
+ * 
+ * ## Key Features (Legacy)
+ * 
+ * - **Custom JavaScript**: Write custom functions to process data
+ * - **Multiple Items**: Process multiple items in a single execution
+ * - **Error Handling**: Basic error handling and debugging
+ * - **Return Control**: Control what gets returned from the function
+ * - **Helper Functions**: Access to n8n helper functions
+ * - **Async Support**: Support for asynchronous operations
+ * - **Context Access**: Access to workflow context and previous nodes
+ * 
+ * ## Legacy Use Cases
+ * 
+ * - Complex data transformations (now use Code node)
+ * - Custom business logic implementation (now use Code node)
+ * - API response processing (now use Code node)
+ * - Data validation and sanitization (now use Code node)
+ * - Mathematical calculations (now use Code node)
+ * - String manipulation and formatting (now use Code node)
+ * - Conditional data processing (now use Code node)
+ * - Custom algorithms and workflows (now use Code node)
+ * 
+ * ## Available Variables (Legacy)
+ * 
+ * - `$input`: Input data from previous node
+ * - `$json`: JSON data of current item
+ * - `$node`: Information about current node
+ * - `$workflow`: Workflow information
+ * - `$prevNode`: Previous node information
+ * - `$items()`: Function to get items from specific nodes
+ * 
+ * ## Replacement Information
+ * 
+ * **For n8n v0.198.0+**: Use the **Code node** which provides enhanced functionality:
+ * - Better code editor with syntax highlighting
+ * - Support for both JavaScript and Python
+ * - AI-assisted code generation (Cloud users)
+ * - Improved debugging capabilities
+ * - Better error messages and handling
+ * - Modern development experience
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const functionNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.function',
   displayName: 'Function',
-  description: 'Execute custom JavaScript code to process workflow data. Access all input data, perform calculations, call external APIs, and return processed results.',
+  description: '⚠️ DEPRECATED: Replaced by Code node from v0.198.0. Run custom JavaScript code to process data.',
   category: 'Core Nodes',
   subcategory: 'Data Processing',
+  
   properties: [
     {
       name: 'functionCode',
-      displayName: 'JavaScript Code',
+      displayName: 'Function',
       type: 'string',
-      required: true,
-      default: `// Access input data
-const items = $input.all();
-
-// Process each item
-for (const item of items) {
-  // Modify item data
-  item.json.processedAt = new Date().toISOString();
-  item.json.processed = true;
-}
-
-// Return modified items
-return items;`,
-      description: 'JavaScript code to execute. Access input data via $input and return processed data.',
       typeOptions: {
-        codeAutocomplete: 'javascript'
-      }
+        rows: 10
+      },
+      required: true,
+      default: '// Add your custom JavaScript here\n// The last expression will be returned\n\n// Access input data\nconst inputData = $input.all();\n\n// Process data\nconst processedData = inputData.map(item => {\n  return {\n    json: {\n      ...item.json,\n      processed: true,\n      timestamp: new Date().toISOString()\n    }\n  };\n});\n\nreturn processedData;',
+      description: 'JavaScript function to process the data'
     },
     {
       name: 'options',
       displayName: 'Options',
       type: 'collection',
       required: false,
-      default: {},description: 'Additional function options',
+      default: {},
+      description: 'Additional options for the function',
       options: [
         {
-      name: 'continueOnFail',
-      displayName: 'Continue on Fail',
-      type: 'boolean',
-      required: false,
-          description: 'Continue workflow even if function throws an error'
-    },
-        {
-      name: 'timeout',
-      displayName: 'Timeout (seconds)',
-      type: 'number',
-      required: false,
-      default: 10,
-          description: 'Maximum execution time for the function',
-          typeOptions: {
-            minValue: 1,
-            maxValue: 300
-    }
+          name: 'onError',
+          displayName: 'On Error',
+          type: 'options',
+          required: false,
+          default: 'stopWorkflow',
+          description: 'What to do when function execution fails',
+          options: [
+            {
+              name: 'Stop Workflow',
+              value: 'stopWorkflow',
+              description: 'Stop the workflow execution'
+            },
+            {
+              name: 'Continue',
+              value: 'continueRegularOutput',
+              description: 'Continue with empty output'
+            },
+            {
+              name: 'Continue Error Output',
+              value: 'continueErrorOutput',
+              description: 'Continue and output error information'
+            }
+          ]
         }
       ]
     }
   ],
+
   inputs: [
     {
       type: 'main',
       displayName: 'Input',
-      required: true
+      required: false
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'Processed data from JavaScript function'
+      displayName: 'Output'
     }
   ],
-  credentials: [],
-  regularNode: true,
-  codeable: true,
-  triggerNode: false,
-  defaults: {
-    functionCode: `// Process input data
-const items = $input.all();
 
-// Transform each item
-return items.map(item => ({
-  json: {
-    ...item.json,
-    processedAt: new Date().toISOString()
-  }
-}));`
+  credentials: [],
+
+  version: [1, 2],
+  defaults: {
+    name: 'Function'
   },
-  aiMetadata: {
-    aiOptimized: true,
-    integrationComplexity: 'high',
-    commonPatterns: [
-      'Complex data transformations',
-      'Custom calculations and logic',
-      'External API calls',
-      'Data validation and cleaning',
-      'Format conversions',
-      'Advanced text processing',
-      'Mathematical operations',
-      'Custom business logic'
-    ],
-    prerequisites: [
-      'JavaScript programming knowledge',
-      'Understanding of n8n data structure',
-      'Familiarity with n8n helper functions'
-    ],
-    errorHandling: {
-      retryableErrors: ['Timeout error'],
-      nonRetryableErrors: ['Syntax error', 'Reference error', 'Type error'],
-      documentation: 'Function node errors are typically JavaScript runtime errors. Use try-catch blocks for error handling.'
-    }
-  },
+
+  aliases: ['javascript', 'js', 'custom', 'script'],
+  
   examples: [
     {
       name: 'Data Transformation',
-      description: 'Transform and enrich input data',
+      description: 'Transform input data using custom JavaScript',
       workflow: {
         nodes: [
           {
-            name: 'Transform Data',
+            name: 'Function',
             type: 'n8n-nodes-base.function',
             parameters: {
-              functionCode: `
-// Get all input items
-const items = $input.all();
-
-// Transform each item
-return items.map(item => {
-  const data = item.json;
-  
-  return {
-    json: {
-      id: data.id,
-      fullName: \`\${data.firstName} \${data.lastName}\`,
-      email: data.email.toLowerCase(),
-      isActive: data.status === 'active',
-      joinedDate: new Date(data.created).toISOString(),
-      age: new Date().getFullYear() - new Date(data.birthDate).getFullYear(),
-      processedAt: new Date().toISOString()
-    }
-  };
-});`
+              functionCode: '// Transform data structure\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    id: item.json.id,\n    name: item.json.firstName + " " + item.json.lastName,\n    email: item.json.email.toLowerCase(),\n    processed: true\n  }\n}));'
             }
           }
         ]
       }
     },
     {
-      name: 'API Data Processing',
-      description: 'Process API response data with custom logic',
+      name: 'Data Filtering',
+      description: 'Filter data based on custom conditions',
       workflow: {
         nodes: [
           {
-            name: 'Process API Data',
+            name: 'Function',
             type: 'n8n-nodes-base.function',
             parameters: {
-              functionCode: `
-const items = $input.all();
-const processedItems = [];
-
-for (const item of items) {
-  const data = item.json;
-  
-  // Extract nested data
-  if (data.results && Array.isArray(data.results)) {
-    for (const result of data.results) {
-      processedItems.push({
-        json: {
-          id: result.id,
-          title: result.title,
-          score: result.relevance_score || 0,
-          category: result.category || 'uncategorized',
-          extractedAt: new Date().toISOString(),
-          source: 'api_processing'
-        }
-      });
-    }
-  }
-}
-
-return processedItems;`
+              functionCode: '// Filter items based on conditions\nconst items = $input.all();\n\nconst filtered = items.filter(item => {\n  return item.json.status === "active" && item.json.score > 75;\n});\n\nreturn filtered;'
             }
           }
         ]
       }
     },
     {
-      name: 'Data Validation',
-      description: 'Validate and filter data with custom rules',
+      name: 'API Response Processing',
+      description: 'Process complex API responses',
       workflow: {
         nodes: [
           {
-            name: 'Validate Data',
+            name: 'Function',
             type: 'n8n-nodes-base.function',
             parameters: {
-              functionCode: `
-const items = $input.all();
-const validItems = [];
-const errors = [];
-
-for (const item of items) {
-  const data = item.json;
-  const validationErrors = [];
-  
-  // Validation rules
-  if (!data.email || !data.email.includes('@')) {
-    validationErrors.push('Invalid email format');
-  }
-  
-  if (!data.name || data.name.length < 2) {
-    validationErrors.push('Name must be at least 2 characters');
-  }
-  
-  if (data.age && (data.age < 0 || data.age > 150)) {
-    validationErrors.push('Age must be between 0 and 150');
-  }
-  
-  if (validationErrors.length === 0) {
-    validItems.push({
-      json: {
-        ...data,
-        validatedAt: new Date().toISOString()
-      }
-    });
-  } else {
-    errors.push({
-      json: {
-        originalData: data,
-        errors: validationErrors,
-        rejectedAt: new Date().toISOString()
-      }
-    });
-  }
-}
-
-// Return valid items (you could also output errors to a second output)
-return validItems;`
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Mathematical Calculations',
-      description: 'Perform complex calculations on numeric data',
-      workflow: {
-        nodes: [
-          {
-            name: 'Calculate Statistics',
-            type: 'n8n-nodes-base.function',
-            parameters: {
-              functionCode: `
-const items = $input.all();
-const values = items.map(item => item.json.value).filter(v => typeof v === 'number');
-
-if (values.length === 0) {
-  return [{ json: { error: 'No numeric values found' } }];
-}
-
-// Calculate statistics
-const sum = values.reduce((acc, val) => acc + val, 0);
-const mean = sum / values.length;
-const sortedValues = [...values].sort((a, b) => a - b);
-const median = values.length % 2 === 0 
-  ? (sortedValues[values.length / 2 - 1] + sortedValues[values.length / 2]) / 2
-  : sortedValues[Math.floor(values.length / 2)];
-
-const variance = values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / values.length;
-const stdDev = Math.sqrt(variance);
-
-return [{
-  json: {
-    count: values.length,
-    sum: sum,
-    mean: mean,
-    median: median,
-    min: Math.min(...values),
-    max: Math.max(...values),
-    standardDeviation: stdDev,
-    variance: variance,
-    calculatedAt: new Date().toISOString()
-  }
-}];`
+              functionCode: '// Process API response\nconst items = $input.all();\n\nreturn items.map(item => {\n  const response = item.json;\n  \n  return {\n    json: {\n      id: response.data.id,\n      title: response.data.attributes.title,\n      status: response.data.attributes.status,\n      tags: response.data.attributes.tags || []\n    }\n  };\n});'
             }
           }
         ]
@@ -290,3 +196,5 @@ return [{
     }
   ]
 };
+
+export default functionNode;

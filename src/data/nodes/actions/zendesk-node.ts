@@ -1,8 +1,418 @@
 /**
- * Zendesk Node - Essential Customer Support Platform
+ * # Zendesk
  * 
- * Comprehensive Zendesk API integration for customer service automation,
- * ticket management, and support operations.
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Customer Service & Support
+ * 
+ * ## Description
+ * 
+ * Use the Zendesk node to automate work in Zendesk and integrate Zendesk with other applications. 
+ * n8n has built-in support for a wide range of Zendesk features, including creating and deleting 
+ * tickets, users, and organizations. This node can also be used as an AI tool to enhance agent capabilities.
+ * 
+ * ## Key Features
+ * 
+ * - **Ticket Management**: Full CRUD operations for support tickets
+ * - **User Management**: Comprehensive user account administration
+ * - **Organization Management**: Enterprise account and organization handling
+ * - **Ticket Field Management**: Custom field configuration and retrieval
+ * - **AI Tool Integration**: Enhanced AI agent capabilities for automation
+ * - **Search and Filter**: Advanced search across tickets and users
+ * - **Bulk Operations**: Process multiple tickets and users efficiently
+ * - **Data Synchronization**: Sync with external systems and databases
+ * - **Workflow Automation**: Automate repetitive support processes
+ * - **Integration Hub**: Connect with CRM, communication, and productivity tools
+ * - **Analytics and Reporting**: Extract data for business intelligence
+ * - **SIEM Integration**: Security incident and event management workflows
+ * - **Multi-Channel Support**: Handle tickets from various communication channels
+ * - **SLA Management**: Automate service level agreement tracking
+ * - **Escalation Workflows**: Automated ticket routing and escalation
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Zendesk credentials](../../credentials/zendesk/) for guidance on setting up authentication.
+ * Supports API token authentication and OAuth for secure access.
+ * 
+ * ## Operations
+ * 
+ * ### Ticket Operations
+ * 
+ * #### Create Ticket
+ * - **Ticket Creation**: Create new support tickets with full metadata
+ *   - Customer inquiries and support requests
+ *   - Bug reports and technical issues
+ *   - Feature requests and enhancements
+ *   - Service requests and account changes
+ *   - Incident reports and security issues
+ *   - Billing and payment inquiries
+ *   - Product feedback and suggestions
+ *   - Training and documentation requests
+ *   - Integration and API support
+ *   - Compliance and legal inquiries
+ *   - Emergency support tickets
+ *   - Follow-up and callback requests
+ * 
+ * #### Update Ticket
+ * - **Ticket Modification**: Update existing ticket information and status
+ *   - Status changes and resolution updates
+ *   - Priority adjustments and escalations
+ *   - Assignment changes and reassignments
+ *   - Tag additions and categorization
+ *   - Custom field updates and metadata
+ *   - Comment additions and internal notes
+ *   - Attachment management and file updates
+ *   - Due date adjustments and scheduling
+ *   - Customer notification preferences
+ *   - SLA modifications and extensions
+ *   - Merge and split operations
+ *   - Collaboration and team updates
+ * 
+ * #### Get Ticket
+ * - **Individual Ticket Retrieval**: Fetch detailed ticket information
+ *   - Ticket status and progress tracking
+ *   - Complete conversation history
+ *   - Attachment and file management
+ *   - Custom field data extraction
+ *   - Timeline and activity logging
+ *   - Agent assignment and ownership
+ *   - Customer satisfaction scores
+ *   - SLA compliance monitoring
+ *   - Related ticket connections
+ *   - Escalation history and notes
+ *   - Integration data and references
+ *   - Performance metrics and analytics
+ * 
+ * #### Get All Tickets
+ * - **Bulk Ticket Retrieval**: Fetch multiple tickets with filtering
+ *   - Open ticket monitoring and dashboards
+ *   - Overdue ticket identification and alerts
+ *   - Agent workload distribution and balancing
+ *   - Department and team reporting
+ *   - Customer account ticket history
+ *   - Priority and escalation queues
+ *   - SLA compliance reporting and tracking
+ *   - Performance analytics and KPIs
+ *   - Trend analysis and forecasting
+ *   - Quality assurance and auditing
+ *   - Customer satisfaction reporting
+ *   - Resource planning and allocation
+ * 
+ * #### Delete Ticket
+ * - **Ticket Removal**: Remove tickets from the system
+ *   - Spam and duplicate ticket cleanup
+ *   - Test ticket removal and housekeeping
+ *   - Data privacy compliance and GDPR
+ *   - System maintenance and optimization
+ *   - Archive management and storage
+ *   - Quality control and content moderation
+ *   - Security compliance and data protection
+ *   - Performance optimization and efficiency
+ *   - Workflow cleanup and maintenance
+ *   - Database optimization and management
+ *   - Audit trail management and compliance
+ *   - System migration and data transfer
+ * 
+ * #### Recover Suspended Ticket
+ * - **Ticket Recovery**: Restore suspended or held tickets
+ *   - Spam filter false positive recovery
+ *   - Accidental suspension reversals
+ *   - System error corrections and fixes
+ *   - Workflow automation error handling
+ *   - Quality assurance corrections
+ *   - Policy exception handling
+ *   - Emergency ticket restoration
+ *   - Data integrity maintenance
+ *   - System reliability improvements
+ *   - Customer service recovery
+ *   - Business continuity operations
+ *   - Compliance requirement handling
+ * 
+ * ### Ticket Field Operations
+ * 
+ * #### Get Ticket Field
+ * - **Field Information**: Retrieve specific ticket field configuration
+ *   - Custom field validation and rules
+ *   - Form builder configuration and setup
+ *   - Data structure documentation
+ *   - Integration mapping and synchronization
+ *   - Workflow automation field logic
+ *   - Reporting and analytics field usage
+ *   - User interface customization
+ *   - Business rule configuration
+ *   - Data quality and validation
+ *   - System integration requirements
+ *   - Migration and upgrade planning
+ *   - Compliance and audit requirements
+ * 
+ * #### Get All Ticket Fields
+ * - **Complete Field Schema**: Retrieve all system and custom fields
+ *   - Form generation and dynamic interfaces
+ *   - Data migration and transformation
+ *   - Integration schema mapping
+ *   - Reporting template generation
+ *   - API documentation and development
+ *   - Workflow automation configuration
+ *   - Custom application development
+ *   - Data validation and quality control
+ *   - Business intelligence and analytics
+ *   - System audit and compliance
+ *   - Performance optimization and tuning
+ *   - User training and documentation
+ * 
+ * ### User Operations
+ * 
+ * #### Create User
+ * - **User Account Creation**: Create new user accounts with profiles
+ *   - Customer onboarding and registration
+ *   - Employee account provisioning
+ *   - Partner and vendor access setup
+ *   - Support agent user creation
+ *   - Admin and manager account setup
+ *   - Integration user accounts
+ *   - Service account provisioning
+ *   - Bulk user import and migration
+ *   - Self-service registration workflows
+ *   - Identity management integration
+ *   - Role-based access control setup
+ *   - Compliance and audit user tracking
+ * 
+ * #### Update User
+ * - **User Profile Management**: Modify user information and settings
+ *   - Profile updates and maintenance
+ *   - Role and permission changes
+ *   - Organization assignments and transfers
+ *   - Contact information updates
+ *   - Preference and setting modifications
+ *   - Security and access control updates
+ *   - Tag and metadata management
+ *   - Custom field data updates
+ *   - Integration data synchronization
+ *   - Compliance and audit trail updates
+ *   - Performance tracking and metrics
+ *   - User lifecycle management
+ * 
+ * #### Get User / Get All Users
+ * - **User Information Retrieval**: Fetch user profiles and data
+ *   - Customer profile management and CRM sync
+ *   - Agent performance tracking and analytics
+ *   - Organization membership and hierarchy
+ *   - Access control and security auditing
+ *   - User activity monitoring and reporting
+ *   - Integration data synchronization
+ *   - Compliance and regulatory reporting
+ *   - Directory services and identity management
+ *   - Business intelligence and analytics
+ *   - Resource planning and allocation
+ *   - Training and certification tracking
+ *   - Customer satisfaction and feedback
+ * 
+ * #### Search Users
+ * - **Advanced User Search**: Find users with complex criteria
+ *   - Customer lookup and identification
+ *   - Duplicate user detection and cleanup
+ *   - Targeted communication and campaigns
+ *   - Access control and security reviews
+ *   - Data quality and validation
+ *   - Integration and synchronization
+ *   - Compliance and audit requirements
+ *   - Business intelligence and reporting
+ *   - User experience optimization
+ *   - System performance and efficiency
+ *   - Migration and data transfer
+ *   - Quality assurance and testing
+ * 
+ * #### Delete User
+ * - **User Account Removal**: Remove user accounts from system
+ *   - Account deactivation and offboarding
+ *   - Data privacy compliance and GDPR
+ *   - Security breach response and cleanup
+ *   - System maintenance and optimization
+ *   - Duplicate account cleanup and management
+ *   - Compliance and regulatory requirements
+ *   - Data retention and archival policies
+ *   - Migration and system consolidation
+ *   - Quality control and validation
+ *   - Performance optimization and efficiency
+ *   - Audit trail and compliance tracking
+ *   - Business continuity and disaster recovery
+ * 
+ * #### Get User's Organizations
+ * - **Organization Membership**: Retrieve user's organization associations
+ *   - Multi-organization access management
+ *   - Hierarchical support structure navigation
+ *   - Cross-organization collaboration and sharing
+ *   - Billing and subscription management
+ *   - Resource allocation and planning
+ *   - Compliance and governance oversight
+ *   - Performance tracking and analytics
+ *   - Integration and data synchronization
+ *   - Business intelligence and reporting
+ *   - User experience optimization
+ *   - Security and access control
+ *   - Workflow automation and routing
+ * 
+ * #### Get User Related Data
+ * - **Comprehensive User Context**: Retrieve user's complete activity data
+ *   - Customer interaction history and timeline
+ *   - Support ticket patterns and trends
+ *   - Performance metrics and KPIs
+ *   - Satisfaction scores and feedback
+ *   - Engagement and activity tracking
+ *   - Business relationship management
+ *   - Personalization and customization
+ *   - Risk assessment and monitoring
+ *   - Compliance and audit requirements
+ *   - Integration and data enrichment
+ *   - Predictive analytics and forecasting
+ *   - Customer lifetime value analysis
+ * 
+ * ### Organization Operations
+ * 
+ * #### Create Organization
+ * - **Organization Setup**: Create new organizational entities
+ *   - Enterprise customer onboarding
+ *   - Partner and vendor organization setup
+ *   - Department and division creation
+ *   - Subsidiary and branch office setup
+ *   - Project and team organization
+ *   - Compliance and regulatory entities
+ *   - Integration and system organization
+ *   - Multi-tenant configuration
+ *   - Hierarchical structure creation
+ *   - Business unit establishment
+ *   - Geographic location organization
+ *   - Service line organization
+ * 
+ * #### Update Organization
+ * - **Organization Management**: Modify organization information
+ *   - Contact information updates
+ *   - Hierarchical structure changes
+ *   - Settings and preference modifications
+ *   - Custom field data updates
+ *   - Tag and metadata management
+ *   - Integration data synchronization
+ *   - Compliance and audit updates
+ *   - Performance tracking configuration
+ *   - Access control and security settings
+ *   - Billing and subscription management
+ *   - Resource allocation adjustments
+ *   - Quality assurance and validation
+ * 
+ * #### Get Organization / Get All Organizations
+ * - **Organization Information**: Retrieve organizational data
+ *   - Customer account management and CRM sync
+ *   - Enterprise relationship mapping
+ *   - Hierarchical reporting and analytics
+ *   - Resource planning and allocation
+ *   - Compliance and governance oversight
+ *   - Performance tracking and KPIs
+ *   - Integration and data synchronization
+ *   - Business intelligence and reporting
+ *   - Customer success and satisfaction
+ *   - Risk assessment and monitoring
+ *   - Strategic planning and forecasting
+ *   - Market analysis and segmentation
+ * 
+ * #### Count Organizations
+ * - **Organization Metrics**: Get organizational statistics
+ *   - Business growth tracking and analysis
+ *   - Market penetration and expansion
+ *   - Resource planning and capacity management
+ *   - Performance benchmarking and comparison
+ *   - Compliance and regulatory reporting
+ *   - Financial planning and budgeting
+ *   - Strategic planning and decision making
+ *   - Risk assessment and management
+ *   - Quality assurance and validation
+ *   - Business intelligence and analytics
+ *   - Customer segmentation and analysis
+ *   - Competitive analysis and positioning
+ * 
+ * #### Delete Organization
+ * - **Organization Removal**: Remove organizational entities
+ *   - Account closure and deactivation
+ *   - Data privacy compliance and GDPR
+ *   - System consolidation and migration
+ *   - Compliance and regulatory requirements
+ *   - Business restructuring and reorganization
+ *   - Performance optimization and efficiency
+ *   - Quality control and validation
+ *   - Audit trail and compliance tracking
+ *   - Risk management and mitigation
+ *   - Cost optimization and reduction
+ *   - Strategic realignment and focus
+ *   - Business continuity and disaster recovery
+ * 
+ * #### Get Organization Related Data
+ * - **Comprehensive Organization Context**: Retrieve complete organizational data
+ *   - Customer relationship management and CRM
+ *   - Enterprise performance analytics
+ *   - Resource utilization and optimization
+ *   - Customer satisfaction and success metrics
+ *   - Compliance and governance reporting
+ *   - Risk assessment and monitoring
+ *   - Strategic planning and forecasting
+ *   - Business intelligence and insights
+ *   - Market analysis and positioning
+ *   - Competitive advantage and differentiation
+ *   - Customer lifetime value analysis
+ *   - Growth opportunity identification
+ * 
+ * ## Use Cases
+ * 
+ * - **Customer Support Automation**: Automated ticket routing and response
+ * - **Help Desk Management**: Centralized IT support and service desk
+ * - **Customer Success Operations**: Proactive customer engagement and retention
+ * - **Sales Support**: Pre-sales and post-sales customer assistance
+ * - **Technical Support**: Product and service technical assistance
+ * - **Internal IT Support**: Employee technology support and service
+ * - **Compliance Management**: Regulatory and policy compliance tracking
+ * - **Security Incident Response**: Security event management and resolution
+ * - **Quality Assurance**: Customer service quality monitoring and improvement
+ * - **Business Process Automation**: Workflow automation and optimization
+ * - **Customer Experience Management**: End-to-end customer journey optimization
+ * - **Knowledge Management**: Information sharing and self-service support
+ * - **Analytics and Reporting**: Performance metrics and business intelligence
+ * - **Integration and Synchronization**: Multi-system data consistency
+ * - **Escalation Management**: Automated issue escalation and resolution
+ * 
+ * ## Integration Patterns
+ * 
+ * ### CRM Integration
+ * - **Customer Data Sync**: Bidirectional customer information synchronization
+ * - **Sales Support**: Convert support interactions to sales opportunities
+ * - **Customer Journey**: Track complete customer lifecycle and touchpoints
+ * - **Account Management**: Unified customer account and relationship management
+ * 
+ * ### Communication Integration
+ * - **Multi-Channel Support**: Email, chat, phone, and social media integration
+ * - **Team Collaboration**: Slack, Microsoft Teams, and communication platforms
+ * - **Notification Systems**: Real-time alerts and status updates
+ * - **Customer Communication**: Automated responses and status notifications
+ * 
+ * ### Business Intelligence Integration
+ * - **Analytics Platforms**: Data warehouse and business intelligence tools
+ * - **Reporting Systems**: Automated report generation and distribution
+ * - **Performance Dashboards**: Real-time metrics and KPI visualization
+ * - **Predictive Analytics**: Forecasting and trend analysis
+ * 
+ * ### Security and Compliance Integration
+ * - **SIEM Platforms**: Security incident and event management
+ * - **Audit Systems**: Compliance tracking and regulatory reporting
+ * - **Identity Management**: User authentication and authorization
+ * - **Data Protection**: Privacy compliance and data security
+ * 
+ * ## AI Tool Integration
+ * 
+ * This node can be used as an AI tool to enhance agent capabilities:
+ * - **Intelligent Ticket Routing**: AI-powered ticket categorization and assignment
+ * - **Automated Response Generation**: AI-generated responses and suggestions
+ * - **Sentiment Analysis**: Customer emotion and satisfaction detection
+ * - **Predictive Support**: Proactive issue identification and resolution
+ * - **Knowledge Base Integration**: AI-powered knowledge retrieval and suggestions
+ * - **Language Translation**: Multi-language customer support automation
+ * - **Performance Optimization**: AI-driven process improvement recommendations
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -10,442 +420,214 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const zendeskNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.zendesk',
   displayName: 'Zendesk',
-  description: 'Integrate with Zendesk for customer support automation, ticket management, and user operations',
-  category: 'Customer Support',
-  subcategory: 'Help Desk',
+  description: 'Integrate with Zendesk customer service platform. Manage tickets, users, and organizations.',
+  category: 'Action Nodes',
+  subcategory: 'Customer Service & Support',
   
   properties: [
-    // Subdomain
-    {
-      name: 'subdomain',
-      displayName: 'Subdomain',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'Your Zendesk subdomain (e.g., "mycompany" for mycompany.zendesk.com)'
-    },
-
-    // Resource selector
     {
       name: 'resource',
       displayName: 'Resource',
       type: 'options',
       required: true,
       default: 'ticket',
-      options: [
-        { name: 'Ticket', value: 'ticket' },
-        { name: 'User', value: 'user' },
-        { name: 'Organization', value: 'organization' },
-        { name: 'Group', value: 'group' },
-        { name: 'Ticket Field', value: 'ticketField' },
-        { name: 'Ticket Comment', value: 'ticketComment' },
-        { name: 'Brand', value: 'brand' },
-        { name: 'Macro', value: 'macro' },
-        { name: 'Tag', value: 'tag' }
-      ],
-      description: 'Choose the Zendesk resource to work with'
-    },
-
-    // Ticket operations
-    {
-      name: 'ticketOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'get',
-      displayOptions: {
-        show: { resource: ['ticket'] }
-      },
-      options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Get All', value: 'getAll' },
-        { name: 'Create', value: 'create' },
-        { name: 'Update', value: 'update' },
-        { name: 'Delete', value: 'delete' },
-        { name: 'Get Comments', value: 'getComments' },
-        { name: 'Add Comment', value: 'addComment' }
-      ],
-      description: 'Choose the operation to perform on the ticket resource'
-    },
-
-    // User operations
-    {
-      name: 'userOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'get',
-      displayOptions: {
-        show: { resource: ['user'] }
-      },
-      options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Get All', value: 'getAll' },
-        { name: 'Create', value: 'create' },
-        { name: 'Update', value: 'update' },
-        { name: 'Delete', value: 'delete' },
-        { name: 'Get Related', value: 'getRelated' }
-      ],
-      description: 'Choose the operation to perform on the user resource'
-    },
-
-    // Organization operations
-    {
-      name: 'organizationOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'get',
-      displayOptions: {
-        show: { resource: ['organization'] }
-      },
-      options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Get All', value: 'getAll' },
-        { name: 'Create', value: 'create' },
-        { name: 'Update', value: 'update' },
-        { name: 'Delete', value: 'delete' }
-      ],
-      description: 'Choose the operation to perform on the organization resource'
-    },
-
-    // Ticket ID
-    {
-      name: 'ticketId',
-      displayName: 'Ticket ID',
-      type: 'number',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['get', 'update', 'delete', 'getComments', 'addComment']
-        }
-      },
-      description: 'The ID of the ticket'
-    },
-
-    // User ID
-    {
-      name: 'userId',
-      displayName: 'User ID',
-      type: 'number',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['user'],
-          userOperation: ['get', 'update', 'delete', 'getRelated']
-        }
-      },
-      description: 'The ID of the user'
-    },
-
-    // Ticket creation fields
-    {
-      name: 'subject',
-      displayName: 'Subject',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      description: 'The subject/title of the ticket'
-    },
-
-    {
-      name: 'description',
-      displayName: 'Description',
-      type: 'string',
-      required: true,
-      typeOptions: {
-        rows: 5
-    },
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create']
-        }
-      },
-      description: 'The initial comment/description for the ticket'
-    },
-
-    {
-      name: 'type',
-      displayName: 'Type',
-      type: 'options',
-      required: false,
-      default: 'ticket',
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      options: [
-        { name: 'Ticket', value: 'ticket' },
-        { name: 'Incident', value: 'incident' },
-        { name: 'Problem', value: 'problem' },
-        { name: 'Question', value: 'question' },
-        { name: 'Task', value: 'task' }
-      ],
-      description: 'The type of ticket to create or update'
-    },
-
-    {
-      name: 'priority',
-      displayName: 'Priority',
-      type: 'options',
-      required: false,
-      default: 'normal',
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      options: [
-        { name: 'Low', value: 'low' },
-        { name: 'Normal', value: 'normal' },
-        { name: 'High', value: 'high' },
-        { name: 'Urgent', value: 'urgent' }
-      ],
-      description: 'The priority level of the ticket'
-    },
-
-    {
-      name: 'status',
-      displayName: 'Status',
-      type: 'options',
-      required: false,
-      default: 'new',
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      options: [
-        { name: 'New', value: 'new' },
-        { name: 'Open', value: 'open' },
-        { name: 'Pending', value: 'pending' },
-        { name: 'Hold', value: 'hold' },
-        { name: 'Solved', value: 'solved' },
-        { name: 'Closed', value: 'closed' }
-      ],
-      description: 'The current status of the ticket'
-    },
-
-    // Requester
-    {
-      name: 'requesterId',
-      displayName: 'Requester ID',
-      type: 'number',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      description: 'The ID of the user requesting support'
-    },
-
-    {
-      name: 'requesterEmail',
-      displayName: 'Requester Email',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create']
-        }
-      },
-      description: 'Email of the requester (alternative to Requester ID)'
-    },
-
-    // Assignee
-    {
-      name: 'assigneeId',
-      displayName: 'Assignee ID',
-      type: 'number',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      description: 'The ID of the agent to assign the ticket to'
-    },
-
-    // Group
-    {
-      name: 'groupId',
-      displayName: 'Group ID',
-      type: 'number',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      description: 'The ID of the group to assign the ticket to'
-    },
-
-    // Tags
-    {
-      name: 'tags',
-      displayName: 'Tags',
-      type: 'string',
-      required: false,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['create', 'update']
-        }
-      },
-      description: 'Comma-separated list of tags to add to the ticket'
-    },
-
-    // Comment
-    {
-      name: 'comment',
-      displayName: 'Comment',
-      type: 'string',
-      required: true,
-      typeOptions: {
-        rows: 4
-    },
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['addComment']
-        }
-      },
-      description: 'The comment to add to the ticket'
-    },
-
-    {
-      name: 'commentPublic',
-      displayName: 'Public Comment',
-      type: 'boolean',
-      required: false,
-      default: true,
-      displayOptions: {
-        show: { 
-          resource: ['ticket'],
-          ticketOperation: ['addComment']
-        }
-      },
-      description: 'Whether the comment is public (visible to requester)'
-    },
-
-    // User creation fields
-    {
-      name: 'userName',
-      displayName: 'Name',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['user'],
-          userOperation: ['create', 'update']
-        }
-      },
-      description: 'The name of the user'
-    },
-
-    {
-      name: 'userEmail',
-      displayName: 'Email',
-      type: 'string',
-      required: true,
-      displayOptions: {
-        show: { 
-          resource: ['user'],
-          userOperation: ['create']
-        }
-      },
-      description: 'The email address of the user'
-    },
-
-    {
-      name: 'userRole',
-      displayName: 'Role',
-      type: 'options',
-      required: false,
-      default: 'end-user',
-      displayOptions: {
-        show: { 
-          resource: ['user'],
-          userOperation: ['create', 'update']
-        }
-      },
-      options: [
-        { name: 'End User', value: 'end-user' },
-        { name: 'Agent', value: 'agent' },
-        { name: 'Admin', value: 'admin' }
-      ],
-      description: 'The role of the user in the Zendesk system'
-    },
-
-    // Additional options
-    {
-      name: 'options',
-      displayName: 'Additional Options',
-      type: 'collection',
-      required: false,
-      default: {},
-      description: 'Additional options for API calls and data filtering',
+      description: 'The resource to operate on',
       options: [
         {
-      name: 'limit',
-      displayName: 'Limit',
-      type: 'number',
-      required: false,
-          description: 'Number of results to return'
-    },
-        {
-      name: 'page',
-      displayName: 'Page',
-      type: 'number',
-      required: false,
-      default: 1,
-          description: 'Page number for pagination'
-    },
-        {
-      name: 'sortBy',
-      displayName: 'Sort By',
-      type: 'string',
-      required: false,
-      default: 'created_at',
-          description: 'Field to sort results by'
-    },
-        {
-      name: 'sortOrder',
-      displayName: 'Sort Order',
-      type: 'options',
-      required: false,
-      default: 'desc',
-          options: [
-            { name: 'Ascending', value: 'asc'
-    },
-            { name: 'Descending', value: 'desc' }
-          ],
-          description: 'The order to sort results in'
+          name: 'Ticket',
+          value: 'ticket',
+          description: 'Operations on support tickets'
         },
         {
-      name: 'query',
-      displayName: 'Search Query',
-      type: 'string',
-      required: false,
-      default: '',
-          description: 'Search query to filter results'
-    }
+          name: 'Ticket Field',
+          value: 'ticketField',
+          description: 'Operations on ticket fields'
+        },
+        {
+          name: 'User',
+          value: 'user',
+          description: 'Operations on users'
+        },
+        {
+          name: 'Organization',
+          value: 'organization',
+          description: 'Operations on organizations'
+        }
+      ]
+    },
+    {
+      name: 'operation',
+      displayName: 'Operation',
+      type: 'options',
+      required: true,
+      default: 'create',
+      description: 'The operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['ticket']
+        }
+      },
+      options: [
+        {
+          name: 'Create',
+          value: 'create',
+          description: 'Create a ticket'
+        },
+        {
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete a ticket'
+        },
+        {
+          name: 'Get',
+          value: 'get',
+          description: 'Get a ticket'
+        },
+        {
+          name: 'Get All',
+          value: 'getAll',
+          description: 'Get all tickets'
+        },
+        {
+          name: 'Recover',
+          value: 'recover',
+          description: 'Recover a suspended ticket'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update a ticket'
+        }
+      ]
+    },
+    {
+      name: 'operation',
+      displayName: 'Operation',
+      type: 'options',
+      required: true,
+      default: 'get',
+      description: 'The operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['ticketField']
+        }
+      },
+      options: [
+        {
+          name: 'Get',
+          value: 'get',
+          description: 'Get a ticket field'
+        },
+        {
+          name: 'Get All',
+          value: 'getAll',
+          description: 'Get all system and custom ticket fields'
+        }
+      ]
+    },
+    {
+      name: 'operation',
+      displayName: 'Operation',
+      type: 'options',
+      required: true,
+      default: 'create',
+      description: 'The operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['user']
+        }
+      },
+      options: [
+        {
+          name: 'Create',
+          value: 'create',
+          description: 'Create a user'
+        },
+        {
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete a user'
+        },
+        {
+          name: 'Get',
+          value: 'get',
+          description: 'Get a user'
+        },
+        {
+          name: 'Get All',
+          value: 'getAll',
+          description: 'Get all users'
+        },
+        {
+          name: 'Get Organizations',
+          value: 'getOrganizations',
+          description: "Get a user's organizations"
+        },
+        {
+          name: 'Get Related Data',
+          value: 'getRelatedData',
+          description: 'Get data related to the user'
+        },
+        {
+          name: 'Search',
+          value: 'search',
+          description: 'Search users'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update a user'
+        }
+      ]
+    },
+    {
+      name: 'operation',
+      displayName: 'Operation',
+      type: 'options',
+      required: true,
+      default: 'create',
+      description: 'The operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['organization']
+        }
+      },
+      options: [
+        {
+          name: 'Create',
+          value: 'create',
+          description: 'Create an organization'
+        },
+        {
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete an organization'
+        },
+        {
+          name: 'Count',
+          value: 'count',
+          description: 'Count organizations'
+        },
+        {
+          name: 'Get',
+          value: 'get',
+          description: 'Get an organization'
+        },
+        {
+          name: 'Get All',
+          value: 'getAll',
+          description: 'Get all organizations'
+        },
+        {
+          name: 'Get Related Data',
+          value: 'getRelatedData',
+          description: 'Get data related to the organization'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update an organization'
+        }
       ]
     }
   ],
@@ -461,18 +643,14 @@ export const zendeskNode: NodeTypeInfo = {
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'Zendesk API response data'
+      displayName: 'Output'
     }
   ],
 
   credentials: [
     {
       name: 'zendeskApi',
-      required: true,
-      displayOptions: {
-        show: {}
-      }
+      required: true
     }
   ],
 
@@ -481,89 +659,61 @@ export const zendeskNode: NodeTypeInfo = {
     name: 'Zendesk'
   },
 
-  aliases: ['customer support', 'help desk', 'tickets', 'support'],
+  aliases: ['zendesk', 'customer service', 'support tickets', 'help desk', 'customer support'],
   
   examples: [
     {
       name: 'Create Support Ticket',
-      description: 'Create a new support ticket in Zendesk',
+      description: 'Create a new support ticket with customer details',
       workflow: {
         nodes: [
           {
-            name: 'Create Ticket',
+            name: 'Zendesk',
             type: 'n8n-nodes-base.zendesk',
             parameters: {
-              subdomain: 'mycompany',
               resource: 'ticket',
-              ticketOperation: 'create',
-              subject: 'User needs help with login',
-              description: 'User is unable to access their account and needs password reset assistance.',
-              type: 'question',
+              operation: 'create',
+              subject: 'Customer Support Request',
+              description: 'Customer needs help with their account',
+              requesterEmail: 'customer@example.com',
               priority: 'normal',
-              requesterEmail: 'user@example.com',
-              tags: 'login,password,help'
+              type: 'question'
             }
           }
         ]
       }
     },
     {
-      name: 'Update Ticket Status',
-      description: 'Update the status of an existing ticket',
+      name: 'Get All Open Tickets',
+      description: 'Retrieve all open support tickets for monitoring',
       workflow: {
         nodes: [
           {
-            name: 'Update Ticket',
+            name: 'Zendesk',
             type: 'n8n-nodes-base.zendesk',
             parameters: {
-              subdomain: 'mycompany',
               resource: 'ticket',
-              ticketOperation: 'update',
-              ticketId: 12345,
-              status: 'solved',
-              assigneeId: 67890
+              operation: 'getAll',
+              status: 'open',
+              returnAll: false,
+              limit: 50
             }
           }
         ]
       }
     },
     {
-      name: 'Get Recent Tickets',
-      description: 'Retrieve recent tickets from Zendesk',
+      name: 'Search Users by Email',
+      description: 'Find users by email address for customer lookup',
       workflow: {
         nodes: [
           {
-            name: 'Get Tickets',
+            name: 'Zendesk',
             type: 'n8n-nodes-base.zendesk',
             parameters: {
-              subdomain: 'mycompany',
-              resource: 'ticket',
-              ticketOperation: 'getAll',
-              options: {
-                limit: 50,
-                sortBy: 'created_at',
-                sortOrder: 'desc'
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Add Comment to Ticket',
-      description: 'Add a comment to an existing ticket',
-      workflow: {
-        nodes: [
-          {
-            name: 'Add Comment',
-            type: 'n8n-nodes-base.zendesk',
-            parameters: {
-              subdomain: 'mycompany',
-              resource: 'ticket',
-              ticketOperation: 'addComment',
-              ticketId: 12345,
-              comment: 'Thank you for your patience. We have resolved the issue and your account should now be accessible.',
-              commentPublic: true
+              resource: 'user',
+              operation: 'search',
+              query: 'email:customer@example.com'
             }
           }
         ]
@@ -571,139 +721,5 @@ export const zendeskNode: NodeTypeInfo = {
     }
   ]
 };
-
-export const zendeskTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.zendeskTrigger',
-  displayName: 'Zendesk Trigger',
-  description: 'Triggers the workflow when events occur in Zendesk, such as new tickets, status changes, or comments',
-  category: 'Customer Support',
-  subcategory: 'Help Desk',
-  
-  properties: [
-    {
-      name: 'subdomain',
-      displayName: 'Subdomain',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'Your Zendesk subdomain (e.g., "mycompany" for mycompany.zendesk.com)'
-    },
-    {
-      name: 'event',
-      displayName: 'Event',
-      type: 'options',
-      required: true,
-      default: 'ticket.created',
-      description: 'The event to listen for',
-      options: [
-        { name: 'Ticket Created', value: 'ticket.created' },
-        { name: 'Ticket Updated', value: 'ticket.updated' },
-        { name: 'Ticket Status Changed', value: 'ticket.status_changed' },
-        { name: 'Ticket Comment Added', value: 'ticket.comment_added' },
-        { name: 'User Created', value: 'user.created' },
-        { name: 'User Updated', value: 'user.updated' },
-        { name: 'Organization Created', value: 'organization.created' },
-        { name: 'Organization Updated', value: 'organization.updated' }
-      ]
-    },
-    {
-      name: 'conditions',
-      displayName: 'Conditions',
-      type: 'collection',
-      required: false,
-      default: {},
-      description: 'Additional conditions to filter events',
-      options: [
-        {
-      name: 'priority',
-      displayName: 'Priority',
-      type: 'multiOptions',
-      required: false,
-          description: 'Filter events by ticket priority levels',
-          options: [
-            { name: 'Low', value: 'low'
-    },
-            { name: 'Normal', value: 'normal' },
-            { name: 'High', value: 'high' },
-            { name: 'Urgent', value: 'urgent' }
-          ]
-        },
-        {
-      name: 'status',
-      displayName: 'Status',
-      type: 'multiOptions',
-      required: false,
-      default: [],
-          description: 'Filter events by ticket status values',
-          options: [
-            { name: 'New', value: 'new'
-    },
-            { name: 'Open', value: 'open' },
-            { name: 'Pending', value: 'pending' },
-            { name: 'Hold', value: 'hold' },
-            { name: 'Solved', value: 'solved' },
-            { name: 'Closed', value: 'closed' }
-          ]
-        },
-        {
-      name: 'tags',
-      displayName: 'Tags',
-      type: 'string',
-      required: false,
-      default: '',
-          description: 'Comma-separated list of tags to filter by'
-    }
-      ]
-    }
-  ],
-
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when Zendesk events occur'
-    }
-  ],
-
-  credentials: [
-    {
-      name: 'zendeskApi',
-      required: true,
-      displayOptions: {
-        show: {}
-      }
-    }
-  ],
-
-  triggerNode: true,
-  polling: true,
-  webhookSupport: true,
-  
-  examples: [
-    {
-      name: 'Monitor New Tickets',
-      description: 'Trigger workflow when new tickets are created',
-      workflow: {
-        nodes: [
-          {
-            name: 'Zendesk Trigger',
-            type: 'n8n-nodes-base.zendeskTrigger',
-            parameters: {
-              subdomain: 'mycompany',
-              event: 'ticket.created',
-              conditions: {
-                priority: ['high', 'urgent']
-              }
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes
-export const zendeskNodes: NodeTypeInfo[] = [zendeskNode, zendeskTriggerNode];
 
 export default zendeskNode;

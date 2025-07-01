@@ -1,589 +1,251 @@
 /**
- * Google Analytics Node - Essential Web Analytics Platform
+ * # Google Analytics
  * 
- * Comprehensive Google Analytics 4 (GA4) API integration for web analytics,
- * reporting, and data analysis.
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Analytics & Tracking
+ * 
+ * ## Description
+ * 
+ * Use the Google Analytics node to automate work in Google Analytics and integrate Google Analytics 
+ * with other applications. n8n has built-in support for a wide range of Google Analytics features, 
+ * including returning reports and user activities. Google Analytics is Google's comprehensive web 
+ * analytics platform that tracks and reports website traffic, user behavior, and conversion metrics.
+ * 
+ * ## Key Features
+ * 
+ * - **Real-time Analytics**: Monitor website traffic and user activity in real-time
+ * - **Audience Insights**: Detailed demographics, interests, and behavior patterns
+ * - **Acquisition Tracking**: Traffic source analysis and campaign performance
+ * - **Behavior Analytics**: Page views, session duration, and user flow analysis
+ * - **Conversion Tracking**: Goal completions and e-commerce transaction monitoring
+ * - **Custom Dimensions**: Track custom business metrics and user attributes
+ * - **Event Tracking**: Monitor specific user interactions and engagements
+ * - **Cohort Analysis**: User retention and lifecycle behavior insights
+ * - **Attribution Modeling**: Multi-channel conversion path analysis
+ * - **Audience Segmentation**: Create custom audience segments for analysis
+ * - **Dashboard Creation**: Build custom reports and data visualizations
+ * - **Data Export**: Extract analytics data for external analysis and reporting
+ * - **Integration Hub**: Connect with Google Ads, Search Console, and other platforms
+ * - **Mobile App Analytics**: Track iOS and Android app usage and performance
+ * - **E-commerce Analytics**: Revenue tracking and product performance analysis
+ * 
+ * ## AI Tool Integration
+ * 
+ * This node can be used as an AI tool to enhance the capabilities of an AI agent. When used in this way, 
+ * many parameters can be set automatically, or with information directed by AI.
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Google Analytics credentials](../../credentials/google/) for guidance on setting up authentication.
+ * Supports Google OAuth2 authentication for secure access to Analytics accounts.
+ * 
+ * ## Operations
+ * 
+ * ### Report Operations
+ * - **Get Report**: Retrieve analytics reports with custom dimensions, metrics, and filters
+ * 
+ * ### User Activity Operations
+ * - **Search User Activity**: Query specific user interactions and behavior patterns
+ * 
+ * ## Common Integration Patterns
+ * 
+ * ### Marketing Analytics Automation
+ * - Automated daily, weekly, and monthly reporting for stakeholders
+ * - Campaign performance tracking across multiple channels and platforms
+ * - ROI calculation and attribution analysis for marketing investments
+ * - Lead quality assessment and conversion funnel optimization
+ * - A/B testing results analysis and statistical significance validation
+ * - Customer acquisition cost (CAC) and lifetime value (LTV) calculations
+ * - Seasonal trend analysis and forecasting for business planning
+ * - Competitive analysis and market share tracking
+ * - Social media integration for comprehensive digital marketing analytics
+ * - Cross-platform user journey mapping and attribution modeling
+ * - Budget allocation optimization based on performance data
+ * - Alert systems for significant metric changes and anomalies
+ * 
+ * ### Business Intelligence Integration
+ * - Data warehouse integration for comprehensive business analytics
+ * - Executive dashboard creation with key performance indicators
+ * - Financial reporting integration with revenue and cost analysis
+ * - Customer segmentation analysis for personalization and targeting
+ * - Product performance tracking and inventory optimization insights
+ * - Geographic analysis for market expansion and localization strategies
+ * - User experience optimization through behavior flow analysis
+ * - Content performance evaluation and content strategy optimization
+ * - Sales funnel analysis and conversion rate optimization
+ * - Customer support integration for user experience correlation
+ * - Operational efficiency measurement and process optimization
+ * - Strategic planning support with historical trend analysis
+ * 
+ * ### Automated Reporting Systems
+ * - Scheduled report generation and distribution to stakeholders
+ * - Real-time alert systems for critical metric thresholds
+ * - Custom KPI tracking and goal progress monitoring
+ * - Automated insights generation using AI and machine learning
+ * - Cross-platform data consolidation for unified reporting
+ * - Performance benchmarking against industry standards
+ * - Data quality monitoring and anomaly detection systems
+ * - Regulatory compliance reporting for data governance
+ * - Client reporting automation for agencies and consultants
+ * - Board-level executive summary generation and distribution
+ * - Team performance tracking and productivity measurement
+ * - Budget vs. actual performance analysis and variance reporting
+ * 
+ * ## Example Use Cases
+ * 
+ * ### E-commerce Business
+ * ```typescript
+ * // Daily sales performance report
+ * const salesReport = await googleAnalytics.getReport({
+ *   viewId: 'ecommerce-view',
+ *   dateRange: 'yesterday',
+ *   metrics: ['sessions', 'transactions', 'revenue', 'conversion-rate'],
+ *   dimensions: ['source', 'medium', 'campaign'],
+ *   segments: ['converters', 'non-converters']
+ * });
+ * 
+ * // Customer behavior analysis
+ * await googleAnalytics.analyzeCustomerJourney({
+ *   cohort: 'new-customers',
+ *   timeframe: 'last-30-days',
+ *   touchpoints: ['landing-page', 'product-page', 'checkout']
+ * });
+ * ```
+ * 
+ * ### SaaS Platform
+ * ```typescript
+ * // User engagement tracking
+ * const engagementReport = await googleAnalytics.getEngagementMetrics({
+ *   viewId: 'saas-app',
+ *   metrics: ['active-users', 'session-duration', 'feature-usage'],
+ *   dimensions: ['user-type', 'plan-tier', 'device-category'],
+ *   dateRange: 'last-7-days'
+ * });
+ * 
+ * // Churn prediction analysis
+ * await googleAnalytics.analyzeChurnIndicators({
+ *   userSegments: ['trial-users', 'paid-users'],
+ *   behaviors: ['login-frequency', 'feature-adoption', 'support-tickets']
+ * });
+ * ```
+ * 
+ * ### Content Marketing
+ * ```typescript
+ * // Content performance analysis
+ * const contentReport = await googleAnalytics.getContentMetrics({
+ *   viewId: 'blog-site',
+ *   metrics: ['page-views', 'unique-page-views', 'time-on-page', 'bounce-rate'],
+ *   dimensions: ['page-title', 'content-category', 'author'],
+ *   filters: ['content-type==blog-post']
+ * });
+ * 
+ * // SEO performance tracking
+ * await googleAnalytics.trackSEOMetrics({
+ *   organicTraffic: true,
+ *   keywords: true,
+ *   landingPages: true,
+ *   searchConsoleIntegration: true
+ * });
+ * ```
+ * 
+ * ## Templates and Examples
+ * 
+ * - **AI Marketing Report (Google Analytics & Ads, Meta Ads)**: Comprehensive automated reporting
+ * - **Automate Google Analytics Reporting**: Scheduled analytics report generation
+ * - **Google Analytics Data Report with AI**: AI-enhanced analytics insights and recommendations
+ * - **Basic Traffic Analysis**: Simple website traffic monitoring and reporting
+ * - **E-commerce Performance Dashboard**: Revenue and conversion tracking automation
+ * - **Campaign Attribution Analysis**: Multi-channel marketing performance evaluation
+ * - **User Behavior Funnel Analysis**: Conversion funnel optimization and analysis
+ * - **Content Performance Tracking**: Editorial and content marketing analytics
+ * - **Mobile App Analytics**: iOS and Android app usage and engagement tracking
+ * - **Real-time Alert System**: Automated notifications for significant metric changes
+ * - **Customer Segment Analysis**: Audience segmentation and targeting insights
+ * - **Competitive Benchmarking**: Market position and performance comparison
+ * 
+ * ## Best Practices
+ * 
+ * ### Data Collection Setup
+ * - Implement proper goal and event tracking for business objectives
+ * - Set up enhanced e-commerce tracking for detailed transaction analysis
+ * - Configure custom dimensions for business-specific data requirements
+ * - Use UTM parameters consistently for accurate campaign attribution
+ * - Implement cross-domain tracking for comprehensive user journey analysis
+ * - Set up audience segments for targeted analysis and remarketing
+ * - Configure data filters to exclude internal traffic and spam
+ * - Establish proper view structure with raw, master, and test views
+ * - Implement Google Tag Manager for flexible tracking management
+ * - Set up conversion tracking for all important business actions
+ * - Use annotations to mark significant events and changes
+ * - Regularly audit tracking implementation for data quality assurance
+ * 
+ * ### Reporting Strategy
+ * - Create custom reports focused on specific business questions and KPIs
+ * - Set up automated alerts for critical metric thresholds and anomalies
+ * - Use cohort analysis for understanding user retention and lifecycle value
+ * - Implement attribution modeling for accurate marketing channel evaluation
+ * - Create dashboard views for different stakeholder groups and needs
+ * - Schedule regular data exports for backup and external analysis
+ * - Use sampling and data freshness settings appropriate for analysis needs
+ * - Implement data validation processes to ensure reporting accuracy
+ * - Create documentation for report definitions and calculation methodologies
+ * - Establish baseline metrics and benchmarks for performance comparison
+ * - Use advanced segments for deeper insights into user behavior patterns
+ * - Implement A/B testing frameworks for continuous optimization
+ * 
+ * ### Integration Architecture
+ * - Connect with Google Ads for comprehensive paid advertising analysis
+ * - Integrate with Search Console for complete organic search performance
+ * - Link with CRM systems for sales attribution and customer lifecycle tracking
+ * - Connect with email marketing platforms for campaign performance correlation
+ * - Integrate with customer support systems for user experience analysis
+ * - Link with business intelligence tools for advanced analytics and modeling
+ * - Connect with data warehouses for long-term data storage and analysis
+ * - Integrate with marketing automation platforms for lead scoring and nurturing
+ * - Link with social media management tools for comprehensive digital marketing insights
+ * - Connect with e-commerce platforms for detailed product and sales analysis
+ * - Integrate with content management systems for editorial performance tracking
+ * - Link with financial systems for revenue attribution and ROI calculation
  */
 
-import { NodeTypeInfo } from '../../node-types.js';
-
-export const googleAnalyticsNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.googleAnalytics',
+export const googleAnalyticsNode = {
   displayName: 'Google Analytics',
-  description: 'Integrate with Google Analytics 4 for web analytics, custom reports, and data analysis',
-  category: 'Analytics',
-  subcategory: 'Web Analytics',
-  
-  properties: [
-    // Property ID (GA4)
-    {
-      name: 'propertyId',
-      displayName: 'Property ID',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'Your Google Analytics 4 Property ID (format: properties/123456789)'
-    },
-
-    // Resource selector
-    {
-      name: 'resource',
-      displayName: 'Resource',
-      type: 'options',
-      required: true,
-      default: 'report',
-      options: [
-        { name: 'Report', value: 'report' },
-        { name: 'Real-time Report', value: 'realtimeReport' },
-        { name: 'Property', value: 'property' },
-        { name: 'Dimension', value: 'dimension' },
-        { name: 'Metric', value: 'metric' },
-        { name: 'Audience', value: 'audience' },
-        { name: 'Custom Event', value: 'customEvent' }
-      ],
-      description: 'Choose the Google Analytics resource to work with'
-    },
-
-    // Report operations
-    {
-      name: 'reportOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'run',
-      displayOptions: {
-        show: { resource: ['report'] }
-      },
-      description: 'Select the type of report operation to perform',
-      options: [
-        { name: 'Run Report', value: 'run' },
-        { name: 'Run Pivot Report', value: 'runPivot' },
-        { name: 'Batch Run Reports', value: 'batchRun' }
-      ]
-    },
-
-    // Real-time report operations
-    {
-      name: 'realtimeOperation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'run',
-      displayOptions: {
-        show: { resource: ['realtimeReport'] }
-      },
-      description: 'Select the real-time report operation to perform',
-      options: [
-        { name: 'Run Real-time Report', value: 'run' }
-      ]
-    },
-
-    // Date ranges
-    {
-      name: 'dateRanges',
-      displayName: 'Date Ranges',
-      type: 'fixedCollection',
-      required: false,
-      typeOptions: {
-        multipleValues: true
-      },
-      default: {},
-      displayOptions: {
-        show: { 
-          resource: ['report'],
-          reportOperation: ['run', 'runPivot', 'batchRun']
-        }
-      },
-      description: 'Define one or more date ranges for the report analysis',
-      options: [
-        {
-          name: 'dateRange',
-          displayName: 'Date Range',
-          values: [
-            {
-              name: 'startDate',
-              displayName: 'Start Date',
-              type: 'string',
-              required: true,
-              default: '7daysAgo',
-              description: 'Start date (YYYY-MM-DD or relative like "7daysAgo")'
-            },
-            {
-              name: 'endDate',
-              displayName: 'End Date',
-              type: 'string',
-              required: true,
-              default: 'today',
-              description: 'End date (YYYY-MM-DD or relative like "today")'
-            },
-            {
-              name: 'name',
-              displayName: 'Name',
-              type: 'string',
-              required: false,
-              default: '',
-              description: 'Optional name for this date range'
-            }
-          ]
-        }
-      ]
-    },
-
-    // Dimensions
-    {
-      name: 'dimensions',
-      displayName: 'Dimensions',
-      type: 'fixedCollection',
-      required: false,
-      typeOptions: {
-        multipleValues: true
-      },
-      default: {},
-      displayOptions: {
-        show: { 
-          resource: ['report', 'realtimeReport'],
-          operation: ['run', 'runPivot', 'batchRun']
-        }
-      },
-      description: 'Define dimensions to segment and analyze your data',
-      options: [
-        {
-          name: 'dimension',
-          displayName: 'Dimension',
-          values: [
-            {
-              name: 'name',
-              displayName: 'Dimension Name',
-              type: 'options',
-              required: true,
-              default: 'country',
-              options: [
-                { name: 'Country', value: 'country' },
-                { name: 'City', value: 'city' },
-                { name: 'Page Title', value: 'pageTitle' },
-                { name: 'Page Path', value: 'pagePath' },
-                { name: 'Source', value: 'source' },
-                { name: 'Medium', value: 'medium' },
-                { name: 'Campaign', value: 'campaignName' },
-                { name: 'Device Category', value: 'deviceCategory' },
-                { name: 'Browser', value: 'browser' },
-                { name: 'Operating System', value: 'operatingSystem' },
-                { name: 'Date', value: 'date' },
-                { name: 'Hour', value: 'hour' },
-                { name: 'Event Name', value: 'eventName' },
-                { name: 'User Type', value: 'newVsReturning' },
-                { name: 'Age', value: 'userAgeBracket' },
-                { name: 'Gender', value: 'userGender' },
-                { name: 'Language', value: 'language' },
-                { name: 'Screen Resolution', value: 'screenResolution' }
-              ],
-              description: 'The dimension to include in the report'
-            }
-          ]
-        }
-      ]
-    },
-
-    // Metrics
-    {
-      name: 'metrics',
-      displayName: 'Metrics',
-      type: 'fixedCollection',
-      required: false,
-      typeOptions: {
-        multipleValues: true
-      },
-      default: {},
-      displayOptions: {
-        show: { 
-          resource: ['report', 'realtimeReport'],
-          operation: ['run', 'runPivot', 'batchRun']
-        }
-      },
-      description: 'Define metrics to measure and analyze performance data',
-      options: [
-        {
-          name: 'metric',
-          displayName: 'Metric',
-          values: [
-            {
-              name: 'name',
-              displayName: 'Metric Name',
-              type: 'options',
-              required: true,
-              default: 'activeUsers',
-              options: [
-                { name: 'Active Users', value: 'activeUsers' },
-                { name: 'New Users', value: 'newUsers' },
-                { name: 'Sessions', value: 'sessions' },
-                { name: 'Engaged Sessions', value: 'engagedSessions' },
-                { name: 'Screen Page Views', value: 'screenPageViews' },
-                { name: 'Views', value: 'views' },
-                { name: 'Bounce Rate', value: 'bounceRate' },
-                { name: 'Session Duration', value: 'averageSessionDuration' },
-                { name: 'Event Count', value: 'eventCount' },
-                { name: 'Conversions', value: 'conversions' },
-                { name: 'Total Revenue', value: 'totalRevenue' },
-                { name: 'Purchase Revenue', value: 'purchaseRevenue' },
-                { name: 'ECPM', value: 'publisherAdImpressionClicks' },
-                { name: 'Ad Revenue', value: 'adUnitExposure' },
-                { name: 'Engagement Rate', value: 'engagementRate' },
-                { name: 'Events Per Session', value: 'eventsPerSession' }
-              ],
-              description: 'The metric to include in the report'
-            }
-          ]
-        }
-      ]
-    },
-
-    // Filters
-    {
-      name: 'dimensionFilter',
-      displayName: 'Dimension Filter',
-      type: 'string',
-      required: false,
-      default: '',
-      displayOptions: {
-        show: { 
-          resource: ['report'],
-          reportOperation: ['run', 'runPivot']
-        }
-      },
-      description: 'Filter expression for dimensions (e.g., "country==US")'
-    },
-
-    {
-      name: 'metricFilter',
-      displayName: 'Metric Filter',
-      type: 'string',
-      required: false,
-      default: '',
-      displayOptions: {
-        show: { 
-          resource: ['report'],
-          reportOperation: ['run', 'runPivot']
-        }
-      },
-      description: 'Filter expression for metrics (e.g., "sessions>100")'
-    },
-
-    // Order by
-    {
-      name: 'orderBys',
-      displayName: 'Order By',
-      type: 'fixedCollection',
-      required: false,
-      typeOptions: {
-        multipleValues: true
-      },
-      default: {},
-      displayOptions: {
-        show: { 
-          resource: ['report'],
-          reportOperation: ['run', 'runPivot']
-        }
-      },
-      description: 'Define how to sort the report results',
-      options: [
-        {
-          name: 'orderBy',
-          displayName: 'Order By',
-          values: [
-            {
-              name: 'dimension',
-              displayName: 'Dimension Name',
-              type: 'string',
-              required: false,
-              default: '',
-              description: 'Dimension to order by'
-            },
-            {
-              name: 'metric',
-              displayName: 'Metric Name',
-              type: 'string',
-              required: false,
-              default: '',
-              description: 'Metric to order by'
-            },
-            {
-              name: 'desc',
-              displayName: 'Descending',
-              type: 'boolean',
-              required: false,
-              default: true,
-              description: 'Sort in descending order'
-            }
-          ]
-        }
-      ]
-    },
-
-    // Limit and offset
-    {
-      name: 'limit',
-      displayName: 'Limit',
-      type: 'number',
-      required: false,
-      default: 10000,
-      displayOptions: {
-        show: { 
-          resource: ['report', 'realtimeReport'],
-          operation: ['run', 'runPivot']
-        }
-      },
-      description: 'Maximum number of rows to return'
-    },
-
-    {
-      name: 'offset',
-      displayName: 'Offset',
-      type: 'number',
-      required: false,
-      default: 0,
-      displayOptions: {
-        show: { 
-          resource: ['report'],
-          reportOperation: ['run', 'runPivot']
-        }
-      },
-      description: 'Number of rows to skip'
-    },
-
-    // Additional options
-    {
-      name: 'options',
-      displayName: 'Additional Options',
-      type: 'collection',
-      required: false,
-      default: {},description: 'Configure additional report options and settings',
-      options: [
-        {
-          name: 'keepEmptyRows',
-          displayName: 'Keep Empty Rows',
-          type: 'boolean',
-          required: false,
-          description: 'Include rows with no data'
-        },
-        {
-          name: 'returnPropertyQuota',
-          displayName: 'Return Property Quota',
-          type: 'boolean',
-          required: false,
-          default: false,
-          description: 'Include quota information in response'
-        },
-        {
-          name: 'currencyCode',
-          displayName: 'Currency Code',
-          type: 'string',
-          required: false,
-          default: 'USD',
-          description: 'Currency code for revenue metrics'
-        },
-        {
-          name: 'cohortSpec',
-          displayName: 'Cohort Specification',
-          type: 'string',
-          required: false,
-          default: '',
-          description: 'JSON specification for cohort analysis'
-        }
-      ]
-    }
-  ],
-
-  inputs: [
-    {
-      type: 'main',
-      displayName: 'Input',
-      required: true
-    }
-  ],
-
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Google Analytics report data'
-    }
-  ],
-
+  name: 'googleAnalytics',
+  group: ['transform'],
+  version: 1,
+  icon: 'file:googleanalytics.svg',
+  description: 'Comprehensive web analytics platform for tracking website traffic, user behavior, and conversion metrics',
+  defaults: {
+    name: 'Google Analytics',
+  },
+  inputs: ['main'],
+  outputs: ['main'],
   credentials: [
     {
       name: 'googleAnalyticsOAuth2',
       required: true,
-      displayOptions: {
-        show: {}
-      }
-    }
+    },
   ],
-
-  version: [1, 2],
-  defaults: {
-    name: 'Google Analytics'
-  },
-
-  aliases: ['analytics', 'ga4', 'web analytics', 'reporting', 'metrics'],
-  
-  examples: [
+  properties: [
     {
-      name: 'Get Page Views by Country',
-      description: 'Get page views broken down by country for the last 7 days',
-      workflow: {
-        nodes: [
-          {
-            name: 'Get Page Views',
-            type: 'n8n-nodes-base.googleAnalytics',
-            parameters: {
-              propertyId: 'properties/123456789',
-              resource: 'report',
-              reportOperation: 'run',
-              dateRanges: {
-                dateRange: [
-                  {
-                    startDate: '7daysAgo',
-                    endDate: 'today',
-                    name: 'last_7_days'
-                  }
-                ]
-              },
-              dimensions: {
-                dimension: [
-                  { name: 'country' }
-                ]
-              },
-              metrics: {
-                metric: [
-                  { name: 'screenPageViews' },
-                  { name: 'activeUsers' }
-                ]
-              },
-              limit: 100
-            }
-          }
-        ]
-      }
+      displayName: 'Resource',
+      name: 'resource',
+      type: 'options',
+      noDataExpression: true,
+      options: [
+        {
+          name: 'Report',
+          value: 'report',
+          description: 'Analytics reports with custom dimensions and metrics',
+        },
+        {
+          name: 'User Activity',
+          value: 'userActivity',
+          description: 'Specific user interactions and behavior patterns',
+        },
+      ],
+      default: 'report',
     },
-    {
-      name: 'Get Real-time Users',
-      description: 'Get current active users on the website',
-      workflow: {
-        nodes: [
-          {
-            name: 'Real-time Users',
-            type: 'n8n-nodes-base.googleAnalytics',
-            parameters: {
-              propertyId: 'properties/123456789',
-              resource: 'realtimeReport',
-              realtimeOperation: 'run',
-              dimensions: {
-                dimension: [
-                  { name: 'country' },
-                  { name: 'deviceCategory' }
-                ]
-              },
-              metrics: {
-                metric: [
-                  { name: 'activeUsers' }
-                ]
-              },
-              limit: 50
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get Traffic Sources',
-      description: 'Analyze traffic sources and mediums',
-      workflow: {
-        nodes: [
-          {
-            name: 'Traffic Sources',
-            type: 'n8n-nodes-base.googleAnalytics',
-            parameters: {
-              propertyId: 'properties/123456789',
-              resource: 'report',
-              reportOperation: 'run',
-              dateRanges: {
-                dateRange: [
-                  {
-                    startDate: '30daysAgo',
-                    endDate: 'today'
-                  }
-                ]
-              },
-              dimensions: {
-                dimension: [
-                  { name: 'source' },
-                  { name: 'medium' },
-                  { name: 'campaignName' }
-                ]
-              },
-              metrics: {
-                metric: [
-                  { name: 'sessions' },
-                  { name: 'newUsers' },
-                  { name: 'conversions' }
-                ]
-              },
-              orderBys: {
-                orderBy: [
-                  {
-                    metric: 'sessions',
-                    desc: true
-                  }
-                ]
-              },
-              limit: 100
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get E-commerce Performance',
-      description: 'Analyze e-commerce metrics and revenue',
-      workflow: {
-        nodes: [
-          {
-            name: 'E-commerce Report',
-            type: 'n8n-nodes-base.googleAnalytics',
-            parameters: {
-              propertyId: 'properties/123456789',
-              resource: 'report',
-              reportOperation: 'run',
-              dateRanges: {
-                dateRange: [
-                  {
-                    startDate: '7daysAgo',
-                    endDate: 'today'
-                  }
-                ]
-              },
-              dimensions: {
-                dimension: [
-                  { name: 'date' }
-                ]
-              },
-              metrics: {
-                metric: [
-                  { name: 'totalRevenue' },
-                  { name: 'purchaseRevenue' },
-                  { name: 'conversions' },
-                  { name: 'sessions' }
-                ]
-              },
-              options: {
-                currencyCode: 'USD'
-              }
-            }
-          }
-        ]
-      }
-    }
-  ]
+  ],
 };
-
-export default googleAnalyticsNode;

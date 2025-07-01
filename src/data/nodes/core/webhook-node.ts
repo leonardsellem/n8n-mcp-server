@@ -1,8 +1,43 @@
 /**
- * Webhook Node
+ * # Webhook
  * 
- * Listen for HTTP requests at a specific URL endpoint. Perfect for receiving data from
- * external services, creating API endpoints, and building webhook integrations.
+ * **Status**: ✅ Active
+ * **Category**: Core Nodes
+ * **Subcategory**: Triggers
+ * 
+ * ## Description
+ * 
+ * Use the Webhook node to create webhooks, which can receive data from apps and services when an event occurs. 
+ * It's a trigger node, which means it can start an n8n workflow. This allows services to connect to n8n and run a workflow.
+ * 
+ * ## Key Features
+ * 
+ * - **HTTP Methods**: Support for GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
+ * - **Authentication**: Basic auth, Header auth, JWT auth, or None
+ * - **Custom Paths**: Define custom webhook paths with route parameters
+ * - **Response Modes**: Immediate response, wait for workflow completion, or custom response
+ * - **Security**: IP whitelisting, authentication, bot filtering
+ * - **CORS Support**: Configure cross-origin resource sharing
+ * - **Binary Data**: Handle file uploads and binary data
+ * - **Custom Headers**: Send custom response headers
+ * - **Test vs Production**: Separate URLs for development and production
+ * 
+ * ## Workflow Development Process
+ * 
+ * n8n provides different Webhook URLs for testing and production:
+ * - **Test URL**: For development with "Listen for test event" option
+ * - **Production URL**: For live workflows when activated
+ * 
+ * ## Use Cases
+ * 
+ * - Receive webhook notifications from external services
+ * - Create API endpoints for custom integrations  
+ * - Handle form submissions from websites
+ * - Process payment notifications (Stripe, PayPal)
+ * - Receive GitHub/GitLab events for CI/CD
+ * - Accept data from IoT devices
+ * - Handle chatbot interactions
+ * - Process file uploads and binary data
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -10,8 +45,8 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const webhookNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.webhook',
   displayName: 'Webhook',
-  description: 'Create HTTP endpoints to receive data from external services. Handle webhooks, build APIs, and trigger workflows from HTTP requests.',
-  category: 'Core',
+  description: 'Create webhooks to receive data from apps and services. Triggers workflows and can return data like an API endpoint.',
+  category: 'Core Nodes',
   subcategory: 'Triggers',
 
   properties: [

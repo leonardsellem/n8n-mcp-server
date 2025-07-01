@@ -1,7 +1,7 @@
 /**
  * Aggregate Node
  * 
- * Groups multiple incoming items (or selected fields of items) into single combined items:contentReference[oaicite:1]{index=1}. Useful for bundling data (via modes like **Individual Fields** or **All Item Data**) before passing it to the next node.
+ * Groups multiple incoming items (or selected fields of items) into single combined items. Useful for bundling data (via modes like **Individual Fields** or **All Item Data**) before passing it to the next node.
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -9,33 +9,116 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const aggregateNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.aggregate',
   displayName: 'Aggregate',
-  description: 'Groups multiple incoming items (or selected fields of items) into single combined items:contentReference[oaicite:1]{index=1}. Useful for bundling data (via modes like **Individual Fields** or **All Item Data**) before passing it to the next node.',
-  category: 'Utility',
-  subcategory: 'Action',
+  description: 'Groups multiple incoming items (or selected fields of items) into single combined items. Useful for bundling data (via modes like **Individual Fields** or **All Item Data**) before passing it to the next node.',
+  category: 'Core Nodes',
+  subcategory: 'Data Transformation',
   
   properties: [
-        {
-      name: 'operation',
-      displayName: 'Operation',
+    {
+      name: 'aggregate',
+      displayName: 'Aggregate',
       type: 'options',
       required: true,
-      default: 'get',
-      description: 'The operation to perform',
+      default: 'aggregateIndividualFields',
+      description: 'How to aggregate the incoming data',
       options: [
-        { name: 'Get', value: 'get' },
-        { name: 'Create', value: 'create' },
-        { name: 'Update', value: 'update' },
-        { name: 'Delete', value: 'delete' }
+        {
+          name: 'Individual Fields',
+          value: 'aggregateIndividualFields',
+          description: 'Combine specific fields from all items'
+        },
+        {
+          name: 'All Item Data',
+          value: 'aggregateAllItemData',
+          description: 'Combine all data from all items into arrays'
+        }
       ]
     },
-
     {
-      name: 'resourceId',
-      displayName: 'Resource ID',
-      type: 'string',
+      name: 'fieldsToAggregate',
+      displayName: 'Fields to Aggregate',
+      type: 'fixedCollection',
       required: false,
-      default: '',
-      description: 'The ID of the resource to work with'
+      default: {},
+      description: 'The fields to aggregate from the incoming items',
+      typeOptions: {
+        multipleValues: true,
+        sortable: true
+      },
+      displayOptions: {
+        show: {
+          aggregate: ['aggregateIndividualFields']
+        }
+      },
+      options: [
+        {
+          name: 'values',
+          displayName: 'Values',
+          values: [
+            {
+              name: 'field',
+              displayName: 'Field',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The field to aggregate',
+              placeholder: 'data.email'
+            },
+            {
+              name: 'renameField',
+              displayName: 'Rename Field',
+              type: 'string',
+              required: false,
+              default: '',
+              description: 'Optionally rename the aggregated field',
+              placeholder: 'email_list'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'options',
+      displayName: 'Options',
+      type: 'collection',
+      required: false,
+      default: {},
+      description: 'Additional options for aggregation',
+      options: [
+        {
+          name: 'disableDotNotation',
+          displayName: 'Disable Dot Notation',
+          type: 'boolean',
+          default: false,
+          description: 'Disable dot notation for nested field access'
+        },
+        {
+          name: 'destinationFieldName',
+          displayName: 'Destination Field Name',
+          type: 'string',
+          default: 'data',
+          description: 'Field name to store aggregated data in',
+          displayOptions: {
+            show: {
+              '/aggregate': ['aggregateAllItemData']
+            }
+          }
+        },
+        {
+          name: 'includeNullValues',
+          displayName: 'Include Null Values',
+          type: 'boolean',
+          default: false,
+          description: 'Include null and undefined values in aggregation'
+        },
+        {
+          name: 'mergeArrays',
+          displayName: 'Merge Arrays',
+          type: 'boolean',
+          default: false,
+          description: 'Merge array values instead of creating nested arrays'
+        }
+      ]
     }
   ],
 
@@ -50,44 +133,86 @@ export const aggregateNode: NodeTypeInfo = {
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'Processed data from Aggregate'
+      displayName: 'Aggregated Data',
+      description: 'Single item containing aggregated data from all input items'
     }
   ],
 
-  credentials: [
-    {
-      name: 'aggregateApi',
-      required: true,
-      displayOptions: {
-        show: {}
-      }
-    }
-  ],
+  credentials: [],
 
   regularNode: true,
-  
-  
   
   version: [1],
   defaults: {
     name: 'Aggregate'
   },
 
-  aliases: ['aggregate'],
+  aliases: ['aggregate', 'combine', 'merge', 'group'],
   
   examples: [
-        {
-      name: 'Get Item',
-      description: 'Get an item from Aggregate',
+    {
+      name: 'Aggregate Email List',
+      description: 'Collect all email addresses into a single array',
       workflow: {
         nodes: [
           {
             name: 'Aggregate',
             type: 'n8n-nodes-base.aggregate',
             parameters: {
-              operation: 'get',
-              resourceId: '123456'
+              aggregate: 'aggregateIndividualFields',
+              fieldsToAggregate: {
+                values: [
+                  {
+                    field: 'email',
+                    renameField: 'email_list'
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'Aggregate All Data',
+      description: 'Combine all item data into arrays organized by field',
+      workflow: {
+        nodes: [
+          {
+            name: 'Aggregate',
+            type: 'n8n-nodes-base.aggregate',
+            parameters: {
+              aggregate: 'aggregateAllItemData',
+              options: {
+                destinationFieldName: 'collected_data'
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      name: 'Aggregate Multiple Fields',
+      description: 'Collect multiple specific fields from all items',
+      workflow: {
+        nodes: [
+          {
+            name: 'Aggregate',
+            type: 'n8n-nodes-base.aggregate',
+            parameters: {
+              aggregate: 'aggregateIndividualFields',
+              fieldsToAggregate: {
+                values: [
+                  {
+                    field: 'name',
+                    renameField: 'user_names'
+                  },
+                  {
+                    field: 'score',
+                    renameField: 'user_scores'
+                  }
+                ]
+              }
             }
           }
         ]

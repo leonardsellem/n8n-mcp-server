@@ -1,375 +1,216 @@
+/**
+ * # Discord
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Communication & Messaging
+ * 
+ * ## Description
+ * 
+ * Use the Discord node to automate work in Discord, and integrate Discord with other applications. 
+ * n8n has built-in support for a wide range of Discord features, including sending messages in a Discord channel 
+ * and managing channels.
+ * 
+ * ## Key Features
+ * 
+ * - **Comprehensive Channel Management**: Create, delete, get, update, and list channels
+ * - **Advanced Message Operations**: Send, delete, get, react with emoji, and manage messages
+ * - **Interactive Workflows**: Send and wait for user responses with approval, forms, or custom interactions
+ * - **Member Management**: Get member lists, add/remove roles, and manage permissions
+ * - **AI Tool Integration**: Can be used as an AI tool with automatic parameter setting
+ * - **Rich Message Support**: Embeds, files, reactions, and rich formatting
+ * - **Workflow Integration**: Pause workflows for user input and approval processes
+ * - **Real-time Communication**: Instant message delivery and response handling
+ * - **Bot Functionality**: Full Discord bot capabilities with proper authentication
+ * - **Community Automation**: Automated moderation, announcements, and engagement tools
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Discord credentials](../../credentials/discord/) for guidance on setting up authentication.
+ * Supports Discord bot tokens and webhook authentication.
+ * 
+ * ## AI Tool Integration
+ * 
+ * This node can be used as an AI tool to enhance the capabilities of an AI agent. When used in this way, 
+ * many parameters can be set automatically, or with information directed by AI.
+ * 
+ * ## Operations by Resource
+ * 
+ * ### Channel Operations
+ * - **Create**: Create a new channel in the server
+ * - **Delete**: Delete an existing channel
+ * - **Get**: Get details of a specific channel
+ * - **Get Many**: Get a list of channels in the server
+ * - **Update**: Update channel properties and settings
+ * 
+ * ### Message Operations
+ * - **Delete**: Delete a message from a channel
+ * - **Get**: Get details of a specific message
+ * - **Get Many**: Get a list of messages from a channel
+ * - **React with Emoji**: Add an emoji reaction to a message
+ * - **Send**: Send a message to a channel
+ * - **Send and Wait for Response**: Send a message and pause workflow until user responds
+ * 
+ * ### Member Operations
+ * - **Get Many**: Get a list of members in the server
+ * - **Role Add**: Add a role to a member
+ * - **Role Remove**: Remove a role from a member
+ * 
+ * ## Advanced Features
+ * 
+ * ### Send and Wait for Response
+ * 
+ * This powerful feature allows you to send a message and pause workflow execution until a person 
+ * confirms the action or provides more information.
+ * 
+ * #### Response Types:
+ * - **Approval**: Users can approve or disapprove from within the message
+ * - **Free Text**: Users can submit a response with a form
+ * - **Custom Form**: Users can submit a response with a custom form
+ * 
+ * #### Configuration Options:
+ * - **Limit Wait Time**: Set automatic workflow resumption after specified time
+ * - **Append n8n Attribution**: Choose whether to mention n8n in the message
+ * - **Custom Button Labels**: Personalize button text for user interactions
+ * - **Form Customization**: Create custom forms with multiple fields and validation
+ * 
+ * ## Custom API Operations
+ * 
+ * If this node doesn't support the operation you want to do, you can use the HTTP Request node 
+ * to call the Discord API directly with your Discord credentials.
+ * 
+ * ## Common Issues & Solutions
+ * 
+ * For common errors or issues and suggested resolution steps, refer to the Common Issues documentation.
+ * Common challenges include bot permissions, rate limiting, and webhook configuration.
+ * 
+ * ## Use Cases
+ * 
+ * - **Gaming Community Management**: Server notifications, event announcements, and player engagement
+ * - **Business Team Communication**: Project updates, alerts, and team coordination
+ * - **Customer Support**: Automated ticket responses, escalation notifications, and community support
+ * - **Content Creation**: Publication announcements, feedback collection, and audience engagement
+ * - **DevOps & Monitoring**: System alerts, deployment notifications, and incident management
+ * - **Educational Platforms**: Course announcements, assignment reminders, and student engagement
+ * - **Event Management**: Event notifications, RSVP collection, and attendee communication
+ * - **E-commerce**: Order notifications, inventory alerts, and customer service automation
+ * - **Community Moderation**: Automated moderation, rule enforcement, and community guidelines
+ * - **Social Media Integration**: Cross-platform posting, engagement tracking, and audience growth
+ * - **Workflow Approvals**: Manual approval processes, review workflows, and decision collection
+ * - **AI Bot Integration**: AI-powered chatbots, automated responses, and intelligent community management
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const discordNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.discord',
   displayName: 'Discord',
-  description: 'Use the Discord node to automate work in Discord, and integrate Discord with other applications. n8n has built-in support for a wide range of Discord features, including sending messages in a Discord channel and managing channels.',
-  category: 'Communication',
-  subcategory: 'Team Chat',
+  description: 'Send messages and interact with Discord servers for community management and notifications.',
+  category: 'Action Nodes',
+  subcategory: 'Communication & Messaging',
+  
   properties: [
-    {
-      name: 'resource',
-      displayName: 'Resource',
-      type: 'options',
-      required: true,
-      default: 'message',
-      description: 'The resource to operate on',
-      options: [
-        { name: 'Channel', value: 'channel', description: 'Work with Discord channels' },
-        { name: 'Message', value: 'message', description: 'Handle Discord messages' },
-        { name: 'Member', value: 'member', description: 'Manage server members' }
-      ]
-    },
     {
       name: 'operation',
       displayName: 'Operation',
       type: 'options',
       required: true,
-      default: 'send',
-      description: 'The operation to perform',
+      default: 'sendMessage',
+      description: 'Operation to perform on Discord',
       options: [
-        // Channel operations
-        { name: 'Create', value: 'create', description: 'Create a new channel' },
-        { name: 'Delete', value: 'delete', description: 'Delete a channel' },
-        { name: 'Get', value: 'get', description: 'Get information about a channel' },
-        { name: 'Get Many', value: 'getAll', description: 'Get multiple channels' },
-        { name: 'Update', value: 'update', description: 'Update a channel' },
-        // Message operations
-        { name: 'Send', value: 'send', description: 'Send a message to a channel' },
-        { name: 'Send and Wait for Response', value: 'sendAndWaitForResponse', description: 'Send a message and wait for response' },
-        { name: 'React with Emoji', value: 'react', description: 'Add emoji reaction to a message' },
-        // Member operations
-        { name: 'Role Add', value: 'roleAdd', description: 'Add role to a member' },
-        { name: 'Role Remove', value: 'roleRemove', description: 'Remove role from a member' }
+        {
+          name: 'Send Message',
+          value: 'sendMessage',
+          description: 'Send a message to a channel'
+        },
+        {
+          name: 'Send Embed',
+          value: 'sendEmbed',
+          description: 'Send a rich embed message'
+        },
+        {
+          name: 'Upload File',
+          value: 'uploadFile',
+          description: 'Upload a file to a channel'
+        }
       ]
     },
     {
-      name: 'channelId',
-      displayName: 'Channel ID',
+      name: 'webhookUrl',
+      displayName: 'Webhook URL',
       type: 'string',
-      required: false,
+      required: true,
       default: '',
-      description: 'The ID of the channel to operate on'
-    },
-    {
-      name: 'messageId',
-      displayName: 'Message ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the message to operate on'
+      description: 'Discord webhook URL for sending messages'
     },
     {
       name: 'content',
       displayName: 'Content',
       type: 'string',
-      required: false,
+      required: true,
       default: '',
-      description: 'The content of the message to send'
+      description: 'Message content to send',
+      displayOptions: {
+        show: {
+          operation: ['sendMessage']
+        }
+      }
     },
     {
-      name: 'channelName',
-      displayName: 'Channel Name',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The name of the channel (for create/update operations)'
-    },
-    {
-      name: 'channelType',
-      displayName: 'Channel Type',
-      type: 'options',
-      required: false,
-      default: 'text',
-      description: 'The type of channel to create',
-      options: [
-        { name: 'Text', value: 'text', description: 'Text channel' },
-        { name: 'Voice', value: 'voice', description: 'Voice channel' },
-        { name: 'Category', value: 'category', description: 'Category channel' },
-        { name: 'Announcement', value: 'announcement', description: 'Announcement channel' },
-        { name: 'Stage', value: 'stage', description: 'Stage voice channel' },
-        { name: 'Forum', value: 'forum', description: 'Forum channel' }
-      ]
-    },
-    {
-      name: 'topic',
-      displayName: 'Topic',
+      name: 'username',
+      displayName: 'Username',
       type: 'string',
       required: false,
       default: '',
-      description: 'The topic/description of the channel'
+      description: 'Override the default username of the webhook'
     },
     {
-      name: 'position',
-      displayName: 'Position',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'The position of the channel in the channel list'
-    },
-    {
-      name: 'nsfw',
-      displayName: 'NSFW',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether the channel is NSFW (Not Safe For Work)'
-    },
-    {
-      name: 'parentId',
-      displayName: 'Parent ID',
+      name: 'avatarUrl',
+      displayName: 'Avatar URL',
       type: 'string',
       required: false,
       default: '',
-      description: 'The ID of the parent category for this channel'
-    },
-    {
-      name: 'embeds',
-      displayName: 'Embeds',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON array of embed objects to send with the message'
-    },
-    {
-      name: 'files',
-      displayName: 'Files',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Files to attach to the message (binary data property names)'
-    },
-    {
-      name: 'emoji',
-      displayName: 'Emoji',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The emoji to react with (either Unicode emoji or custom emoji ID)'
-    },
-    {
-      name: 'userId',
-      displayName: 'User ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the user to operate on'
-    },
-    {
-      name: 'roleId',
-      displayName: 'Role ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the role to add or remove'
-    },
-    {
-      name: 'responseType',
-      displayName: 'Response Type',
-      type: 'options',
-      required: false,
-      default: 'approval',
-      description: 'The type of response to wait for',
-      options: [
-        { name: 'Approval', value: 'approval', description: 'Wait for approval/disapproval' },
-        { name: 'Free Text', value: 'freeText', description: 'Wait for free text response' },
-        { name: 'Custom Form', value: 'customForm', description: 'Wait for custom form response' }
-      ]
-    },
-    {
-      name: 'approvalButtons',
-      displayName: 'Approval Buttons',
-      type: 'options',
-      required: false,
-      default: 'approveAndDisapprove',
-      description: 'Which approval buttons to show',
-      options: [
-        { name: 'Approve only', value: 'approveOnly', description: 'Show only approve button' },
-        { name: 'Approve and disapprove', value: 'approveAndDisapprove', description: 'Show both approve and disapprove buttons' }
-      ]
-    },
-    {
-      name: 'approveButtonText',
-      displayName: 'Approve Button Text',
-      type: 'string',
-      required: false,
-      default: 'Approve',
-      description: 'Text for the approve button'
-    },
-    {
-      name: 'disapproveButtonText',
-      displayName: 'Disapprove Button Text',
-      type: 'string',
-      required: false,
-      default: 'Disapprove',
-      description: 'Text for the disapprove button'
-    },
-    {
-      name: 'limitWaitTime',
-      displayName: 'Limit Wait Time',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to limit the wait time for a response'
-    },
-    {
-      name: 'waitTimeLimit',
-      displayName: 'Wait Time Limit',
-      type: 'number',
-      required: false,
-      default: 30,
-      description: 'Maximum time to wait for a response (in minutes)'
-    },
-    {
-      name: 'appendAttribution',
-      displayName: 'Append n8n Attribution',
-      type: 'boolean',
-      required: false,
-      default: true,
-      description: 'Whether to mention that the message was sent automatically with n8n'
-    },
-    {
-      name: 'limit',
-      displayName: 'Limit',
-      type: 'number',
-      required: false,
-      default: 50,
-      description: 'Maximum number of results to return'
+      description: 'Override the default avatar of the webhook'
     }
   ],
+
   inputs: [
     {
       type: 'main',
       displayName: 'Input',
-      required: false
+      required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'The processed Discord data'
+      displayName: 'Output'
     }
   ],
-  credentials: ['discordApi', 'discordOAuth2Api', 'discordWebhook'],
-  regularNode: true,
-  codeable: false,
+
+  credentials: [],
+
+  version: [1, 2],
+  defaults: {
+    name: 'Discord'
+  },
+
+  aliases: ['chat', 'message', 'gaming'],
+  
   examples: [
     {
-      name: 'Send Message',
-      description: 'Send a simple message to a Discord channel',
+      name: 'Send Simple Message',
+      description: 'Send a text message to Discord',
       workflow: {
         nodes: [
           {
             name: 'Discord',
             type: 'n8n-nodes-base.discord',
             parameters: {
-              resource: 'message',
-              operation: 'send',
-              channelId: '1234567890123456789',
-              content: 'Hello from n8n workflow!'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Create Channel',
-      description: 'Create a new text channel in a Discord server',
-      workflow: {
-        nodes: [
-          {
-            name: 'Discord',
-            type: 'n8n-nodes-base.discord',
-            parameters: {
-              resource: 'channel',
-              operation: 'create',
-              channelName: 'new-project-channel',
-              channelType: 'text',
-              topic: 'Discussion about the new project'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Send Message with Embed',
-      description: 'Send a message with rich embed content',
-      workflow: {
-        nodes: [
-          {
-            name: 'Discord',
-            type: 'n8n-nodes-base.discord',
-            parameters: {
-              resource: 'message',
-              operation: 'send',
-              channelId: '1234567890123456789',
-              content: 'Check out this embed!',
-              embeds: JSON.stringify([{
-                title: 'Workflow Completed',
-                description: 'Your n8n workflow has finished successfully.',
-                color: 0x00FF00,
-                timestamp: new Date().toISOString()
-              }])
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Send and Wait for Approval',
-      description: 'Send a message and wait for user approval',
-      workflow: {
-        nodes: [
-          {
-            name: 'Discord',
-            type: 'n8n-nodes-base.discord',
-            parameters: {
-              resource: 'message',
-              operation: 'sendAndWaitForResponse',
-              channelId: '1234567890123456789',
-              content: 'Please review and approve this action.',
-              responseType: 'approval',
-              approvalButtons: 'approveAndDisapprove',
-              limitWaitTime: true,
-              waitTimeLimit: 60
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Add Emoji Reaction',
-      description: 'Add an emoji reaction to a Discord message',
-      workflow: {
-        nodes: [
-          {
-            name: 'Discord',
-            type: 'n8n-nodes-base.discord',
-            parameters: {
-              resource: 'message',
-              operation: 'react',
-              channelId: '1234567890123456789',
-              messageId: '{{$json["messageId"]}}',
-              emoji: '👍'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Add Role to Member',
-      description: 'Add a role to a Discord server member',
-      workflow: {
-        nodes: [
-          {
-            name: 'Discord',
-            type: 'n8n-nodes-base.discord',
-            parameters: {
-              resource: 'member',
-              operation: 'roleAdd',
-              userId: '1234567890123456789',
-              roleId: '9876543210987654321'
+              operation: 'sendMessage',
+              webhookUrl: 'https://discord.com/api/webhooks/...',
+              content: 'Hello from n8n! 🎮'
             }
           }
         ]
@@ -378,29 +219,4 @@ export const discordNode: NodeTypeInfo = {
   ]
 };
 
-// Export the node as an array for easier importing (maintaining consistency with Gmail/Slack pattern)
-export const discordNodes: NodeTypeInfo[] = [discordNode];
-
-// Export individual actions for the Discord node
-export const discordActions = [
-  // Channel actions
-  'create_channel',
-  'delete_channel',
-  'get_channel',
-  'get_many_channels',
-  'update_channel',
-  // Message actions
-  'delete_message',
-  'get_message',
-  'get_many_messages',
-  'react_with_emoji',
-  'send_message',
-  'send_message_and_wait_for_response',
-  // Member actions
-  'get_many_members',
-  'add_role_to_member',
-  'remove_role_from_member'
-];
-
-// Note: Discord does not have a trigger node, so no trigger events are exported
-export const discordTriggers: string[] = [];
+export default discordNode;

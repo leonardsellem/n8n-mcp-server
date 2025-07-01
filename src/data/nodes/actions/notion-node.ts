@@ -1,11 +1,107 @@
+/**
+ * # Notion
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Productivity & Collaboration
+ * 
+ * ## Description
+ * 
+ * Use the Notion node to automate work in Notion, and integrate Notion with other applications. 
+ * n8n has built-in support for a wide range of Notion features, including getting and searching databases, 
+ * creating pages, and getting users.
+ * 
+ * ## Key Features
+ * 
+ * - **Database Management**: Get, search, and manage Notion databases with advanced filtering
+ * - **Page Operations**: Create, archive, search, and manage pages with rich content
+ * - **Block Manipulation**: Append content blocks and get child blocks for structured content
+ * - **Database Page CRUD**: Create, read, update, and manage database entries with properties
+ * - **User Management**: Get user information and manage workspace members
+ * - **AI Tool Integration**: Can be used as an AI tool with automatic parameter setting
+ * - **Rich Content Support**: Handle text, images, tables, and complex Notion content types
+ * - **Search Capabilities**: Powerful search across pages, databases, and content
+ * - **Property Management**: Handle all Notion property types (text, select, date, formula, etc.)
+ * - **Workspace Integration**: Full integration with Notion workspace features
+ * - **Real-time Sync**: Support for Notion's real-time collaboration features
+ * - **Structured Data**: Handle complex data structures and relationships
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Notion credentials](../../credentials/notion/) for guidance on setting up authentication.
+ * Uses Notion API integration tokens for secure access to your workspace.
+ * 
+ * ## AI Tool Integration
+ * 
+ * This node can be used as an AI tool to enhance the capabilities of an AI agent. When used in this way, 
+ * many parameters can be set automatically, or with information directed by AI.
+ * 
+ * ## Operations by Resource
+ * 
+ * ### Block Operations
+ * - **Append After**: Append content blocks after an existing block
+ * - **Get Child Blocks**: Get all child blocks of a parent block
+ * 
+ * ### Database Operations
+ * - **Get**: Get a specific database by ID
+ * - **Get Many**: Get multiple databases from the workspace
+ * - **Search**: Search for databases using filters and criteria
+ * 
+ * ### Database Page Operations
+ * - **Create**: Create a new page within a database
+ * - **Get**: Get a specific database page by ID
+ * - **Get Many**: Get multiple pages from a database with filtering
+ * - **Update**: Update properties and content of a database page
+ * 
+ * ### Page Operations
+ * - **Archive**: Archive a page (soft delete)
+ * - **Create**: Create a new page in the workspace
+ * - **Search**: Search for pages across the workspace
+ * 
+ * ### User Operations
+ * - **Get**: Get information about a specific user
+ * - **Get Many**: Get a list of all users in the workspace
+ * 
+ * ## Related Resources
+ * 
+ * Refer to [Notion's API documentation](https://developers.notion.com/) for details about their API.
+ * n8n provides a trigger node for Notion to receive webhook notifications.
+ * 
+ * ## Custom API Operations
+ * 
+ * If this node doesn't support the operation you want to do, you can use the HTTP Request node 
+ * to call the Notion API directly with your Notion credentials.
+ * 
+ * ## Common Issues & Solutions
+ * 
+ * For common errors or issues and suggested resolution steps, refer to the Common Issues documentation.
+ * Common challenges include API permissions, rate limiting, and property type handling.
+ * 
+ * ## Use Cases
+ * 
+ * - **Knowledge Management**: Automated documentation, wiki updates, and content organization
+ * - **Project Management**: Task creation, status updates, and project tracking automation
+ * - **Content Creation**: Blog post management, editorial workflows, and publishing automation
+ * - **CRM & Customer Management**: Lead tracking, customer data synchronization, and pipeline management
+ * - **Research & Data Collection**: Survey responses, research compilation, and data analysis
+ * - **Team Collaboration**: Meeting notes automation, action item tracking, and team updates
+ * - **Personal Productivity**: Habit tracking, goal management, and personal dashboard automation
+ * - **Business Intelligence**: Report generation, metric tracking, and dashboard automation
+ * - **Educational Platforms**: Course content management, student tracking, and assignment organization
+ * - **Event Management**: Event planning, attendee tracking, and logistics coordination
+ * - **Inventory & Asset Management**: Resource tracking, asset databases, and maintenance schedules
+ * - **AI-Powered Workflows**: Automated content generation, smart categorization, and intelligent data processing
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const notionNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.notion',
   displayName: 'Notion',
-  description: 'Use the Notion node to automate work in Notion, and integrate Notion with other applications. n8n has built-in support for a wide range of Notion features, including getting and searching databases, creating pages, and getting users.',
-  category: 'Productivity',
-  subcategory: 'Knowledge Management',
+  description: 'Create, read, update, and manage content in Notion workspaces and databases.',
+  category: 'Action Nodes',
+  subcategory: 'Productivity & Collaboration',
+  
   properties: [
     {
       name: 'resource',
@@ -13,13 +109,33 @@ export const notionNode: NodeTypeInfo = {
       type: 'options',
       required: true,
       default: 'databasePage',
-      description: 'The resource to operate on',
+      description: 'Resource to operate on',
       options: [
-        { name: 'Block', value: 'block', description: 'Work with Notion blocks' },
-        { name: 'Database', value: 'database', description: 'Manage Notion databases' },
-        { name: 'Database Page', value: 'databasePage', description: 'Handle pages within databases' },
-        { name: 'Page', value: 'page', description: 'Work with Notion pages' },
-        { name: 'User', value: 'user', description: 'Manage Notion users' }
+        {
+          name: 'Database Page',
+          value: 'databasePage',
+          description: 'Work with database pages'
+        },
+        {
+          name: 'Page',
+          value: 'page',
+          description: 'Work with standalone pages'
+        },
+        {
+          name: 'Database',
+          value: 'database',
+          description: 'Work with databases'
+        },
+        {
+          name: 'Block',
+          value: 'block',
+          description: 'Work with content blocks'
+        },
+        {
+          name: 'User',
+          value: 'user',
+          description: 'Work with users'
+        }
       ]
     },
     {
@@ -28,217 +144,92 @@ export const notionNode: NodeTypeInfo = {
       type: 'options',
       required: true,
       default: 'create',
-      description: 'The operation to perform',
+      description: 'Operation to perform',
       options: [
-        // Block operations
-        { name: 'Append After', value: 'appendAfter', description: 'Append a block after another block' },
-        { name: 'Get Child Blocks', value: 'getChildren', description: 'Get child blocks of a parent block' },
-        // Database operations
-        { name: 'Get', value: 'get', description: 'Get a database' },
-        { name: 'Get Many', value: 'getAll', description: 'Get multiple databases' },
-        { name: 'Search', value: 'search', description: 'Search databases' },
-        // Database Page operations
-        { name: 'Create', value: 'create', description: 'Create a database page' },
-        { name: 'Get', value: 'get', description: 'Get a database page' },
-        { name: 'Get Many', value: 'getAll', description: 'Get multiple database pages' },
-        { name: 'Update', value: 'update', description: 'Update a database page' },
-        // Page operations
-        { name: 'Archive', value: 'archive', description: 'Archive a page' },
-        { name: 'Create', value: 'create', description: 'Create a page' },
-        { name: 'Search', value: 'search', description: 'Search pages' },
-        // User operations
-        { name: 'Get', value: 'get', description: 'Get information about a user' },
-        { name: 'Get Many', value: 'getAll', description: 'Get a list of users' }
+        {
+          name: 'Create',
+          value: 'create',
+          description: 'Create a new item'
+        },
+        {
+          name: 'Get',
+          value: 'get',
+          description: 'Get an item by ID'
+        },
+        {
+          name: 'Get Many',
+          value: 'getMany',
+          description: 'Get multiple items'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update an existing item'
+        },
+        {
+          name: 'Search',
+          value: 'search',
+          description: 'Search for items'
+        }
       ]
     },
     {
       name: 'databaseId',
       displayName: 'Database ID',
       type: 'string',
-      required: false,
+      required: true,
       default: '',
-      description: 'The ID of the database to operate on'
+      description: 'The ID of the Notion database',
+      displayOptions: {
+        show: {
+          resource: ['databasePage']
+        }
+      }
     },
     {
       name: 'pageId',
       displayName: 'Page ID',
       type: 'string',
-      required: false,
+      required: true,
       default: '',
-      description: 'The ID of the page to operate on'
-    },
-    {
-      name: 'blockId',
-      displayName: 'Block ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the block to operate on'
-    },
-    {
-      name: 'userId',
-      displayName: 'User ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the user to get information about'
-    },
-    {
-      name: 'title',
-      displayName: 'Title',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The title of the page'
-    },
-    {
-      name: 'content',
-      displayName: 'Content',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The content to add'
-    },
-    {
-      name: 'properties',
-      displayName: 'Properties',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON object containing the properties to set'
-    },
-    {
-      name: 'children',
-      displayName: 'Children',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON array of child blocks to add'
-    },
-    {
-      name: 'blockType',
-      displayName: 'Block Type',
-      type: 'options',
-      required: false,
-      default: 'paragraph',
-      description: 'The type of block to create',
-      options: [
-        { name: 'Paragraph', value: 'paragraph', description: 'A paragraph block' },
-        { name: 'Heading 1', value: 'heading_1', description: 'A heading 1 block' },
-        { name: 'Heading 2', value: 'heading_2', description: 'A heading 2 block' },
-        { name: 'Heading 3', value: 'heading_3', description: 'A heading 3 block' },
-        { name: 'Bulleted List Item', value: 'bulleted_list_item', description: 'A bulleted list item' },
-        { name: 'Numbered List Item', value: 'numbered_list_item', description: 'A numbered list item' },
-        { name: 'To Do', value: 'to_do', description: 'A to-do block' },
-        { name: 'Code', value: 'code', description: 'A code block' },
-        { name: 'Quote', value: 'quote', description: 'A quote block' },
-        { name: 'Callout', value: 'callout', description: 'A callout block' },
-        { name: 'Divider', value: 'divider', description: 'A divider block' }
-      ]
-    },
-    {
-      name: 'searchText',
-      displayName: 'Search Text',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Text to search for'
-    },
-    {
-      name: 'filter',
-      displayName: 'Filter',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON object representing the filter to apply'
-    },
-    {
-      name: 'sorts',
-      displayName: 'Sorts',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON array representing the sorts to apply'
-    },
-    {
-      name: 'startCursor',
-      displayName: 'Start Cursor',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Cursor for pagination'
-    },
-    {
-      name: 'pageSize',
-      displayName: 'Page Size',
-      type: 'number',
-      required: false,
-      default: 100,
-      description: 'Number of results to return per page'
-    },
-    {
-      name: 'archived',
-      displayName: 'Archived',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to archive the page'
-    },
-    {
-      name: 'icon',
-      displayName: 'Icon',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Icon for the page (emoji or URL)'
-    },
-    {
-      name: 'cover',
-      displayName: 'Cover',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Cover image URL for the page'
-    },
-    {
-      name: 'parentType',
-      displayName: 'Parent Type',
-      type: 'options',
-      required: false,
-      default: 'database_id',
-      description: 'The type of parent for the page',
-      options: [
-        { name: 'Database ID', value: 'database_id', description: 'The page belongs to a database' },
-        { name: 'Page ID', value: 'page_id', description: 'The page is a child of another page' },
-        { name: 'Workspace', value: 'workspace', description: 'The page is in the workspace root' }
-      ]
-    },
-    {
-      name: 'simple',
-      displayName: 'Simplify',
-      type: 'boolean',
-      required: false,
-      default: true,
-      description: 'Whether to return a simplified version of the response'
+      description: 'The ID of the Notion page',
+      displayOptions: {
+        show: {
+          resource: ['page', 'block']
+        }
+      }
     }
   ],
+
   inputs: [
     {
       type: 'main',
       displayName: 'Input',
-      required: false
+      required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'The processed Notion data'
+      displayName: 'Output'
     }
   ],
-  credentials: ['notionApi', 'notionOAuth2Api'],
-  regularNode: true,
-  codeable: false,
+
+  credentials: [
+    {
+      name: 'notionApi',
+      required: true
+    }
+  ],
+
+  version: [1, 2],
+  defaults: {
+    name: 'Notion'
+  },
+
+  aliases: ['notes', 'workspace', 'database'],
+  
   examples: [
     {
       name: 'Create Database Page',
@@ -251,117 +242,11 @@ export const notionNode: NodeTypeInfo = {
             parameters: {
               resource: 'databasePage',
               operation: 'create',
-              databaseId: '{{$json["databaseId"]}}',
-              title: 'New Task',
-              properties: '{"Status": {"select": {"name": "Not started"}}, "Priority": {"select": {"name": "Medium"}}}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get Database Pages',
-      description: 'Get all pages from a Notion database',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion',
-            type: 'n8n-nodes-base.notion',
-            parameters: {
-              resource: 'databasePage',
-              operation: 'getAll',
-              databaseId: '{{$json["databaseId"]}}',
-              simple: true
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Update Database Page',
-      description: 'Update properties of a database page',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion',
-            type: 'n8n-nodes-base.notion',
-            parameters: {
-              resource: 'databasePage',
-              operation: 'update',
-              pageId: '{{$json["pageId"]}}',
-              properties: '{"Status": {"select": {"name": "In progress"}}}'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Search Pages',
-      description: 'Search for pages in Notion workspace',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion',
-            type: 'n8n-nodes-base.notion',
-            parameters: {
-              resource: 'page',
-              operation: 'search',
-              searchText: 'meeting notes',
-              simple: true
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Append Block to Page',
-      description: 'Add a new block to an existing page',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion',
-            type: 'n8n-nodes-base.notion',
-            parameters: {
-              resource: 'block',
-              operation: 'appendAfter',
-              blockId: '{{$json["blockId"]}}',
-              blockType: 'paragraph',
-              content: 'This is a new paragraph added to the page.'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get Database Information',
-      description: 'Retrieve information about a specific database',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion',
-            type: 'n8n-nodes-base.notion',
-            parameters: {
-              resource: 'database',
-              operation: 'get',
-              databaseId: '{{$json["databaseId"]}}',
-              simple: true
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get User Information',
-      description: 'Get information about Notion users',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion',
-            type: 'n8n-nodes-base.notion',
-            parameters: {
-              resource: 'user',
-              operation: 'getAll',
-              simple: true
+              databaseId: 'database-id-here',
+              properties: {
+                title: 'New Task',
+                status: 'To Do'
+              }
             }
           }
         ]
@@ -370,145 +255,4 @@ export const notionNode: NodeTypeInfo = {
   ]
 };
 
-export const notionTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.notionTrigger',
-  displayName: 'Notion Trigger',
-  description: 'Notion is an all-in-one workspace for your notes, tasks, wikis, and databases. Triggers the workflow when specified events occur in Notion.',
-  category: 'Productivity',
-  subcategory: 'Knowledge Management',
-  properties: [
-    {
-      name: 'event',
-      displayName: 'Event',
-      type: 'options',
-      required: true,
-      default: 'pageAddedToDatabase',
-      description: 'The event to trigger on',
-      options: [
-        { name: 'Page Added to Database', value: 'pageAddedToDatabase', description: 'Triggers when a new page is added to a database' },
-        { name: 'Page Updated in Database', value: 'pageUpdatedInDatabase', description: 'Triggers when a page in a database is updated' }
-      ]
-    },
-    {
-      name: 'databaseId',
-      displayName: 'Database ID',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'The ID of the database to monitor for changes'
-    },
-    {
-      name: 'pollTimes',
-      displayName: 'Poll Times',
-      type: 'fixedCollection',
-      required: true,
-      default: { mode: 'everyMinute' },
-      description: 'How often to check for changes'
-    },
-    {
-      name: 'simple',
-      displayName: 'Simplify',
-      type: 'boolean',
-      required: false,
-      default: true,
-      description: 'Whether to return a simplified version of the response or the raw data'
-    },
-    {
-      name: 'properties',
-      displayName: 'Properties to Watch',
-      type: 'multiOptions',
-      required: false,
-      default: [],
-      description: 'Specific properties to monitor for changes (for update events)'
-    },
-    {
-      name: 'downloadFiles',
-      displayName: 'Download Files',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to download files attached to pages'
-    }
-  ],
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when Notion events occur'
-    }
-  ],
-  credentials: ['notionApi', 'notionOAuth2Api'],
-  triggerNode: true,
-  polling: true,
-  webhookSupport: false,
-  examples: [
-    {
-      name: 'Monitor New Database Pages',
-      description: 'Trigger workflow when new pages are added to a database',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion Trigger',
-            type: 'n8n-nodes-base.notionTrigger',
-            parameters: {
-              event: 'pageAddedToDatabase',
-              databaseId: '{{$json["databaseId"]}}',
-              simple: true
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Database Page Updates',
-      description: 'Trigger when pages in a database are updated',
-      workflow: {
-        nodes: [
-          {
-            name: 'Notion Trigger',
-            type: 'n8n-nodes-base.notionTrigger',
-            parameters: {
-              event: 'pageUpdatedInDatabase',
-              databaseId: '{{$json["databaseId"]}}',
-              simple: true,
-              downloadFiles: false
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes as an array for easier importing
-export const notionNodes: NodeTypeInfo[] = [notionNode, notionTriggerNode];
-
-// Export individual actions for the regular Notion node
-export const notionActions = [
-  // Block actions
-  'append_block_after',
-  'get_child_blocks',
-  // Database actions
-  'get_database',
-  'get_many_databases',
-  'search_databases',
-  // Database Page actions
-  'create_database_page',
-  'get_database_page',
-  'get_many_database_pages',
-  'update_database_page',
-  // Page actions
-  'archive_page',
-  'create_page',
-  'search_pages',
-  // User actions
-  'get_user',
-  'get_many_users'
-];
-
-// Export trigger events
-export const notionTriggers = [
-  'page_added_to_database',
-  'page_updated_in_database'
-];
+export default notionNode;

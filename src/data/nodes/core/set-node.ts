@@ -1,8 +1,50 @@
 /**
- * Edit Fields (Set) Node
+ * # Edit Fields (Set)
  * 
- * Use the Edit Fields node to set workflow data. This node can set new data as well as 
- * overwrite data that already exists. Supports both manual field mapping and JSON output modes.
+ * **Status**: ✅ Active
+ * **Category**: Core Nodes
+ * **Subcategory**: Data Transformation
+ * 
+ * ## Description
+ * 
+ * Use the Edit Fields node to set workflow data. This node can set new data as well as overwrite data that already exists. 
+ * This node is crucial in workflows which expect incoming data from previous nodes, such as when inserting values to Google Sheets or databases.
+ * 
+ * ## Key Features
+ * 
+ * - **Two Modes**: Manual Mapping (GUI) and JSON Output (code)
+ * - **Drag & Drop Support**: GUI interface for easy field mapping
+ * - **Expression Support**: Dynamic field values using n8n expressions
+ * - **Dot Notation**: Create nested objects automatically (user.name → {user: {name: value}})
+ * - **Type Conversion**: Automatic data type handling with error tolerance
+ * - **Binary Data**: Optional inclusion of binary data in output
+ * - **Field Filtering**: Keep only set fields or include all input data
+ * - **Fixed/Expression Toggle**: Switch between static values and dynamic expressions
+ * 
+ * ## Modes
+ * 
+ * ### Manual Mapping
+ * - Use GUI with drag and drop from INPUT panel
+ * - Set field names and values individually
+ * - Fixed/Expression toggle for each field
+ * - Support for dot notation to create nested structures
+ * 
+ * ### JSON Output
+ * - Write JSON directly with expressions
+ * - Support for arrays and complex nested structures
+ * - Full JavaScript expression support within JSON
+ * - Control over input data inclusion
+ * 
+ * ## Use Cases
+ * 
+ * - Transform data for API integrations
+ * - Add calculated fields and timestamps
+ * - Rename or restructure data fields
+ * - Format data for databases or spreadsheets
+ * - Create complex nested object structures
+ * - Clean and normalize incoming data
+ * - Conditional field mapping based on input values
+ * - Data enrichment and augmentation
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
@@ -10,8 +52,8 @@ import { NodeTypeInfo } from '../../node-types.js';
 export const setNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.set',
   displayName: 'Edit Fields (Set)',
-  description: 'Modify, add, or remove data from your workflow. Transform data fields, add new properties, rename fields, or restructure your data format.',
-  category: 'Core',
+  description: 'Set workflow data by creating new fields or overwriting existing ones. Essential for data transformation and API preparation.',
+  category: 'Core Nodes',
   subcategory: 'Data Transformation',
 
   properties: [

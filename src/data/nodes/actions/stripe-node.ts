@@ -1,11 +1,187 @@
+/**
+ * # Stripe
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Payments & E-commerce
+ * 
+ * ## Description
+ * 
+ * Use the Stripe node to automate work in Stripe, and integrate Stripe with other applications. 
+ * n8n has built-in support for a wide range of Stripe features, including getting balance, 
+ * creating charges, managing customers, and handling payment methods.
+ * 
+ * ## Key Features
+ * 
+ * - **Payment Processing**: Create and manage charges, payments, and transactions
+ * - **Customer Management**: Complete customer lifecycle management and payment methods
+ * - **Balance Management**: Monitor account balance and transaction history
+ * - **Coupon & Discount Management**: Create and manage promotional codes and discounts
+ * - **Payment Method Management**: Handle cards, sources, and payment tokens securely
+ * - **Subscription Support**: Manage recurring billing and subscription payments
+ * - **Webhook Integration**: Receive real-time notifications about payment events
+ * - **Multi-currency Support**: Process payments in multiple currencies worldwide
+ * - **Fraud Prevention**: Built-in fraud detection and prevention mechanisms
+ * - **PCI Compliance**: Secure payment processing with PCI DSS compliance
+ * - **Mobile Payments**: Support for mobile wallets and contactless payments
+ * - **International Markets**: Global payment processing with local payment methods
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Stripe credentials](../../credentials/stripe/) for guidance on setting up authentication.
+ * Uses Stripe API keys (secret keys) for secure access to your Stripe account.
+ * 
+ * ## Operations by Resource
+ * 
+ * ### Balance Operations
+ * - **Get Balance**: Retrieve current account balance and available funds
+ *   - View available balance by currency
+ *   - Check pending balance from recent transactions
+ *   - Monitor connect account balances
+ *   - Track reserve balances and holds
+ * 
+ * ### Charge Operations
+ * - **Create Charge**: Process one-time payments and charges
+ *   - Accept credit cards, debit cards, and digital wallets
+ *   - Set custom amounts and currency
+ *   - Add metadata and description for tracking
+ *   - Handle 3D Secure authentication
+ * - **Get Charge**: Retrieve specific charge details by ID
+ *   - Access payment status and transaction details
+ *   - View dispute and refund information
+ *   - Check fraud detection results
+ * - **Get All Charges**: List and filter all charges
+ *   - Filter by date range, customer, or status
+ *   - Paginate through large transaction volumes
+ *   - Export transaction data for reporting
+ * - **Update Charge**: Modify charge metadata and details
+ *   - Update description and metadata
+ *   - Add shipping and receipt information
+ *   - Modify fraud detection settings
+ * 
+ * ### Customer Operations
+ * - **Create Customer**: Add new customers to your Stripe account
+ *   - Store customer contact information
+ *   - Set default payment methods
+ *   - Add custom metadata and tags
+ *   - Configure tax information
+ * - **Get Customer**: Retrieve specific customer information by ID
+ *   - Access customer profile and payment history
+ *   - View attached payment methods
+ *   - Check subscription status
+ * - **Get All Customers**: List and search all customers
+ *   - Filter by creation date or metadata
+ *   - Search by email or name
+ *   - Export customer databases
+ * - **Update Customer**: Modify existing customer information
+ *   - Update contact details and preferences
+ *   - Change default payment methods
+ *   - Modify subscription settings
+ * - **Delete Customer**: Remove customers from your account
+ *   - Safely delete customer data
+ *   - Handle data privacy compliance
+ *   - Archive transaction history
+ * 
+ * ### Customer Card Operations
+ * - **Add Customer Card**: Attach payment methods to customers
+ *   - Add credit cards, debit cards, and bank accounts
+ *   - Set default payment methods
+ *   - Verify card information
+ * - **Get Customer Card**: Retrieve specific payment method details
+ *   - Access card brand, last 4 digits, and expiry
+ *   - Check verification status
+ *   - View usage history
+ * - **Remove Customer Card**: Delete payment methods from customers
+ *   - Safely remove expired or invalid cards
+ *   - Handle payment method updates
+ *   - Maintain payment history
+ * 
+ * ### Coupon Operations
+ * - **Create Coupon**: Create promotional codes and discounts
+ *   - Set percentage or fixed amount discounts
+ *   - Configure usage limits and expiration dates
+ *   - Create one-time or recurring discounts
+ * - **Get All Coupons**: List and manage all promotional codes
+ *   - View active and expired coupons
+ *   - Track usage statistics
+ *   - Export coupon performance data
+ * 
+ * ### Source Operations
+ * - **Create Source**: Generate payment sources for various methods
+ *   - Support ACH, SEPA, and other bank transfers
+ *   - Handle alternative payment methods
+ *   - Create reusable payment sources
+ * - **Get Source**: Retrieve source details and status
+ *   - Check payment method verification
+ *   - Monitor transaction status
+ *   - Access source metadata
+ * - **Delete Source**: Remove payment sources
+ *   - Clean up unused payment methods
+ *   - Handle customer payment updates
+ *   - Maintain security compliance
+ * 
+ * ### Token Operations
+ * - **Create Token**: Generate secure payment tokens
+ *   - Tokenize credit card information
+ *   - Create bank account tokens
+ *   - Generate one-time use tokens for security
+ * 
+ * ## Security Features
+ * 
+ * - **PCI DSS Compliance**: Stripe handles all PCI compliance requirements
+ * - **Tokenization**: Secure card data with tokenization
+ * - **3D Secure**: Strong customer authentication for European regulations
+ * - **Fraud Detection**: Machine learning-powered fraud prevention
+ * - **Encryption**: End-to-end encryption for all sensitive data
+ * 
+ * ## Related Resources
+ * 
+ * Refer to Stripe's API documentation for more information about the service.
+ * n8n provides trigger nodes for Stripe to receive webhook notifications about payment events.
+ * 
+ * ## Custom API Operations
+ * 
+ * If this node doesn't support the operation you want to do, you can use the HTTP Request node 
+ * to call the Stripe API directly with your Stripe credentials.
+ * 
+ * ## Common Issues & Solutions
+ * 
+ * For common errors or issues and suggested resolution steps, refer to the Common Issues documentation.
+ * Common challenges include webhook handling, payment method validation, and currency conversion.
+ * 
+ * ## Use Cases
+ * 
+ * - **E-commerce Payment Processing**: Accept payments for online stores and marketplaces
+ * - **Subscription Billing**: Automate recurring billing for SaaS and membership sites
+ * - **Invoice Automation**: Generate and send invoices with payment links
+ * - **Donation Processing**: Handle charitable donations and fundraising campaigns
+ * - **Event Ticketing**: Process payments for events, conferences, and workshops
+ * - **Marketplace Payments**: Facilitate payments between buyers and sellers
+ * - **Mobile App Monetization**: Handle in-app purchases and premium features
+ * - **Freelancer Payments**: Process payments for gig work and professional services
+ * - **Course Sales**: Sell online courses and educational content
+ * - **Product Pre-orders**: Handle pre-order payments and inventory management
+ * - **Refund Management**: Automate refund processing and customer service
+ * - **Payment Analytics**: Track revenue, conversion rates, and payment trends
+ * - **Customer Retention**: Manage failed payments and dunning management
+ * - **Tax Calculation**: Automatically calculate and collect taxes
+ * - **Multi-tenant Platforms**: Handle payments for platform businesses
+ * - **International Expansion**: Process payments in multiple currencies and regions
+ * - **Fraud Prevention**: Monitor and prevent fraudulent transactions
+ * - **Compliance Management**: Ensure PCI DSS and regulatory compliance
+ * - **Financial Reporting**: Generate detailed financial reports and analytics
+ * - **Customer Support**: Handle payment disputes and customer inquiries
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const stripeNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.stripe',
   displayName: 'Stripe',
-  description: 'Use the Stripe node to automate work in Stripe, and integrate Stripe with other applications. n8n has built-in support for a wide range of Stripe features, including getting balance, creating charges, and deleting customers.',
-  category: 'Finance & Accounting',
-  subcategory: 'Payment Processing',
+  description: 'Process payments, manage customers, and handle financial transactions with Stripe.',
+  category: 'Action Nodes',
+  subcategory: 'Payments & E-commerce',
+  
   properties: [
     {
       name: 'resource',
@@ -13,15 +189,43 @@ export const stripeNode: NodeTypeInfo = {
       type: 'options',
       required: true,
       default: 'charge',
-      description: 'The resource to operate on',
+      description: 'Resource to operate on',
       options: [
-        { name: 'Balance', value: 'balance', description: 'Work with account balance' },
-        { name: 'Charge', value: 'charge', description: 'Handle payment charges' },
-        { name: 'Coupon', value: 'coupon', description: 'Manage discount coupons' },
-        { name: 'Customer', value: 'customer', description: 'Manage customers' },
-        { name: 'Customer Card', value: 'customerCard', description: 'Manage customer payment methods' },
-        { name: 'Source', value: 'source', description: 'Handle payment sources' },
-        { name: 'Token', value: 'token', description: 'Create payment tokens' }
+        {
+          name: 'Balance',
+          value: 'balance',
+          description: 'Work with account balance'
+        },
+        {
+          name: 'Charge',
+          value: 'charge',
+          description: 'Work with charges and payments'
+        },
+        {
+          name: 'Customer',
+          value: 'customer',
+          description: 'Work with customers'
+        },
+        {
+          name: 'Customer Card',
+          value: 'customerCard',
+          description: 'Work with customer payment methods'
+        },
+        {
+          name: 'Coupon',
+          value: 'coupon',
+          description: 'Work with coupons and discounts'
+        },
+        {
+          name: 'Source',
+          value: 'source',
+          description: 'Work with payment sources'
+        },
+        {
+          name: 'Token',
+          value: 'token',
+          description: 'Work with payment tokens'
+        }
       ]
     },
     {
@@ -29,189 +233,71 @@ export const stripeNode: NodeTypeInfo = {
       displayName: 'Operation',
       type: 'options',
       required: true,
-      default: 'create',
-      description: 'The operation to perform',
+      default: 'get',
+      description: 'Operation to perform',
       options: [
-        // Balance operations
-        { name: 'Get', value: 'get', description: 'Get account balance' },
-        // Charge operations
-        { name: 'Create', value: 'create', description: 'Create a new charge' },
-        { name: 'Get', value: 'get', description: 'Get a charge' },
-        { name: 'Update', value: 'update', description: 'Update a charge' },
-        { name: 'Get All', value: 'getAll', description: 'Get all charges' },
-        // Coupon operations
-        { name: 'Create', value: 'create', description: 'Create a coupon' },
-        { name: 'Get All', value: 'getAll', description: 'Get all coupons' },
-        { name: 'Get', value: 'get', description: 'Get a coupon' },
-        { name: 'Delete', value: 'delete', description: 'Delete a coupon' },
-        // Customer operations
-        { name: 'Create', value: 'create', description: 'Create a customer' },
-        { name: 'Delete', value: 'delete', description: 'Delete a customer' },
-        { name: 'Get', value: 'get', description: 'Get a customer' },
-        { name: 'Get All', value: 'getAll', description: 'Get all customers' },
-        { name: 'Update', value: 'update', description: 'Update a customer' },
-        // Customer Card operations
-        { name: 'Add', value: 'add', description: 'Add a customer card' },
-        { name: 'Get', value: 'get', description: 'Get a customer card' },
-        { name: 'Remove', value: 'remove', description: 'Remove a customer card' },
-        // Source operations
-        { name: 'Create', value: 'create', description: 'Create a source' },
-        { name: 'Delete', value: 'delete', description: 'Delete a source' },
-        { name: 'Get', value: 'get', description: 'Get a source' },
-        // Token operations
-        { name: 'Create', value: 'create', description: 'Create a token' }
+        {
+          name: 'Create',
+          value: 'create',
+          description: 'Create a new record'
+        },
+        {
+          name: 'Get',
+          value: 'get',
+          description: 'Get a record by ID'
+        },
+        {
+          name: 'Get All',
+          value: 'getAll',
+          description: 'Get all records'
+        },
+        {
+          name: 'Update',
+          value: 'update',
+          description: 'Update an existing record'
+        },
+        {
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete a record'
+        }
       ]
-    },
-    {
-      name: 'amount',
-      displayName: 'Amount',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'Amount to charge in cents'
-    },
-    {
-      name: 'currency',
-      displayName: 'Currency',
-      type: 'string',
-      required: false,
-      default: 'USD',
-      description: 'Three-letter ISO currency code'
-    },
-    {
-      name: 'customerId',
-      displayName: 'Customer ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the customer to operate on'
-    },
-    {
-      name: 'chargeId',
-      displayName: 'Charge ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the charge to operate on'
-    },
-    {
-      name: 'sourceId',
-      displayName: 'Source ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the payment source'
-    },
-    {
-      name: 'tokenId',
-      displayName: 'Token ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the token'
-    },
-    {
-      name: 'couponId',
-      displayName: 'Coupon ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the coupon'
-    },
-    {
-      name: 'cardId',
-      displayName: 'Card ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the card to operate on'
-    },
-    {
-      name: 'description',
-      displayName: 'Description',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Description for the operation'
-    },
-    {
-      name: 'email',
-      displayName: 'Email',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Customer email address'
-    },
-    {
-      name: 'name',
-      displayName: 'Name',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Customer or item name'
-    },
-    {
-      name: 'source',
-      displayName: 'Source',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Payment source (token, card, etc.)'
-    },
-    {
-      name: 'receipt_email',
-      displayName: 'Receipt Email',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Email address to send receipt to'
-    },
-    {
-      name: 'metadata',
-      displayName: 'Metadata',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'JSON string of metadata key-value pairs'
-    },
-    {
-      name: 'capture',
-      displayName: 'Capture',
-      type: 'boolean',
-      required: false,
-      default: true,
-      description: 'Whether to immediately capture the charge'
-    },
-    {
-      name: 'limit',
-      displayName: 'Limit',
-      type: 'number',
-      required: false,
-      default: 100,
-      description: 'Maximum number of results to return'
     }
   ],
+
   inputs: [
     {
       type: 'main',
       displayName: 'Input',
-      required: false
+      required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'The processed Stripe data'
+      displayName: 'Output'
     }
   ],
-  credentials: ['stripeApi'],
-  regularNode: true,
-  codeable: false,
+
+  credentials: [
+    {
+      name: 'stripeApi',
+      required: true
+    }
+  ],
+
+  version: [1, 2],
+  defaults: {
+    name: 'Stripe'
+  },
+
+  aliases: ['payments', 'billing', 'ecommerce', 'transactions'],
+  
   examples: [
     {
       name: 'Create Charge',
-      description: 'Create a new payment charge',
+      description: 'Process a payment with Stripe',
       workflow: {
         nodes: [
           {
@@ -221,63 +307,9 @@ export const stripeNode: NodeTypeInfo = {
               resource: 'charge',
               operation: 'create',
               amount: 2000,
-              currency: 'USD',
+              currency: 'usd',
               source: 'tok_visa',
-              description: 'Test charge from n8n'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Create Customer',
-      description: 'Create a new customer in Stripe',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe',
-            type: 'n8n-nodes-base.stripe',
-            parameters: {
-              resource: 'customer',
-              operation: 'create',
-              email: 'customer@example.com',
-              name: 'John Doe',
-              description: 'Customer created via n8n'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Get Balance',
-      description: 'Get account balance from Stripe',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe',
-            type: 'n8n-nodes-base.stripe',
-            parameters: {
-              resource: 'balance',
-              operation: 'get'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Create Coupon',
-      description: 'Create a discount coupon',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe',
-            type: 'n8n-nodes-base.stripe',
-            parameters: {
-              resource: 'coupon',
-              operation: 'create',
-              couponId: 'SAVE20',
-              name: '20% Off',
-              description: 'Save 20% on your order'
+              description: 'Test payment'
             }
           }
         ]
@@ -286,169 +318,4 @@ export const stripeNode: NodeTypeInfo = {
   ]
 };
 
-export const stripeTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.stripeTrigger',
-  displayName: 'Stripe Trigger',
-  description: 'Use the Stripe Trigger node to respond to events in Stripe and integrate Stripe with other applications. n8n has built-in support for a wide range of Stripe events, including new charges, customer updates, and payment failures.',
-  category: 'Finance & Accounting',
-  subcategory: 'Payment Processing',
-  properties: [
-    {
-      name: 'events',
-      displayName: 'Events',
-      type: 'multiOptions',
-      required: true,
-      default: ['charge.succeeded'],
-      description: 'The events to trigger on',
-      options: [
-        { name: 'Charge Failed', value: 'charge.failed', description: 'Triggered when a charge fails' },
-        { name: 'Charge Succeeded', value: 'charge.succeeded', description: 'Triggered when a charge succeeds' },
-        { name: 'Charge Updated', value: 'charge.updated', description: 'Triggered when a charge is updated' },
-        { name: 'Customer Created', value: 'customer.created', description: 'Triggered when a customer is created' },
-        { name: 'Customer Deleted', value: 'customer.deleted', description: 'Triggered when a customer is deleted' },
-        { name: 'Customer Updated', value: 'customer.updated', description: 'Triggered when a customer is updated' },
-        { name: 'Invoice Payment Failed', value: 'invoice.payment_failed', description: 'Triggered when an invoice payment fails' },
-        { name: 'Invoice Payment Succeeded', value: 'invoice.payment_succeeded', description: 'Triggered when an invoice payment succeeds' },
-        { name: 'Payment Intent Succeeded', value: 'payment_intent.succeeded', description: 'Triggered when a payment intent succeeds' },
-        { name: 'Payment Intent Failed', value: 'payment_intent.payment_failed', description: 'Triggered when a payment intent fails' },
-        { name: 'Subscription Created', value: 'customer.subscription.created', description: 'Triggered when a subscription is created' },
-        { name: 'Subscription Updated', value: 'customer.subscription.updated', description: 'Triggered when a subscription is updated' },
-        { name: 'Subscription Deleted', value: 'customer.subscription.deleted', description: 'Triggered when a subscription is deleted' }
-      ]
-    },
-    {
-      name: 'endpoint',
-      displayName: 'Webhook Endpoint',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The webhook endpoint URL (automatically generated)'
-    }
-  ],
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when Stripe events occur'
-    }
-  ],
-  credentials: ['stripeApi'],
-  triggerNode: true,
-  polling: false,
-  webhookSupport: true,
-  examples: [
-    {
-      name: 'Monitor Successful Payments',
-      description: 'Trigger workflow when charges succeed',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe Trigger',
-            type: 'n8n-nodes-base.stripeTrigger',
-            parameters: {
-              events: ['charge.succeeded']
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Customer Events',
-      description: 'Trigger when customers are created or updated',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe Trigger',
-            type: 'n8n-nodes-base.stripeTrigger',
-            parameters: {
-              events: ['customer.created', 'customer.updated']
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Payment Failures',
-      description: 'Trigger when charges or payment intents fail',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe Trigger',
-            type: 'n8n-nodes-base.stripeTrigger',
-            parameters: {
-              events: ['charge.failed', 'payment_intent.payment_failed']
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Subscription Changes',
-      description: 'Trigger when subscriptions are created, updated, or deleted',
-      workflow: {
-        nodes: [
-          {
-            name: 'Stripe Trigger',
-            type: 'n8n-nodes-base.stripeTrigger',
-            parameters: {
-              events: ['customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted']
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes as an array for easier importing
-export const stripeNodes: NodeTypeInfo[] = [stripeNode, stripeTriggerNode];
-
-// Export individual actions for the regular Stripe node
-export const stripeActions = [
-  // Balance actions
-  'get_balance',
-  // Charge actions
-  'create_charge',
-  'get_charge',
-  'update_charge',
-  'get_all_charges',
-  // Coupon actions
-  'create_coupon',
-  'get_all_coupons',
-  'get_coupon',
-  'delete_coupon',
-  // Customer actions
-  'create_customer',
-  'delete_customer',
-  'get_customer',
-  'get_all_customers',
-  'update_customer',
-  // Customer Card actions
-  'add_customer_card',
-  'get_customer_card',
-  'remove_customer_card',
-  // Source actions
-  'create_source',
-  'delete_source',
-  'get_source',
-  // Token actions
-  'create_token'
-];
-
-// Export trigger events
-export const stripeTriggers = [
-  'charge_failed',
-  'charge_succeeded',
-  'charge_updated',
-  'customer_created',
-  'customer_deleted',
-  'customer_updated',
-  'invoice_payment_failed',
-  'invoice_payment_succeeded',
-  'payment_intent_succeeded',
-  'payment_intent_failed',
-  'subscription_created',
-  'subscription_updated',
-  'subscription_deleted'
-];
+export default stripeNode;

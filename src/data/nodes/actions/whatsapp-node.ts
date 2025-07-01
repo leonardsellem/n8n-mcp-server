@@ -1,11 +1,242 @@
+/**
+ * # WhatsApp Business Cloud
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Communication & Messaging
+ * 
+ * ## Description
+ * 
+ * Use the WhatsApp Business Cloud node to automate work in WhatsApp Business and integrate 
+ * WhatsApp Business with other applications. n8n has built-in support for a wide range of 
+ * WhatsApp Business features, including sending messages, uploading, downloading, and deleting media.
+ * 
+ * ## Key Features
+ * 
+ * - **Message Operations**: Send messages and templates with rich formatting
+ * - **Interactive Messaging**: Send and wait for responses with custom forms
+ * - **Media Management**: Upload, download, and delete media files
+ * - **Template Support**: Use pre-approved WhatsApp business message templates
+ * - **Response Handling**: Advanced form-based response collection
+ * - **AI Integration**: Build AI-powered chatbots with memory
+ * - **Approval Workflows**: Create approval processes within WhatsApp
+ * - **Custom Forms**: Build interactive forms for data collection
+ * - **Automated Responses**: Set up automated customer service workflows
+ * - **Multi-Media Support**: Handle text, voice, images, and PDFs
+ * - **Business Integration**: Connect with CRM and business systems
+ * - **Customer Support**: Automate customer service interactions
+ * - **Notification System**: Send automated business notifications
+ * - **Lead Generation**: Capture leads through interactive forms
+ * - **Order Management**: Handle orders and transactions through chat
+ * 
+ * ## Credentials
+ * 
+ * Refer to [WhatsApp Business Cloud credentials](../../credentials/whatsapp/) for guidance 
+ * on setting up authentication. Requires WhatsApp Business API access and proper webhook configuration.
+ * 
+ * ## Operations
+ * 
+ * ### Message Operations
+ * 
+ * #### Send Message
+ * - **Direct Messaging**: Send text messages, media, and rich content
+ *   - Customer service and support communications
+ *   - Order confirmations and shipping updates
+ *   - Marketing campaigns and promotions
+ *   - Appointment reminders and scheduling
+ *   - Product information and catalogs
+ *   - Payment confirmations and invoices
+ *   - Welcome messages and onboarding
+ *   - Survey and feedback collection
+ *   - Event invitations and updates
+ *   - Emergency notifications and alerts
+ *   - Educational content and tutorials
+ *   - Community engagement and updates
+ * 
+ * #### Send and Wait for Response
+ * - **Interactive Messaging**: Send messages and pause workflow for user response
+ *   - Customer approval processes and confirmations
+ *   - Lead qualification and data collection
+ *   - Service request handling and triage
+ *   - Product configuration and customization
+ *   - Appointment booking and scheduling
+ *   - Feedback collection and surveys
+ *   - Order placement and modification
+ *   - Support ticket creation and updates
+ *   - User onboarding and registration
+ *   - Payment authorization and verification
+ *   - Document submission and verification
+ *   - Complaint resolution and follow-up
+ * 
+ * **Response Types:**
+ * 
+ * ##### Approval Response
+ * - **Binary Decision Making**: Present approval/disapproval options
+ *   - Purchase order approvals and procurement
+ *   - Expense report approvals and finance
+ *   - Time-off requests and HR processes
+ *   - Content publication and marketing
+ *   - Policy compliance and legal reviews
+ *   - Budget approvals and financial controls
+ *   - Project milestone approvals
+ *   - Quality assurance and testing sign-offs
+ *   - Contract reviews and negotiations
+ *   - Vendor approvals and partnerships
+ *   - Security access requests and permissions
+ *   - Change management and IT approvals
+ * 
+ * ##### Free Text Response
+ * - **Open-Ended Data Collection**: Collect detailed text responses
+ *   - Customer feedback and testimonials
+ *   - Support ticket descriptions and issues
+ *   - Product reviews and ratings
+ *   - Service improvement suggestions
+ *   - Bug reports and technical issues
+ *   - Feature requests and enhancements
+ *   - Personal information and preferences
+ *   - Address and contact details
+ *   - Special instructions and requirements
+ *   - Complaint details and resolution
+ *   - Custom requirements and specifications
+ *   - Open-ended survey responses
+ * 
+ * ##### Custom Form Response
+ * - **Structured Data Collection**: Build custom forms with multiple field types
+ *   - Lead generation and qualification forms
+ *   - Customer registration and onboarding
+ *   - Service request forms and ticketing
+ *   - Product configuration and ordering
+ *   - Event registration and RSVP
+ *   - Survey and research questionnaires
+ *   - Job application and recruitment
+ *   - Insurance claim forms and documentation
+ *   - Medical appointment scheduling
+ *   - Financial application and KYC
+ *   - Real estate inquiry and viewing requests
+ *   - Educational enrollment and admissions
+ * 
+ * **Response Customization Options:**
+ * - **Limit Wait Time**: Set automatic timeout for responses
+ * - **Custom Button Labels**: Personalize action button text
+ * - **Form Titles and Descriptions**: Brand and customize form appearance
+ * - **n8n Attribution**: Control workflow attribution display
+ * 
+ * #### Send Template
+ * - **Pre-Approved Messaging**: Use WhatsApp Business approved message templates
+ *   - Transactional notifications and confirmations
+ *   - Appointment reminders and scheduling
+ *   - Shipping and delivery notifications
+ *   - Payment confirmations and receipts
+ *   - Account security and verification
+ *   - Service disruption notifications
+ *   - Policy updates and legal notices
+ *   - Promotional campaigns and offers
+ *   - Event announcements and invitations
+ *   - Survey invitations and feedback requests
+ *   - Welcome messages and onboarding
+ *   - Subscription renewals and billing
+ * 
+ * ### Media Operations
+ * 
+ * #### Upload Media
+ * - **Content Management**: Upload media files for messaging
+ *   - Product images and catalogs
+ *   - Marketing materials and brochures
+ *   - Instructional videos and tutorials
+ *   - Document templates and forms
+ *   - Audio messages and voice notes
+ *   - Presentation slides and materials
+ *   - Infographics and visual content
+ *   - Certificate and achievement badges
+ *   - Brand assets and logos
+ *   - Event photos and documentation
+ *   - Technical diagrams and schematics
+ *   - User-generated content compilation
+ * 
+ * #### Download Media
+ * - **Content Retrieval**: Download media files from conversations
+ *   - Customer-submitted documents and forms
+ *   - Product photos and specifications
+ *   - Support ticket attachments and evidence
+ *   - User-generated content and reviews
+ *   - Voice messages and audio recordings
+ *   - Video testimonials and feedback
+ *   - Receipt and invoice documentation
+ *   - Identification and verification documents
+ *   - Technical diagrams and sketches
+ *   - Compliance documentation and records
+ *   - Research materials and data collection
+ *   - Quality assurance and inspection photos
+ * 
+ * #### Delete Media
+ * - **Content Cleanup**: Remove media files from storage
+ *   - Privacy compliance and data protection
+ *   - Storage optimization and cost management
+ *   - Content lifecycle management
+ *   - Outdated material removal and updates
+ *   - Security compliance and data retention
+ *   - Workflow cleanup and maintenance
+ *   - Legal compliance and record management
+ *   - Performance optimization and efficiency
+ *   - Brand consistency and content curation
+ *   - Quality control and content moderation
+ *   - User request compliance and deletion
+ *   - Archive management and organization
+ * 
+ * ## Use Cases
+ * 
+ * - **Customer Service**: Automated support and help desk operations
+ * - **Sales Automation**: Lead generation and qualification workflows
+ * - **Marketing Campaigns**: Personalized promotional messaging
+ * - **Order Management**: E-commerce order processing and updates
+ * - **Appointment Booking**: Healthcare and service appointment scheduling
+ * - **Educational Delivery**: Course content and learning management
+ * - **Survey and Research**: Data collection and market research
+ * - **Event Management**: Registration and attendee communication
+ * - **Payment Processing**: Transaction confirmations and billing
+ * - **HR Automation**: Employee onboarding and communication
+ * - **Compliance Management**: Document collection and verification
+ * - **Property Management**: Tenant communication and maintenance
+ * - **Healthcare Communication**: Patient engagement and care coordination
+ * - **Financial Services**: Account management and transaction alerts
+ * - **Travel and Hospitality**: Booking confirmations and guest services
+ * 
+ * ## Integration Patterns
+ * 
+ * ### AI-Powered Chatbots
+ * - **Natural Language Processing**: Understand and respond to customer queries
+ * - **Context Awareness**: Maintain conversation history and context
+ * - **Multi-Modal Support**: Handle text, voice, images, and documents
+ * - **Learning Capabilities**: Improve responses through interaction data
+ * 
+ * ### CRM Integration
+ * - **Lead Management**: Capture and qualify leads through WhatsApp
+ * - **Customer Data Sync**: Update customer records with conversation data
+ * - **Sales Pipeline**: Move prospects through sales stages via messaging
+ * - **Support Ticketing**: Create and update support tickets from conversations
+ * 
+ * ### E-Commerce Automation
+ * - **Product Catalogs**: Share product information and media
+ * - **Order Processing**: Handle orders from inquiry to fulfillment
+ * - **Payment Integration**: Process payments and send confirmations
+ * - **Inventory Updates**: Notify customers of stock changes and availability
+ * 
+ * ### Business Process Automation
+ * - **Approval Workflows**: Route requests through approval chains
+ * - **Document Collection**: Gather required documents and forms
+ * - **Notification Systems**: Send automated business notifications
+ * - **Data Collection**: Collect structured data through forms and surveys
+ */
+
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const whatsappNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.whatsapp',
   displayName: 'WhatsApp Business Cloud',
-  description: 'Use the WhatsApp Business Cloud node to automate work in WhatsApp Business, and integrate WhatsApp Business with other applications. n8n has built-in support for a wide range of WhatsApp Business features, including sending messages, and uploading, downloading, and deleting media.',
-  category: 'Communication',
-  subcategory: 'Messaging',
+  description: 'Integrate with WhatsApp Business Cloud API. Send messages, handle responses, and manage media.',
+  category: 'Action Nodes',
+  subcategory: 'Communication & Messaging',
+  
   properties: [
     {
       name: 'resource',
@@ -15,8 +246,16 @@ export const whatsappNode: NodeTypeInfo = {
       default: 'message',
       description: 'The resource to operate on',
       options: [
-        { name: 'Message', value: 'message', description: 'Work with message operations' },
-        { name: 'Media', value: 'media', description: 'Work with media operations' }
+        {
+          name: 'Message',
+          value: 'message',
+          description: 'Operations on messages'
+        },
+        {
+          name: 'Media',
+          value: 'media',
+          description: 'Operations on media files'
+        }
       ]
     },
     {
@@ -26,260 +265,135 @@ export const whatsappNode: NodeTypeInfo = {
       required: true,
       default: 'send',
       description: 'The operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['message']
+        }
+      },
       options: [
-        { name: 'Send', value: 'send', description: 'Send a message' },
-        { name: 'Send and Wait for Response', value: 'sendAndWait', description: 'Send a message and wait for a response' },
-        { name: 'Send Template', value: 'sendTemplate', description: 'Send a template message' },
-        { name: 'Upload Media', value: 'upload', description: 'Upload media file' },
-        { name: 'Download Media', value: 'download', description: 'Download media file' },
-        { name: 'Delete Media', value: 'delete', description: 'Delete media file' }
+        {
+          name: 'Send',
+          value: 'send',
+          description: 'Send a message'
+        },
+        {
+          name: 'Send and Wait for Response',
+          value: 'sendAndWait',
+          description: 'Send a message and wait for a response'
+        },
+        {
+          name: 'Send Template',
+          value: 'sendTemplate',
+          description: 'Send a pre-approved template message'
+        }
       ]
     },
     {
-      name: 'phoneNumberId',
-      displayName: 'Phone Number ID',
-      type: 'string',
-      required: true,
-      default: '',
-      description: 'WhatsApp Business phone number ID'
-    },
-    {
-      name: 'to',
-      displayName: 'To',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'WhatsApp ID or phone number for the person you want to send a message to'
-    },
-    {
-      name: 'messageType',
-      displayName: 'Message Type',
+      name: 'operation',
+      displayName: 'Operation',
       type: 'options',
-      required: false,
-      default: 'text',
-      description: 'The type of message to send',
+      required: true,
+      default: 'upload',
+      description: 'The operation to perform',
+      displayOptions: {
+        show: {
+          resource: ['media']
+        }
+      },
       options: [
-        { name: 'Text', value: 'text', description: 'Send a text message' },
-        { name: 'Template', value: 'template', description: 'Send a template message' },
-        { name: 'Image', value: 'image', description: 'Send an image' },
-        { name: 'Audio', value: 'audio', description: 'Send an audio file' },
-        { name: 'Video', value: 'video', description: 'Send a video' },
-        { name: 'Document', value: 'document', description: 'Send a document' },
-        { name: 'Location', value: 'location', description: 'Send a location' },
-        { name: 'Contacts', value: 'contacts', description: 'Send contact information' }
+        {
+          name: 'Upload',
+          value: 'upload',
+          description: 'Upload media'
+        },
+        {
+          name: 'Download',
+          value: 'download',
+          description: 'Download media'
+        },
+        {
+          name: 'Delete',
+          value: 'delete',
+          description: 'Delete media'
+        }
       ]
-    },
-    {
-      name: 'message',
-      displayName: 'Message',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The message to send'
-    },
-    {
-      name: 'templateName',
-      displayName: 'Template Name',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Name of the WhatsApp template to use'
-    },
-    {
-      name: 'templateLanguage',
-      displayName: 'Template Language',
-      type: 'string',
-      required: false,
-      default: 'en_US',
-      description: 'Language code for the template'
     },
     {
       name: 'responseType',
       displayName: 'Response Type',
       type: 'options',
-      required: false,
+      required: true,
       default: 'approval',
       description: 'Type of response to wait for',
+      displayOptions: {
+        show: {
+          resource: ['message'],
+          operation: ['sendAndWait']
+        }
+      },
       options: [
-        { name: 'Approval', value: 'approval', description: 'Wait for approval/disapproval' },
-        { name: 'Free Text', value: 'freeText', description: 'Wait for free text response' },
-        { name: 'Custom Form', value: 'customForm', description: 'Wait for custom form response' }
+        {
+          name: 'Approval',
+          value: 'approval',
+          description: 'Wait for approval/disapproval'
+        },
+        {
+          name: 'Free Text',
+          value: 'freeText',
+          description: 'Wait for free text response'
+        },
+        {
+          name: 'Custom Form',
+          value: 'customForm',
+          description: 'Wait for custom form submission'
+        }
       ]
-    },
-    {
-      name: 'limitWaitTime',
-      displayName: 'Limit Wait Time',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Whether to limit the wait time for responses'
-    },
-    {
-      name: 'waitTimeLimit',
-      displayName: 'Wait Time Limit',
-      type: 'number',
-      required: false,
-      default: 3600,
-      description: 'Maximum time to wait for response (in seconds)'
-    },
-    {
-      name: 'appendAttribution',
-      displayName: 'Append n8n Attribution',
-      type: 'boolean',
-      required: false,
-      default: true,
-      description: 'Whether to mention that the message was sent automatically with n8n'
-    },
-    {
-      name: 'approvalButtonText',
-      displayName: 'Approval Button Text',
-      type: 'string',
-      required: false,
-      default: 'Approve',
-      description: 'Text for the approval button'
-    },
-    {
-      name: 'disapprovalButtonText',
-      displayName: 'Disapproval Button Text',
-      type: 'string',
-      required: false,
-      default: 'Disapprove',
-      description: 'Text for the disapproval button'
-    },
-    {
-      name: 'formTitle',
-      displayName: 'Form Title',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Title for the response form'
-    },
-    {
-      name: 'formDescription',
-      displayName: 'Form Description',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Description for the response form'
-    },
-    {
-      name: 'mediaId',
-      displayName: 'Media ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'ID of the media file'
-    },
-    {
-      name: 'mediaUrl',
-      displayName: 'Media URL',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'URL of the media file'
-    },
-    {
-      name: 'caption',
-      displayName: 'Caption',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Caption for media messages'
-    },
-    {
-      name: 'filename',
-      displayName: 'Filename',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Name of the file for document messages'
-    },
-    {
-      name: 'latitude',
-      displayName: 'Latitude',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'Latitude for location messages'
-    },
-    {
-      name: 'longitude',
-      displayName: 'Longitude',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'Longitude for location messages'
-    },
-    {
-      name: 'locationName',
-      displayName: 'Location Name',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Name of the location'
-    },
-    {
-      name: 'locationAddress',
-      displayName: 'Location Address',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Address of the location'
     }
   ],
+
   inputs: [
     {
       type: 'main',
       displayName: 'Input',
-      required: false
+      required: true
     }
   ],
+
   outputs: [
     {
       type: 'main',
-      displayName: 'Output',
-      description: 'The processed WhatsApp data'
+      displayName: 'Output'
     }
   ],
-  credentials: ['whatsappApi'],
-  regularNode: true,
-  codeable: false,
+
+  credentials: [
+    {
+      name: 'whatsAppApi',
+      required: true
+    }
+  ],
+
+  version: [1],
+  defaults: {
+    name: 'WhatsApp Business Cloud'
+  },
+
+  aliases: ['whatsapp', 'whatsapp business', 'messaging', 'chat', 'business messaging'],
+  
   examples: [
     {
-      name: 'Send Text Message',
-      description: 'Send a simple text message via WhatsApp',
+      name: 'Send Message',
+      description: 'Send a text message to a WhatsApp contact',
       workflow: {
         nodes: [
           {
-            name: 'WhatsApp',
+            name: 'WhatsApp Business Cloud',
             type: 'n8n-nodes-base.whatsapp',
             parameters: {
               resource: 'message',
               operation: 'send',
-              phoneNumberId: '1234567890',
               to: '+1234567890',
-              messageType: 'text',
-              message: 'Hello from n8n! 📱'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Send Template Message',
-      description: 'Send a WhatsApp template message',
-      workflow: {
-        nodes: [
-          {
-            name: 'WhatsApp',
-            type: 'n8n-nodes-base.whatsapp',
-            parameters: {
-              resource: 'message',
-              operation: 'sendTemplate',
-              phoneNumberId: '1234567890',
-              to: '+1234567890',
-              templateName: 'hello_world',
-              templateLanguage: 'en_US'
+              message: 'Hello! This is an automated message from n8n.'
             }
           }
         ]
@@ -287,39 +401,53 @@ export const whatsappNode: NodeTypeInfo = {
     },
     {
       name: 'Send and Wait for Approval',
-      description: 'Send a message and wait for user approval',
+      description: 'Send a message and wait for approval response',
       workflow: {
         nodes: [
           {
-            name: 'WhatsApp',
+            name: 'WhatsApp Business Cloud',
             type: 'n8n-nodes-base.whatsapp',
             parameters: {
               resource: 'message',
               operation: 'sendAndWait',
-              phoneNumberId: '1234567890',
-              to: '+1234567890',
-              message: 'Please approve this action',
               responseType: 'approval',
-              limitWaitTime: true,
-              waitTimeLimit: 1800
+              to: '+1234567890',
+              message: 'Please approve this request',
+              approvalOptions: {
+                approveButtonLabel: 'Approve',
+                disapproveButtonLabel: 'Reject'
+              }
             }
           }
         ]
       }
     },
     {
-      name: 'Upload Media',
-      description: 'Upload a media file to WhatsApp',
+      name: 'Custom Form Response',
+      description: 'Send a message with custom form for data collection',
       workflow: {
         nodes: [
           {
-            name: 'WhatsApp',
+            name: 'WhatsApp Business Cloud',
             type: 'n8n-nodes-base.whatsapp',
             parameters: {
-              resource: 'media',
-              operation: 'upload',
-              mediaUrl: 'https://example.com/image.jpg',
-              filename: 'image.jpg'
+              resource: 'message',
+              operation: 'sendAndWait',
+              responseType: 'customForm',
+              to: '+1234567890',
+              message: 'Please fill out this form',
+              formElements: [
+                {
+                  fieldType: 'text',
+                  fieldLabel: 'Full Name',
+                  fieldRequired: true
+                },
+                {
+                  fieldType: 'email',
+                  fieldLabel: 'Email Address',
+                  fieldRequired: true
+                }
+              ]
             }
           }
         ]
@@ -328,154 +456,4 @@ export const whatsappNode: NodeTypeInfo = {
   ]
 };
 
-export const whatsappTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.whatsappTrigger',
-  displayName: 'WhatsApp Trigger',
-  description: 'Triggers the workflow when events occur in WhatsApp. Supports various event types including messages, account updates, and business capability changes.',
-  category: 'Communication',
-  subcategory: 'Messaging',
-  properties: [
-    {
-      name: 'events',
-      displayName: 'Events',
-      type: 'multiOptions',
-      required: true,
-      default: ['messages'],
-      description: 'The event types to listen for',
-      options: [
-        { name: 'Account Review Update', value: 'account_review_update', description: 'Account review status changes' },
-        { name: 'Account Update', value: 'account_update', description: 'Account information updates' },
-        { name: 'Business Capability Update', value: 'business_capability_update', description: 'Business capability changes' },
-        { name: 'Message Template Quality Update', value: 'message_template_quality_update', description: 'Template quality score changes' },
-        { name: 'Message Template Status Update', value: 'message_template_status_update', description: 'Template status changes' },
-        { name: 'Messages', value: 'messages', description: 'New incoming messages' },
-        { name: 'Phone Number Name Update', value: 'phone_number_name_update', description: 'Phone number display name changes' },
-        { name: 'Phone Number Quality Update', value: 'phone_number_quality_update', description: 'Phone number quality score changes' },
-        { name: 'Security', value: 'security', description: 'Security-related events' },
-        { name: 'Template Category Update', value: 'template_category_update', description: 'Template category changes' }
-      ]
-    },
-    {
-      name: 'phoneNumberId',
-      displayName: 'Phone Number ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Filter events by specific phone number ID'
-    },
-    {
-      name: 'businessAccountId',
-      displayName: 'Business Account ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Filter events by specific business account ID'
-    },
-    {
-      name: 'includeMetadata',
-      displayName: 'Include Metadata',
-      type: 'boolean',
-      required: false,
-      default: true,
-      description: 'Whether to include additional metadata in webhook payloads'
-    },
-    {
-      name: 'verifyToken',
-      displayName: 'Verify Token',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Token used to verify webhook endpoints'
-    }
-  ],
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when specified WhatsApp events occur'
-    }
-  ],
-  credentials: ['whatsappOAuth2Api'],
-  triggerNode: true,
-  polling: false,
-  webhookSupport: true,
-  examples: [
-    {
-      name: 'Monitor All Messages',
-      description: 'Trigger workflow when any message is received',
-      workflow: {
-        nodes: [
-          {
-            name: 'WhatsApp Trigger',
-            type: 'n8n-nodes-base.whatsappTrigger',
-            parameters: {
-              events: ['messages'],
-              includeMetadata: true
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Account Updates',
-      description: 'Trigger on account-related changes',
-      workflow: {
-        nodes: [
-          {
-            name: 'WhatsApp Trigger',
-            type: 'n8n-nodes-base.whatsappTrigger',
-            parameters: {
-              events: ['account_update', 'account_review_update'],
-              businessAccountId: '123456789',
-              includeMetadata: true
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Template Changes',
-      description: 'Trigger when message templates are updated',
-      workflow: {
-        nodes: [
-          {
-            name: 'WhatsApp Trigger',
-            type: 'n8n-nodes-base.whatsappTrigger',
-            parameters: {
-              events: ['message_template_status_update', 'message_template_quality_update'],
-              includeMetadata: true
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes as an array for easier importing
-export const whatsappNodes: NodeTypeInfo[] = [whatsappNode, whatsappTriggerNode];
-
-// Export individual actions for the regular WhatsApp node
-export const whatsappActions = [
-  'send_message',
-  'send_and_wait',
-  'send_template',
-  'upload_media',
-  'download_media',
-  'delete_media'
-];
-
-// Export trigger events
-export const whatsappTriggers = [
-  'account_review_update',
-  'account_update', 
-  'business_capability_update',
-  'message_template_quality_update',
-  'message_template_status_update',
-  'messages',
-  'phone_number_name_update',
-  'phone_number_quality_update',
-  'security',
-  'template_category_update'
-];
+export default whatsappNode;

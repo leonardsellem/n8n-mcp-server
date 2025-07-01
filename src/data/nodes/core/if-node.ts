@@ -1,17 +1,78 @@
 /**
- * If Node
+ * # If
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Core Nodes
+ * **Subcategory**: Flow Control
+ * 
+ * ## Description
  * 
  * Use the If node to split a workflow conditionally based on comparison operations.
- * Supports multiple data types and comparison operations with AND/OR logic.
+ * 
+ * ## Key Features
+ * 
+ * - **Multiple Data Types**: String, Number, Date & Time, Boolean, Array, Object
+ * - **Comprehensive Comparisons**: Existence, equality, containment, regex, size checks
+ * - **Logical Operations**: AND/OR combining of multiple conditions
+ * - **Two Outputs**: True and False paths for workflow branching
+ * - **Expression Support**: Dynamic value comparisons using expressions
+ * - **Type-Specific Operations**: Specialized comparisons for each data type
+ * 
+ * ## Available Data Type Comparisons
+ * 
+ * ### String
+ * - exists, does not exist, is empty, is not empty
+ * - is equal to, is not equal to
+ * - contains, does not contain
+ * - starts with, does not start with, ends with, does not end with
+ * - matches regex, does not match regex
+ * 
+ * ### Number
+ * - exists, does not exist, is empty, is not empty
+ * - is equal to, is not equal to
+ * - is greater than, is less than
+ * - is greater than or equal to, is less than or equal to
+ * 
+ * ### Date & Time
+ * - exists, does not exist, is empty, is not empty
+ * - is equal to, is not equal to
+ * - is after, is before
+ * - is after or equal to, is before or equal to
+ * 
+ * ### Boolean
+ * - exists, does not exist, is empty, is not empty
+ * - is true, is false
+ * - is equal to, is not equal to
+ * 
+ * ### Array
+ * - exists, does not exist, is empty, is not empty
+ * - contains, does not contain
+ * - length equal to, length not equal to
+ * - length greater than, length less than
+ * - length greater than or equal to, length less than or equal to
+ * 
+ * ### Object
+ * - exists, does not exist, is empty, is not empty
+ * 
+ * ## Use Cases
+ * 
+ * - Filter data based on conditions
+ * - Route workflow paths conditionally
+ * - Error handling and validation
+ * - Status checking and branching
+ * - Data quality checks
+ * - User permission filtering
+ * - Content moderation
+ * - A/B testing logic
  */
 
 import { NodeTypeInfo } from '../../node-types.js';
 
 export const ifNode: NodeTypeInfo = {
   name: 'n8n-nodes-base.if',
-  displayName: 'IF',
-  description: 'Route data based on conditional logic. Compare values, check conditions, and send data down different workflow paths based on true/false results.',
-  category: 'Core',
+  displayName: 'If',
+  description: 'Split a workflow conditionally based on comparison operations. Compare values and route data down different paths.',
+  category: 'Core Nodes',
   subcategory: 'Flow Control',
 
   properties: [
@@ -217,6 +278,85 @@ export const ifNode: NodeTypeInfo = {
                   operation: ['equal', 'notEqual', 'after', 'before', 'afterEqual', 'beforeEqual']
                 }
               }
+            }
+          ]
+        },
+        {
+          name: 'array',
+          displayName: 'Array',
+          values: [
+            {
+              name: 'value1',
+              displayName: 'Value 1',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The first value to compare',
+              placeholder: '={{$json.fieldName}}'
+            },
+            {
+              name: 'operation',
+              displayName: 'Operation',
+              type: 'options',
+              required: true,
+              default: 'exists',
+              description: 'The comparison operation',
+              options: [
+                { name: 'exists', value: 'exists' },
+                { name: 'does not exist', value: 'notExists' },
+                { name: 'is empty', value: 'isEmpty' },
+                { name: 'is not empty', value: 'isNotEmpty' },
+                { name: 'contains', value: 'contains' },
+                { name: 'does not contain', value: 'notContains' },
+                { name: 'length equal to', value: 'lengthEqual' },
+                { name: 'length not equal to', value: 'lengthNotEqual' },
+                { name: 'length greater than', value: 'lengthGreater' },
+                { name: 'length less than', value: 'lengthLess' },
+                { name: 'length greater than or equal to', value: 'lengthGreaterEqual' },
+                { name: 'length less than or equal to', value: 'lengthLessEqual' }
+              ]
+            },
+            {
+              name: 'value2',
+              displayName: 'Value 2',
+              type: 'string',
+              required: false,
+              default: '',
+              description: 'The second value to compare',
+              displayOptions: {
+                show: {
+                  operation: ['contains', 'notContains', 'lengthEqual', 'lengthNotEqual', 'lengthGreater', 'lengthLess', 'lengthGreaterEqual', 'lengthLessEqual']
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: 'object',
+          displayName: 'Object',
+          values: [
+            {
+              name: 'value1',
+              displayName: 'Value 1',
+              type: 'string',
+              required: true,
+              default: '',
+              description: 'The first value to compare',
+              placeholder: '={{$json.fieldName}}'
+            },
+            {
+              name: 'operation',
+              displayName: 'Operation',
+              type: 'options',
+              required: true,
+              default: 'exists',
+              description: 'The comparison operation',
+              options: [
+                { name: 'exists', value: 'exists' },
+                { name: 'does not exist', value: 'notExists' },
+                { name: 'is empty', value: 'isEmpty' },
+                { name: 'is not empty', value: 'isNotEmpty' }
+              ]
             }
           ]
         }

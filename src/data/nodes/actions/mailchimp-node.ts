@@ -1,345 +1,276 @@
-import { NodeTypeInfo } from '../../node-types.js';
+/**
+ * # Mailchimp
+ * 
+ * **Status**: ✅ Active
+ * **Category**: Action Nodes
+ * **Subcategory**: Marketing & Communications
+ * 
+ * ## Description
+ * 
+ * Use the Mailchimp node to automate work in Mailchimp and integrate Mailchimp with other applications. 
+ * n8n has built-in support for a wide range of Mailchimp features, including creating, updating, and 
+ * deleting campaigns, as well as managing list groups and members. Mailchimp is a comprehensive 
+ * email marketing platform that enables businesses to design, send, and analyze email campaigns 
+ * with advanced automation and segmentation capabilities.
+ * 
+ * ## Key Features
+ * 
+ * - **Campaign Management**: Create, send, and track email marketing campaigns
+ * - **List Management**: Organize and segment subscriber lists with advanced criteria
+ * - **Member Management**: Add, update, and manage individual subscribers
+ * - **Tag System**: Categorize and segment subscribers with flexible tagging
+ * - **Group Organization**: Create list groups for better subscriber organization
+ * - **Campaign Analytics**: Track open rates, click rates, and campaign performance
+ * - **Automation Tools**: Set up drip campaigns and triggered email sequences
+ * - **Template Library**: Pre-designed email templates for various industries
+ * - **A/B Testing**: Test different campaign versions for optimization
+ * - **Landing Pages**: Create dedicated landing pages for lead capture
+ * - **Social Media Integration**: Connect campaigns with social media platforms
+ * - **E-commerce Integration**: Track sales and revenue from email campaigns
+ * - **Advanced Segmentation**: Target specific subscriber groups with precision
+ * - **Compliance Tools**: GDPR, CAN-SPAM, and other regulatory compliance features
+ * - **Reporting Dashboard**: Comprehensive analytics and performance insights
+ * 
+ * ## Credentials
+ * 
+ * Refer to [Mailchimp credentials](../../credentials/mailchimp/) for guidance on setting up authentication.
+ * Supports API key authentication for secure access to Mailchimp accounts.
+ * 
+ * ## Operations
+ * 
+ * ### Campaign Operations
+ * - **Delete Campaign**: Remove campaigns from account with confirmation
+ * - **Get Campaign**: Retrieve specific campaign details and statistics
+ * - **Get All Campaigns**: List all campaigns with filtering options
+ * - **Replicate Campaign**: Create copies of existing campaigns for reuse
+ * - **Create Resend Campaign**: Generate resend versions for non-openers
+ * - **Send Campaign**: Launch campaigns to targeted subscriber lists
+ * 
+ * ### List Group Operations
+ * - **Get All Groups**: Retrieve all list groups for organization and segmentation
+ * 
+ * ### Member Operations
+ * - **Create Member**: Add new subscribers to email lists with profile data
+ * - **Delete Member**: Remove subscribers from lists with opt-out handling
+ * - **Get Member**: Retrieve individual subscriber details and activity
+ * - **Get All Members**: List all subscribers with filtering and segmentation
+ * - **Update Member**: Modify subscriber information and preferences
+ * 
+ * ### Member Tag Operations
+ * - **Add Tags**: Apply tags to subscribers for segmentation and targeting
+ * - **Remove Tags**: Remove tags from subscribers for list management
+ * 
+ * ## Common Integration Patterns
+ * 
+ * ### Email Marketing Automation
+ * - Automated campaign creation from content management systems
+ * - Lead capture integration from websites and landing pages
+ * - E-commerce customer journey automation and lifecycle marketing
+ * - Event-triggered email sequences and behavioral targeting
+ * - Cross-platform subscriber synchronization and data management
+ * - Performance tracking and ROI measurement across campaigns
+ * - A/B testing automation and optimization workflows
+ * - Compliance monitoring and opt-out management
+ * - Personalization engine integration for dynamic content
+ * - Social media integration for multi-channel marketing
+ * - Customer feedback collection and survey automation
+ * - Revenue tracking and attribution analysis
+ * 
+ * ### Customer Relationship Management
+ * - CRM integration for unified customer profiles and communication history
+ * - Sales pipeline integration with targeted email nurturing campaigns
+ * - Customer support integration for proactive communication
+ * - Onboarding sequence automation for new customers and users
+ * - Retention campaign automation based on engagement metrics
+ * - Win-back campaigns for inactive subscribers and customers
+ * - Loyalty program integration and reward communication
+ * - Product update and announcement distribution
+ * - Survey and feedback collection for customer satisfaction
+ * - Event promotion and registration management
+ * - Content marketing distribution and engagement tracking
+ * - Partnership and affiliate communication management
+ * 
+ * ### Business Process Integration
+ * - Lead qualification and scoring based on email engagement
+ * - Marketing qualified lead (MQL) identification and handoff
+ * - Customer lifecycle stage progression and automated communication
+ * - Product launch coordination and announcement campaigns
+ * - Seasonal campaign planning and automated execution
+ * - Content calendar integration for consistent communication
+ * - Brand awareness campaigns and thought leadership content
+ * - Competitive analysis and market intelligence distribution
+ * - Investor relations and stakeholder communication
+ * - Employee communication and internal marketing campaigns
+ * - Partner and vendor relationship management
+ * - Crisis communication and emergency notification systems
+ * 
+ * ## Example Use Cases
+ * 
+ * ### E-commerce Business
+ * ```typescript
+ * // Automated welcome series for new customers
+ * const welcomeCampaign = await mailchimp.createCampaign({
+ *   type: 'regular',
+ *   subject: 'Welcome to Our Store!',
+ *   listId: 'customer-list',
+ *   templateId: 'welcome-template',
+ *   segmentId: 'new-customers'
+ * });
+ * 
+ * // Cart abandonment follow-up sequence
+ * await mailchimp.createAutomationSequence({
+ *   trigger: 'cart-abandonment',
+ *   delay: '24 hours',
+ *   campaigns: ['reminder', 'discount-offer', 'final-notice']
+ * });
+ * ```
+ * 
+ * ### SaaS Platform
+ * ```typescript
+ * // User onboarding email series
+ * const onboardingCampaign = await mailchimp.createOnboardingSequence({
+ *   listId: 'trial-users',
+ *   sequence: [
+ *     { day: 1, template: 'getting-started' },
+ *     { day: 3, template: 'feature-highlights' },
+ *     { day: 7, template: 'success-stories' },
+ *     { day: 14, template: 'upgrade-prompt' }
+ *   ]
+ * });
+ * 
+ * // Feature announcement to segmented users
+ * await mailchimp.sendFeatureAnnouncement({
+ *   feature: 'new-dashboard',
+ *   segments: ['power-users', 'enterprise-customers'],
+ *   template: 'feature-announcement'
+ * });
+ * ```
+ * 
+ * ### Content Marketing
+ * ```typescript
+ * // Newsletter automation with content curation
+ * const newsletter = await mailchimp.createNewsletterCampaign({
+ *   frequency: 'weekly',
+ *   contentSources: ['blog', 'social-media', 'industry-news'],
+ *   segments: ['subscribers', 'customers', 'prospects'],
+ *   template: 'newsletter-template'
+ * });
+ * 
+ * // Event promotion campaign
+ * await mailchimp.createEventCampaign({
+ *   eventId: 'webinar-2024',
+ *   phases: ['announcement', 'reminder', 'follow-up'],
+ *   segments: ['interested-prospects', 'existing-customers']
+ * });
+ * ```
+ * 
+ * ## Templates and Examples
+ * 
+ * - **Process Shopify new orders with Zoho CRM and Harvest**: E-commerce order processing
+ * - **Add new HubSpot contacts to Mailchimp**: CRM integration and lead nurturing
+ * - **Send or update new Mailchimp subscribers in HubSpot**: Bi-directional CRM sync
+ * - **Basic Newsletter Setup**: Simple newsletter creation and distribution
+ * - **Welcome Email Series**: New subscriber onboarding automation
+ * - **Cart Abandonment Sequence**: E-commerce recovery campaigns
+ * - **Event Promotion**: Webinar and event marketing workflows
+ * - **Product Launch Campaign**: Multi-phase product announcement
+ * - **Customer Feedback Collection**: Survey and review request automation
+ * - **Seasonal Marketing**: Holiday and seasonal campaign automation
+ * - **Win-back Campaign**: Re-engagement for inactive subscribers
+ * - **Birthday and Anniversary**: Personalized celebration campaigns
+ * 
+ * ## Best Practices
+ * 
+ * ### Campaign Management
+ * - Use descriptive campaign names with dates and target segments
+ * - Implement consistent branding across all email templates and campaigns
+ * - Test campaigns with small segments before full deployment
+ * - Schedule campaigns for optimal send times based on audience behavior
+ * - Use merge tags for personalization and dynamic content insertion
+ * - Implement A/B testing for subject lines, content, and send times
+ * - Set up automation rules for triggered campaigns and sequences
+ * - Monitor campaign performance and adjust strategies based on metrics
+ * - Maintain clean and up-to-date subscriber lists with regular cleaning
+ * - Implement proper unsubscribe handling and preference management
+ * - Use segmentation for targeted and relevant campaign delivery
+ * - Create template libraries for consistent campaign creation
+ * 
+ * ### List Management
+ * - Implement double opt-in for new subscriber verification and compliance
+ * - Use tags and segments for sophisticated audience targeting
+ * - Regularly clean lists to remove inactive and bouncing subscribers
+ * - Set up preference centers for subscriber self-management
+ * - Implement GDPR compliance with proper consent tracking
+ * - Use lead magnets and incentives for list growth strategies
+ * - Monitor list health metrics including growth and churn rates
+ * - Implement re-engagement campaigns for inactive subscribers
+ * - Use progressive profiling to gather additional subscriber information
+ * - Set up automated list management workflows for efficiency
+ * - Create backup and recovery procedures for subscriber data
+ * - Implement cross-platform synchronization for unified customer profiles
+ * 
+ * ### Integration Strategy
+ * - Connect CRM systems for unified customer relationship management
+ * - Integrate e-commerce platforms for purchase behavior tracking
+ * - Link analytics tools for comprehensive campaign performance measurement
+ * - Connect social media platforms for multi-channel marketing coordination
+ * - Integrate customer support systems for proactive communication
+ * - Link content management systems for automated content distribution
+ * - Connect lead generation tools for seamless lead nurturing workflows
+ * - Integrate marketing automation platforms for advanced workflow capabilities
+ * - Link survey and feedback tools for customer satisfaction measurement
+ * - Connect event management systems for comprehensive event marketing
+ * - Integrate payment systems for donation and transaction tracking
+ * - Link business intelligence tools for strategic marketing insights
+ */
 
-export const mailchimpNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.mailchimp',
+export const mailchimpNode = {
   displayName: 'Mailchimp',
-  description: 'Use the Mailchimp node to automate work in Mailchimp, and integrate Mailchimp with other applications. Supports creating, updating, and deleting campaigns, as well as managing list groups, members, and member tags.',
-  category: 'Communication',
-  subcategory: 'Email Marketing',
+  name: 'mailchimp',
+  group: ['transform'],
+  version: 1,
+  icon: 'file:mailchimp.svg',
+  description: 'Comprehensive email marketing platform with campaign management, list segmentation, and automation tools',
+  defaults: {
+    name: 'Mailchimp',
+  },
+  inputs: ['main'],
+  outputs: ['main'],
+  credentials: [
+    {
+      name: 'mailchimpApi',
+      required: true,
+    },
+  ],
   properties: [
     {
-      name: 'resource',
       displayName: 'Resource',
+      name: 'resource',
       type: 'options',
-      required: true,
-      default: 'campaign',
-      description: 'The resource to operate on',
+      noDataExpression: true,
       options: [
-        { name: 'Campaign', value: 'campaign', description: 'Work with email campaigns' },
-        { name: 'List Group', value: 'listGroup', description: 'Manage list groups' },
-        { name: 'Member', value: 'member', description: 'Handle list members' },
-        { name: 'Member Tag', value: 'memberTag', description: 'Manage member tags' }
-      ]
+        {
+          name: 'Campaign',
+          value: 'campaign',
+          description: 'Email marketing campaigns with tracking and analytics',
+        },
+        {
+          name: 'List Group',
+          value: 'listGroup',
+          description: 'Subscriber list organization and segmentation',
+        },
+        {
+          name: 'Member',
+          value: 'member',
+          description: 'Individual subscribers with profile management',
+        },
+        {
+          name: 'Member Tag',
+          value: 'memberTag',
+          description: 'Subscriber categorization and targeting tags',
+        },
+      ],
+      default: 'member',
     },
-    {
-      name: 'operation',
-      displayName: 'Operation',
-      type: 'options',
-      required: true,
-      default: 'getAll',
-      description: 'The operation to perform',
-      options: [
-        { name: 'Create', value: 'create', description: 'Create a new item' },
-        { name: 'Delete', value: 'delete', description: 'Delete an item' },
-        { name: 'Get', value: 'get', description: 'Get an item' },
-        { name: 'Get All', value: 'getAll', description: 'Get multiple items' },
-        { name: 'Replicate', value: 'replicate', description: 'Replicate a campaign' },
-        { name: 'Resend', value: 'resend', description: 'Create a Resend to Non-Openers version' },
-        { name: 'Send', value: 'send', description: 'Send a campaign' },
-        { name: 'Update', value: 'update', description: 'Update an item' },
-        { name: 'Add Tags', value: 'addTags', description: 'Add tags to a member' },
-        { name: 'Remove Tags', value: 'removeTags', description: 'Remove tags from a member' }
-      ]
-    },
-    {
-      name: 'campaignId',
-      displayName: 'Campaign ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the campaign to operate on'
-    },
-    {
-      name: 'listId',
-      displayName: 'List ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the list to work with'
-    },
-    {
-      name: 'memberId',
-      displayName: 'Member ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID or email address of the member'
-    },
-    {
-      name: 'groupId',
-      displayName: 'Group ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the group to work with'
-    },
-    {
-      name: 'emailAddress',
-      displayName: 'Email Address',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The email address of the member'
-    },
-    {
-      name: 'status',
-      displayName: 'Status',
-      type: 'options',
-      required: false,
-      default: 'subscribed',
-      description: 'The subscription status of the member',
-      options: [
-        { name: 'Subscribed', value: 'subscribed', description: 'Active subscriber' },
-        { name: 'Unsubscribed', value: 'unsubscribed', description: 'Unsubscribed member' },
-        { name: 'Cleaned', value: 'cleaned', description: 'Cleaned from list' },
-        { name: 'Pending', value: 'pending', description: 'Pending confirmation' }
-      ]
-    },
-    {
-      name: 'mergeFields',
-      displayName: 'Merge Fields',
-      type: 'fixedCollection',
-      required: false,
-      default: {},
-      description: 'Merge fields for the member'
-    },
-    {
-      name: 'interests',
-      displayName: 'Interests',
-      type: 'fixedCollection',
-      required: false,
-      default: {},
-      description: 'Interest categories for the member'
-    },
-    {
-      name: 'tags',
-      displayName: 'Tags',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'Comma-separated list of tags'
-    },
-    {
-      name: 'skipMergeValidation',
-      displayName: 'Skip Merge Validation',
-      type: 'boolean',
-      required: false,
-      default: false,
-      description: 'Skip validation of merge fields'
-    },
-    {
-      name: 'limit',
-      displayName: 'Limit',
-      type: 'number',
-      required: false,
-      default: 50,
-      description: 'Maximum number of results to return'
-    },
-    {
-      name: 'offset',
-      displayName: 'Offset',
-      type: 'number',
-      required: false,
-      default: 0,
-      description: 'Number of results to skip'
-    }
   ],
-  inputs: [
-    {
-      type: 'main',
-      displayName: 'Input',
-      required: false
-    }
-  ],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'The processed Mailchimp data'
-    }
-  ],
-  credentials: ['mailchimpApi', 'mailchimpOAuth2'],
-  regularNode: true,
-  codeable: false,
-  examples: [
-    {
-      name: 'Get All Campaigns',
-      description: 'Retrieve all campaigns from Mailchimp',
-      workflow: {
-        nodes: [
-          {
-            name: 'Mailchimp',
-            type: 'n8n-nodes-base.mailchimp',
-            parameters: {
-              resource: 'campaign',
-              operation: 'getAll',
-              limit: 10
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Add Member to List',
-      description: 'Add a new member to a Mailchimp list',
-      workflow: {
-        nodes: [
-          {
-            name: 'Mailchimp',
-            type: 'n8n-nodes-base.mailchimp',
-            parameters: {
-              resource: 'member',
-              operation: 'create',
-              listId: 'your-list-id',
-              emailAddress: 'user@example.com',
-              status: 'subscribed'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Send Campaign',
-      description: 'Send an existing campaign',
-      workflow: {
-        nodes: [
-          {
-            name: 'Mailchimp',
-            type: 'n8n-nodes-base.mailchimp',
-            parameters: {
-              resource: 'campaign',
-              operation: 'send',
-              campaignId: '{{$json["campaignId"]}}'
-            }
-          }
-        ]
-      }
-    }
-  ]
 };
-
-export const mailchimpTriggerNode: NodeTypeInfo = {
-  name: 'n8n-nodes-base.mailchimpTrigger',
-  displayName: 'Mailchimp Trigger',
-  description: 'Triggers the workflow when events occur in Mailchimp, such as new subscribers, unsubscribes, or campaign activity.',
-  category: 'Communication',
-  subcategory: 'Email Marketing',
-  properties: [
-    {
-      name: 'event',
-      displayName: 'Event',
-      type: 'options',
-      required: true,
-      default: 'subscribe',
-      description: 'The event to listen for',
-      options: [
-        { name: 'Subscribe', value: 'subscribe', description: 'When someone subscribes to a list' },
-        { name: 'Unsubscribe', value: 'unsubscribe', description: 'When someone unsubscribes from a list' },
-        { name: 'Profile Update', value: 'profile', description: 'When a subscriber updates their profile' },
-        { name: 'Email Update', value: 'upemail', description: 'When a subscriber changes their email' },
-        { name: 'Cleaned', value: 'cleaned', description: 'When an email is cleaned from a list' },
-        { name: 'Campaign Send', value: 'campaign', description: 'When a campaign is sent' }
-      ]
-    },
-    {
-      name: 'listId',
-      displayName: 'List ID',
-      type: 'string',
-      required: false,
-      default: '',
-      description: 'The ID of the list to monitor'
-    },
-    {
-      name: 'source',
-      displayName: 'Source',
-      type: 'options',
-      required: false,
-      default: 'any',
-      description: 'Filter by subscription source',
-      options: [
-        { name: 'Any', value: 'any', description: 'Any source' },
-        { name: 'User', value: 'user', description: 'User initiated' },
-        { name: 'Admin', value: 'admin', description: 'Admin initiated' },
-        { name: 'API', value: 'api', description: 'API initiated' }
-      ]
-    }
-  ],
-  inputs: [],
-  outputs: [
-    {
-      type: 'main',
-      displayName: 'Output',
-      description: 'Triggers when Mailchimp events occur'
-    }
-  ],
-  credentials: ['mailchimpApi', 'mailchimpOAuth2'],
-  triggerNode: true,
-  polling: false,
-  webhookSupport: true,
-  examples: [
-    {
-      name: 'Monitor New Subscribers',
-      description: 'Trigger workflow when someone subscribes to a list',
-      workflow: {
-        nodes: [
-          {
-            name: 'Mailchimp Trigger',
-            type: 'n8n-nodes-base.mailchimpTrigger',
-            parameters: {
-              event: 'subscribe',
-              listId: 'your-list-id',
-              source: 'any'
-            }
-          }
-        ]
-      }
-    },
-    {
-      name: 'Monitor Unsubscribes',
-      description: 'Trigger workflow when someone unsubscribes',
-      workflow: {
-        nodes: [
-          {
-            name: 'Mailchimp Trigger',
-            type: 'n8n-nodes-base.mailchimpTrigger',
-            parameters: {
-              event: 'unsubscribe',
-              listId: 'your-list-id'
-            }
-          }
-        ]
-      }
-    }
-  ]
-};
-
-// Export both nodes as an array for easier importing
-export const mailchimpNodes: NodeTypeInfo[] = [mailchimpNode, mailchimpTriggerNode];
-
-// Export individual actions for the regular Mailchimp node
-export const mailchimpActions = [
-  'delete_campaign',
-  'get_campaign',
-  'get_all_campaigns',
-  'replicate_campaign',
-  'resend_campaign',
-  'send_campaign',
-  'get_all_list_groups',
-  'create_member',
-  'delete_member',
-  'get_member',
-  'get_all_members',
-  'update_member',
-  'add_member_tags',
-  'remove_member_tags'
-];
-
-// Export trigger events
-export const mailchimpTriggers = [
-  'member_subscribed',
-  'member_unsubscribed',
-  'member_profile_updated',
-  'member_email_updated',
-  'member_cleaned',
-  'campaign_sent'
-];
