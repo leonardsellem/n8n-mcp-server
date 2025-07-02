@@ -401,6 +401,66 @@ export const n8nDocumentationToolsFinal: ToolDefinition[] = [
       required: ['workflow'],
     },
   },
+  {
+    name: 'discover_nodes',
+    description: `Discover n8n nodes dynamically from GitHub with intelligent caching. Returns comprehensive node list with timeout-safe operation. Uses background GitHub sync with immediate cache responses. Bulletproof alternative to static node lists. Categories, search functionality, and metadata included. Always returns results - falls back to cache if GitHub unavailable.`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          description: 'Optional filter by node category. Use list_node_categories to see available categories.',
+        },
+        search: {
+          type: 'string',
+          description: 'Optional search query to find nodes by name or description.',
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of results to return (default: 50)',
+          default: 50,
+        },
+      },
+    },
+  },
+  {
+    name: 'get_node_details',
+    description: `Get detailed information about a specific n8n node from the integrated discovery system. Returns comprehensive node metadata including properties, operations, credentials, and usage information. Uses intelligent caching for fast responses.`,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        nodeName: {
+          type: 'string',
+          description: 'Name of the node to get details for (e.g., "HttpRequest", "Slack", "OpenAI")',
+        },
+      },
+      required: ['nodeName'],
+    },
+  },
+  {
+    name: 'sync_nodes_from_github',
+    description: `Force refresh node data from GitHub repository. Use this to get the latest nodes and updates. The system automatically syncs when repository changes are detected, but this forces an immediate update. Returns sync status and statistics.`,
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'get_cache_stats',
+    description: `Get statistics about the node cache and discovery system. Shows cache performance, last sync time, total nodes discovered, and GitHub API usage. Useful for monitoring and troubleshooting the discovery system.`,
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
+  {
+    name: 'list_node_categories',
+    description: `List all available node categories in the system. Use this to discover available categories for filtering with discover_nodes. Returns sorted list of categories with node counts.`,
+    inputSchema: {
+      type: 'object',
+      properties: {},
+    },
+  },
 ];
 
 /**

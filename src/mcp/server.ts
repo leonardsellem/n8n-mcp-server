@@ -25,6 +25,7 @@ import { isN8nApiConfigured } from '../config/n8n-api';
 import * as n8nHandlers from './handlers-n8n-manager';
 import { handleUpdatePartialWorkflow } from './handlers-workflow-diff';
 import { PROJECT_VERSION } from '../utils/version';
+import { IntegratedNodeDiscovery } from '../loaders/integrated-node-discovery';
 
 interface NodeRow {
   node_type: string;
@@ -51,6 +52,7 @@ export class N8NDocumentationMCPServer {
   private templateService: TemplateService | null = null;
   private initialized: Promise<void>;
   private cache = new SimpleCache();
+  private integratedDiscovery: IntegratedNodeDiscovery | null = null;
 
   constructor() {
     // Try multiple database paths
@@ -235,6 +237,18 @@ export class N8NDocumentationMCPServer {
         return this.validateWorkflowConnections(args.workflow);
       case 'validate_workflow_expressions':
         return this.validateWorkflowExpressions(args.workflow);
+      
+      // New IntegratedNodeDiscovery Tools
+      case 'discover_nodes':
+        return this.discoverNodes(args.category, args.search, args.limit);
+      case 'get_node_details':
+        return this.getNodeDetails(args.nodeName);
+      case 'sync_nodes_from_github':
+        return this.syncNodesFromGitHub();
+      case 'get_cache_stats':
+        return this.getCacheStats();
+      case 'list_node_categories':
+        return this.listNodeCategories();
       
       // n8n Management Tools (if API is configured)
       case 'n8n_create_workflow':
@@ -1568,6 +1582,137 @@ Full documentation is being prepared. For now, use get_node_essentials for confi
     logger.info('MCP Server connected', { 
       transportType: transport.constructor.name 
     });
+  }
+
+  // IntegratedNodeDiscovery tool implementations
+  private async discoverNodes(category?: string, search?: string, limit?: number): Promise<any> {
+    if (!this.integratedDiscovery) {
+      this.integratedDiscovery = new IntegratedNodeDiscovery();
+    }
+
+    try {
+      let nodes;
+      
+      if (search) {
+        nodes = await this.integratedDiscovery.searchNodes(search);
+      } else if (category) {
+        nodes = await this.integratedDiscovery.getNodesByCategory(category);
+      } else {
+        nodes = await this.integratedDiscovery.discoverNodes();
+      }
+
+      // Apply limit if specified
+      if (limit && nodes.length > limit) {
+        nodes = nodes.slice(0, limit);
+      }
+
+      return {
+        nodes,
+        count: nodes.length,
+        filters: { category, search, limit },
+        cacheStats: await this.integratedDiscovery.getCacheStats()
+      };
+    } catch (error) {
+      logger.error('Error in discoverNodes:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        nodes: [],
+        count: 0
+      };
+    }
+  }
+
+  private async getNodeDetails(nodeName: string): Promise<any> {
+    if (!this.integratedDiscovery) {
+      this.integratedDiscovery = new IntegratedNodeDiscovery();
+    }
+
+    try {
+      const details = await this.integratedDiscovery.getNodeDetails(nodeName);
+      
+      if (!details) {
+        return {
+          error: `Node '${nodeName}' not found`,
+          suggestion: "Use discover_nodes or list_node_categories to find available nodes"
+        };
+      }
+
+      return {
+        node: details,
+        lastUpdated: details.lastUpdated,
+        source: 'IntegratedNodeDiscovery'
+      };
+    } catch (error) {
+      logger.error('Error in getNodeDetails:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        nodeName
+      };
+    }
+  }
+
+  private async syncNodesFromGitHub(): Promise<any> {
+    if (!this.integratedDiscovery) {
+      this.integratedDiscovery = new IntegratedNodeDiscovery();
+    }
+
+    try {
+      await this.integratedDiscovery.forceRefresh();
+      const stats = await this.integratedDiscovery.getCacheStats();
+      
+      return {
+        success: true,
+        message: 'Successfully refreshed nodes from GitHub',
+        stats,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      logger.error('Error in syncNodesFromGitHub:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        fallback: 'Using cached data'
+      };
+    }
+  }
+
+  private async getCacheStats(): Promise<any> {
+    if (!this.integratedDiscovery) {
+      this.integratedDiscovery = new IntegratedNodeDiscovery();
+    }
+
+    try {
+      return await this.integratedDiscovery.getCacheStats();
+    } catch (error) {
+      logger.error('Error in getCacheStats:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        totalNodes: 0,
+        lastSync: 'Never'
+      };
+    }
+  }
+
+  private async listNodeCategories(): Promise<any> {
+    if (!this.integratedDiscovery) {
+      this.integratedDiscovery = new IntegratedNodeDiscovery();
+    }
+
+    try {
+      const categories = await this.integratedDiscovery.getAvailableCategories();
+      
+      return {
+        categories,
+        count: categories.length,
+        usage: "Use these categories with discover_nodes({category: 'categoryName'})"
+      };
+    } catch (error) {
+      logger.error('Error in listNodeCategories:', error);
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        categories: []
+      };
+    }
   }
   
   // Template-related methods
