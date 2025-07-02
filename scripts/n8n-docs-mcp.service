@@ -1,0 +1,29 @@
+[Unit]
+Description=n8n Documentation MCP Server
+After=network.target
+
+[Service]
+Type=simple
+User=nodejs
+WorkingDirectory=/opt/n8n-mcp
+ExecStart=/usr/bin/node /opt/n8n-mcp/dist/index-http.js
+Restart=always
+RestartSec=10
+
+# Environment
+Environment="NODE_ENV=production"
+EnvironmentFile=/opt/n8n-mcp/.env
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/n8n-mcp/data /opt/n8n-mcp/logs /opt/n8n-mcp/temp
+
+# Logging
+StandardOutput=append:/opt/n8n-mcp/logs/service.log
+StandardError=append:/opt/n8n-mcp/logs/service-error.log
+
+[Install]
+WantedBy=multi-user.target

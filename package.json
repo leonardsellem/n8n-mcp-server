@@ -61,7 +61,6 @@
   },
   "homepage": "https://github.com/czlonkowski/n8n-mcp#readme",
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.3",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.30",
@@ -80,7 +79,6 @@
     "better-sqlite3": "^11.10.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "find-config": "^1.0.0",
     "n8n": "^1.100.1",
     "n8n-core": "^1.99.0",
     "n8n-workflow": "^1.97.0",

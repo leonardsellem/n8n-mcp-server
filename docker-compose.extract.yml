@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Latest n8n container for node extraction
+  n8n-latest:
+    image: n8nio/n8n:latest
+    container_name: n8n-latest-extractor
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_PORT=5678
+      - N8N_ENCRYPTION_KEY=dummy-key-for-extraction
+    volumes:
+      # Mount n8n's node_modules for extraction
+      - n8n_modules:/usr/local/lib/node_modules/n8n/node_modules
+      # Provide writable directory for n8n config
+      - n8n_config:/home/node/.n8n
+    # We don't need n8n to stay running, just to install modules
+    entrypoint: ["sh", "-c", "sleep 300"]
+    healthcheck:
+      test: ["CMD-SHELL", "ls /usr/local/lib/node_modules/n8n/node_modules/n8n-nodes-base > /dev/null 2>&1"]
+      interval: 5s
+      timeout: 30s
+      retries: 20
+
+  # Extractor service that will read from the mounted volumes
+  node-extractor:
+    image: node:18-alpine
+    container_name: n8n-node-extractor
+    working_dir: /app
+    depends_on:
+      n8n-latest:
+        condition: service_healthy
+    volumes:
+      # Mount the n8n modules from the n8n container
+      - n8n_modules:/n8n-modules:ro
+      - n8n_custom:/n8n-custom:ro
+      # Mount our project files
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+      - NODE_DB_PATH=/app/data/nodes-fresh.db
+      - N8N_MODULES_PATH=/n8n-modules
+      - N8N_CUSTOM_PATH=/n8n-custom
+    command: /bin/sh -c "apk add --no-cache sqlite && node /app/scripts/extract-from-docker.js"
+
+volumes:
+  n8n_modules:
+  n8n_custom:
+  n8n_config:

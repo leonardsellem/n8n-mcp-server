@@ -100,7 +100,7 @@ export class TemplateService {
   ): Promise<void> {
     try {
       // Dynamically import fetcher only when needed (requires axios)
-      const { TemplateFetcher } = await import('./template-fetcher.js');
+      const { TemplateFetcher } = await import('./template-fetcher');
       const fetcher = new TemplateFetcher();
       
       // Clear existing templates
@@ -108,7 +108,7 @@ export class TemplateService {
       
       // Fetch template list
       logger.info('Fetching template list from n8n.io');
-      const templates = await fetcher.fetchTemplates((current: number, total: number) => {
+      const templates = await fetcher.fetchTemplates((current, total) => {
         progressCallback?.('Fetching template list', current, total);
       });
       
@@ -116,7 +116,7 @@ export class TemplateService {
       
       // Fetch details for each template
       logger.info('Fetching template details');
-      const details = await fetcher.fetchAllTemplateDetails(templates, (current: number, total: number) => {
+      const details = await fetcher.fetchAllTemplateDetails(templates, (current, total) => {
         progressCallback?.('Fetching template details', current, total);
       });
       

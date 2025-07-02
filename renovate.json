@@ -1,0 +1,56 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "schedule": ["after 9am on monday"],
+  "timezone": "UTC",
+  "packageRules": [
+    {
+      "description": "Group all n8n-related updates",
+      "groupName": "n8n dependencies",
+      "matchPackagePatterns": ["^n8n", "^@n8n/"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["after 9am on monday"]
+    },
+    {
+      "description": "Require approval for major n8n updates",
+      "matchPackagePatterns": ["^n8n", "^@n8n/"],
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Disable updates for other dependencies",
+      "excludePackagePatterns": ["^n8n", "^@n8n/"],
+      "enabled": false
+    }
+  ],
+  "postUpdateOptions": [
+    "npmDedupe"
+  ],
+  "prConcurrentLimit": 1,
+  "prCreation": "immediate",
+  "labels": ["dependencies", "n8n-update"],
+  "assignees": ["@czlonkowski"],
+  "reviewers": ["@czlonkowski"],
+  "commitMessagePrefix": "chore: ",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "from {{currentVersion}} to {{newVersion}}",
+  "prBodyDefinitions": {
+    "Package": "{{depName}}",
+    "Type": "{{depType}}",
+    "Update": "{{updateType}}",
+    "Current": "{{currentVersion}}",
+    "New": "{{newVersion}}",
+    "Change": "[Compare]({{compareUrl}})"
+  },
+  "prBodyColumns": ["Package", "Type", "Update", "Current", "New", "Change"],
+  "prBodyNotes": [
+    "**Important**: Please review the [n8n release notes](https://docs.n8n.io/release-notes/) for breaking changes.",
+    "",
+    "After merging, please:",
+    "1. Run `npm run rebuild` to update the node database",
+    "2. Run `npm run validate` to ensure all nodes are properly loaded",
+    "3. Test critical functionality"
+  ]
+}

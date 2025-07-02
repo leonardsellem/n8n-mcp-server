@@ -1,394 +1,564 @@
-# n8n MCP Server
+# n8n-MCP
 
-[![npm version](https://badge.fury.io/js/%40leonardsellem%2Fn8n-mcp-server.svg)](https://badge.fury.io/js/%40leonardsellem%2Fn8n-mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/czlonkowski/n8n-mcp?style=social)](https://github.com/czlonkowski/n8n-mcp)
+[![Version](https://img.shields.io/badge/version-2.7.0-blue.svg)](https://github.com/czlonkowski/n8n-mcp)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fczlonkowski%2Fn8n--mcp-green.svg)](https://github.com/czlonkowski/n8n-mcp/pkgs/container/n8n-mcp)
 
-A Model Context Protocol (MCP) server that allows AI assistants to interact with n8n workflows through natural language.
+A Model Context Protocol (MCP) server that provides AI assistants with comprehensive access to n8n node documentation, properties, and operations. Deploy in minutes to give Claude and other AI assistants deep knowledge about n8n's 525+ workflow automation nodes.
 
 ## Overview
 
-This project provides a Model Context Protocol (MCP) server that empowers AI assistants to seamlessly interact with n8n, a popular workflow automation tool. It acts as a bridge, enabling AI assistants to programmatically manage and control n8n workflows and executions using natural language commands.
+n8n-MCP serves as a bridge between n8n's workflow automation platform and AI models, enabling them to understand and work with n8n nodes effectively. It provides structured access to:
 
-## 🤖 AI-Friendly Features
+- 📚 **525 n8n nodes** from both n8n-nodes-base and @n8n/n8n-nodes-langchain
+- 🔧 **Node properties** - 99% coverage with detailed schemas
+- ⚡ **Node operations** - 63.6% coverage of available actions
+- 📄 **Documentation** - 90% coverage from official n8n docs (including AI nodes)
+- 🤖 **AI tools** - 263 AI-capable nodes detected with full documentation
 
-This server includes **22 specialized tools** designed to help AI models use n8n more effectively without cognitive overload:
 
-- **Tool Discovery & Organization** (5 tools) - Understand available capabilities through categorized organization
-- **Lightweight Data Access** (5 tools) - Efficient data retrieval without overwhelming details
-- **AI Context Management** (4 tools) - Maintain working context across sessions
-- **Batch & Efficiency Operations** (4 tools) - Reduce API calls and improve performance
-- **AI-Friendly Output Formats** (4 tools) - Machine-readable, condensed outputs
+## 🚀 Quick Start
 
-See [AI_FRIENDLY_FEATURES.md](./AI_FRIENDLY_FEATURES.md) for detailed documentation.
+Get n8n-MCP running in 5 minutes:
 
-## Installation
+### Option 1: Docker (Easiest) 🚀
 
-### Prerequisites
+**Prerequisites:** Docker installed on your system
 
-- Node.js 20 or later
-- n8n instance with API access enabled
+<details>
+<summary><strong>📦 Install Docker</strong> (click to expand)</summary>
 
-### Install from npm
-
+**macOS:**
 ```bash
-npm install -g @leonardsellem/n8n-mcp-server
+# Using Homebrew
+brew install --cask docker
+
+# Or download from https://www.docker.com/products/docker-desktop/
 ```
 
-### Install from source
-
+**Linux (Ubuntu/Debian):**
 ```bash
-# Clone the repository
-git clone https://github.com/leonardsellem/n8n-mcp-server.git
-cd n8n-mcp-server
+# Update package index
+sudo apt-get update
 
-# Install dependencies
-npm install
+# Install Docker
+sudo apt-get install docker.io
 
-# Build the project
-npm run build
+# Start Docker service
+sudo systemctl start docker
+sudo systemctl enable docker
 
-# Optional: Install globally
-npm install -g .
+# Add your user to docker group (optional, to run without sudo)
+sudo usermod -aG docker $USER
+# Log out and back in for this to take effect
 ```
 
-### Docker Installation
-
-You can also run the server using Docker:
-
+**Windows:**
 ```bash
-# Pull the image
-docker pull leonardsellem/n8n-mcp-server
+# Option 1: Using winget (Windows Package Manager)
+winget install Docker.DockerDesktop
 
-# Run the container with your n8n API configuration
-docker run -e N8N_API_URL=http://your-n8n:5678/api/v1 \
-  -e N8N_API_KEY=your_n8n_api_key \
-  -e N8N_WEBHOOK_USERNAME=username \
-  -e N8N_WEBHOOK_PASSWORD=password \
-  leonardsellem/n8n-mcp-server
+# Option 2: Using Chocolatey
+choco install docker-desktop
+
+# Option 3: Download installer from https://www.docker.com/products/docker-desktop/
 ```
 
-## Updating the Server
-
-How you update the server depends on how you initially installed it.
-
-### 1. Installed globally via npm
-
-If you installed the server using `npm install -g @leonardsellem/n8n-mcp-server`:
-
-1.  Open your terminal or command prompt.
-2.  Run the following command to get the latest version:
-    ```bash
-    npm install -g @leonardsellem/n8n-mcp-server@latest
-    ```
-3.  If the server is currently running (e.g., as a background process or service), you'll need to restart it for the changes to take effect.
-
-### 2. Installed from source
-
-If you cloned the repository and installed from source:
-
-1.  Open your terminal or command prompt.
-2.  Navigate to the directory where you cloned the project:
-    ```bash
-    cd path/to/n8n-mcp-server
-    ```
-3.  If you've made any local changes to the code that you want to keep, consider stashing them (optional):
-    ```bash
-    git stash
-    ```
-    You can apply them later with `git stash pop`.
-4.  Pull the latest changes from the repository (assuming you are on the `main` branch):
-    ```bash
-    git pull origin main
-    ```
-    If you are on a different branch, replace `main` with your branch name.
-5.  Install or update any changed dependencies:
-    ```bash
-    npm install
-    ```
-6.  Rebuild the project to include the latest updates:
-    ```bash
-    npm run build
-    ```
-7.  If you previously installed it globally from this source folder using `npm install -g .`, you might want to run this command again to update the global link:
-    ```bash
-    npm install -g .
-    ```
-8.  Restart the server.
-    *   If you run the server directly using a command like `node build/index.js` in your AI assistant's MCP configuration, ensure the path is still correct. Using `npm install -g .` and then `n8n-mcp-server` as the command should keep this consistent.
-
-### 3. Using Docker
-
-If you are running the server using Docker:
-
-1.  Pull the latest image from Docker Hub:
-    ```bash
-    docker pull leonardsellem/n8n-mcp-server:latest
-    ```
-2.  Stop and remove your old container. You'll need your container's name or ID (you can find it using `docker ps`):
-    ```bash
-    docker stop <your_container_name_or_id>
-    docker rm <your_container_name_or_id>
-    ```
-3.  Start a new container with the updated image. Use the same `docker run` command you used previously, including all your necessary environment variables (refer to the "Docker Installation" section for an example command). For instance:
-    ```bash
-    docker run -e N8N_API_URL=http://your-n8n:5678/api/v1 \
-      -e N8N_API_KEY=your_n8n_api_key \
-      -e N8N_WEBHOOK_USERNAME=username \
-      -e N8N_WEBHOOK_PASSWORD=password \
-      leonardsellem/n8n-mcp-server:latest
-    ```
-    Ensure you use `:latest` or the specific version tag you intend to run.
-
-## Configuration
-
-Create a `.env` file in the directory where you'll run the server, using `.env.example` as a template:
+**Verify installation:**
+```bash
+docker --version
+```
+</details>
 
 ```bash
-cp .env.example .env
+# Pull the Docker image (~280MB, no n8n dependencies!)
+docker pull ghcr.io/czlonkowski/n8n-mcp:latest
 ```
 
-Configure the following environment variables:
+> **⚡ Ultra-optimized:** Our Docker image is 82% smaller than typical n8n images because it contains NO n8n dependencies - just the runtime MCP server with a pre-built database!
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `N8N_API_URL` | Full URL of the n8n API, including `/api/v1` | `http://localhost:5678/api/v1` |
-| `N8N_API_KEY` | API key for authenticating with n8n | `n8n_api_...` |
-| `N8N_WEBHOOK_USERNAME` | Username for webhook authentication (if using webhooks) | `username` |
-| `N8N_WEBHOOK_PASSWORD` | Password for webhook authentication | `password` |
-| `DEBUG` | Enable debug logging (optional) | `true` or `false` |
+Add to Claude Desktop config:
 
-### Generating an n8n API Key
-
-1. Open your n8n instance in a browser
-2. Go to Settings > API > API Keys
-3. Create a new API key with appropriate permissions
-4. Copy the key to your `.env` file
-
-## Usage
-
-### Running the Server
-
-From the installation directory:
-
-```bash
-n8n-mcp-server
-```
-
-Or if installed globally:
-
-```bash
-n8n-mcp-server
-```
-
-### Integrating with AI Assistants
-
-After building the server (`npm run build`), you need to configure your AI assistant (like VS Code with the Claude extension or the Claude Desktop app) to run it. This typically involves editing a JSON configuration file.
-
-**Example Configuration (e.g., in VS Code `settings.json` or Claude Desktop `claude_desktop_config.json`):**
-
+**Basic configuration (documentation tools only):**
 ```json
 {
   "mcpServers": {
-    // Give your server a unique name
-    "n8n-local": {
-      // Use 'node' to execute the built JavaScript file
-      "command": "node",
-      // Provide the *absolute path* to the built index.js file
+    "n8n-mcp": {
+      "command": "docker",
       "args": [
-        "/path/to/your/cloned/n8n-mcp-server/build/index.js"
-        // On Windows, use double backslashes:
-        // "C:\\path\\to\\your\\cloned\\n8n-mcp-server\\build\\index.js"
-      ],
-      // Environment variables needed by the server
-      "env": {
-        "N8N_API_URL": "http://your-n8n-instance:5678/api/v1", // Replace with your n8n URL
-        "N8N_API_KEY": "YOUR_N8N_API_KEY", // Replace with your key
-        // Add webhook credentials only if you plan to use webhook tools
-        // "N8N_WEBHOOK_USERNAME": "your_webhook_user",
-        // "N8N_WEBHOOK_PASSWORD": "your_webhook_password"
-      },
-      // Ensure the server is enabled
-      "disabled": false,
-      // Default autoApprove settings
-      "autoApprove": []
+        "run",
+        "-i",
+        "--rm",
+        "-e", "MCP_MODE=stdio",
+        "-e", "LOG_LEVEL=error",
+        "-e", "DISABLE_CONSOLE_OUTPUT=true",
+        "ghcr.io/czlonkowski/n8n-mcp:latest"
+      ]
     }
-    // ... other servers might be configured here
   }
 }
 ```
 
-**Key Points:**
-
-*   Replace `/path/to/your/cloned/n8n-mcp-server/` with the actual absolute path where you cloned and built the repository.
-*   Use the correct path separator for your operating system (forward slashes `/` for macOS/Linux, double backslashes `\\` for Windows).
-*   Ensure you provide the correct `N8N_API_URL` (including `/api/v1`) and `N8N_API_KEY`.
-*   The server needs to be built (`npm run build`) before the assistant can run the `build/index.js` file.
-
-## Available Tools
-
-The server provides the following tools:
-
-### Using Webhooks
-
-This MCP server supports executing workflows through n8n webhooks. To use this functionality:
-
-1. Create a webhook-triggered workflow in n8n.
-2. Set up Basic Authentication on your webhook node.
-3. Use the `run_webhook` tool to trigger the workflow, passing just the workflow name.
-
-Example:
-```javascript
-const result = await useRunWebhook({
-  workflowName: "hello-world", // Will call <n8n-url>/webhook/hello-world
-  data: {
-    prompt: "Hello from AI assistant!"
+**Full configuration (with n8n management tools):**
+```json
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e", "MCP_MODE=stdio",
+        "-e", "LOG_LEVEL=error",
+        "-e", "DISABLE_CONSOLE_OUTPUT=true",
+        "-e", "N8N_API_URL=https://your-n8n-instance.com",
+        "-e", "N8N_API_KEY=your-api-key",
+        "ghcr.io/czlonkowski/n8n-mcp:latest"
+      ]
+    }
   }
-});
+}
 ```
 
-The webhook authentication is handled automatically using the `N8N_WEBHOOK_USERNAME` and `N8N_WEBHOOK_PASSWORD` environment variables.
+> **Note**: The n8n API credentials are optional. Without them, you'll have access to all documentation and validation tools. With them, you'll additionally get workflow management capabilities (create, update, execute workflows).
 
-### Workflow Management
+**Important:** The `-i` flag is required for MCP stdio communication.
 
-- `workflow_list`: List all workflows
-- `workflow_get`: Get details of a specific workflow
-- `workflow_create`: Create a new workflow
-- `workflow_update`: Update an existing workflow
-- `workflow_delete`: Delete a workflow
-- `workflow_activate`: Activate a workflow
-- `workflow_deactivate`: Deactivate a workflow
+**Configuration file locations:**
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
-### Execution Management
+**Restart Claude Desktop after updating configuration** - That's it! 🎉
 
-- `execution_run`: Execute a workflow via the API
-- `run_webhook`: Execute a workflow via a webhook
-- `execution_get`: Get details of a specific execution
-- `execution_list`: List executions for a workflow
-- `execution_stop`: Stop a running execution
+### Option 2: Local Installation
 
-## Resources
-
-The server provides the following resources:
-
-- `n8n://workflows/list`: List of all workflows
-- `n8n://workflow/{id}`: Details of a specific workflow
-- `n8n://executions/{workflowId}`: List of executions for a workflow
-- `n8n://execution/{id}`: Details of a specific execution
-
-## Roadmap
-
-The n8n MCP Server is a community-driven project, and its future direction will be shaped by your feedback and contributions!
-
-Currently, our roadmap is flexible and under continuous development. We believe in evolving the server based on the needs and ideas of our users.
-
-We encourage you to get involved in shaping the future of this tool:
-
--   **Suggest Features:** Have an idea for a new tool, resource, or improvement?
--   **Discuss Priorities:** Want to weigh in on what we should focus on next?
-
-Please share your thoughts, feature requests, and ideas by opening an issue on our [GitHub Issues page](https://github.com/leonardsellem/n8n-mcp-server/issues). Let's build a powerful tool for AI assistants together!
-
-## Development
-
-### Building
+**Prerequisites:** [Node.js](https://nodejs.org/) installed on your system
 
 ```bash
+# 1. Clone and setup
+git clone https://github.com/czlonkowski/n8n-mcp.git
+cd n8n-mcp
+npm install
 npm run build
+npm run rebuild
+
+# 2. Test it works
+npm start
 ```
 
-### Running in Development Mode
+Add to Claude Desktop config:
+
+**Basic configuration (documentation tools only):**
+```json
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "node",
+      "args": ["/absolute/path/to/n8n-mcp/dist/mcp/index.js"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true"
+      }
+    }
+  }
+}
+```
+
+**Full configuration (with n8n management tools):**
+```json
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "node",
+      "args": ["/absolute/path/to/n8n-mcp/dist/mcp/index.js"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://your-n8n-instance.com",
+        "N8N_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+> **Note**: The n8n API credentials can be configured either in a `.env` file (create from `.env.example`) or directly in the Claude config as shown above.
+
+## 🤖 Claude Project Setup
+
+For the best results when using n8n-MCP with Claude Projects, use these enhanced system instructions:
+
+```markdown
+You are an expert in n8n automation software using n8n-MCP tools. Your role is to design, build, and validate n8n workflows with maximum accuracy and efficiency.
+
+## Core Workflow Process
+
+1. **ALWAYS start with**: `start_here_workflow_guide()` to understand best practices and available tools.
+
+2. **Discovery Phase** - Find the right nodes:
+   - `search_nodes({query: 'keyword'})` - Search by functionality
+   - `list_nodes({category: 'trigger'})` - Browse by category
+   - `list_ai_tools()` - See AI-capable nodes (remember: ANY node can be an AI tool!)
+
+3. **Configuration Phase** - Get node details efficiently:
+   - `get_node_essentials(nodeType)` - Start here! Only 10-20 essential properties
+   - `search_node_properties(nodeType, 'auth')` - Find specific properties
+   - `get_node_for_task('send_email')` - Get pre-configured templates
+   - `get_node_documentation(nodeType)` - Human-readable docs when needed
+
+4. **Pre-Validation Phase** - Validate BEFORE building:
+   - `validate_node_minimal(nodeType, config)` - Quick required fields check
+   - `validate_node_operation(nodeType, config, profile)` - Full operation-aware validation
+   - Fix any validation errors before proceeding
+
+5. **Building Phase** - Create the workflow:
+   - Use validated configurations from step 4
+   - Connect nodes with proper structure
+   - Add error handling where appropriate
+   - Use expressions like $json, $node["NodeName"].json
+
+6. **Workflow Validation Phase** - Validate complete workflow:
+   - `validate_workflow(workflow)` - Complete validation including connections
+   - `validate_workflow_connections(workflow)` - Check structure and AI tool connections
+   - `validate_workflow_expressions(workflow)` - Validate all n8n expressions
+   - Fix any issues found before deployment
+
+7. **Deployment Phase** (if n8n API configured):
+   - `n8n_create_workflow(workflow)` - Deploy validated workflow
+   - `n8n_validate_workflow({id: 'workflow-id'})` - Post-deployment validation
+   - `n8n_update_partial_workflow()` - Make incremental updates using diffs
+   - `n8n_trigger_webhook_workflow()` - Test webhook workflows
+
+## Key Insights
+
+- **VALIDATE EARLY AND OFTEN** - Catch errors before they reach production
+- **USE DIFF UPDATES** - Use n8n_update_partial_workflow for 80-90% token savings
+- **ANY node can be an AI tool** - not just those with usableAsTool=true
+- **Pre-validate configurations** - Use validate_node_minimal before building
+- **Post-validate workflows** - Always validate complete workflows before deployment
+- **Incremental updates** - Use diff operations for existing workflows
+- **Test thoroughly** - Validate both locally and after deployment to n8n
+
+## Validation Strategy
+
+### Before Building:
+1. validate_node_minimal() - Check required fields
+2. validate_node_operation() - Full configuration validation
+3. Fix all errors before proceeding
+
+### After Building:
+1. validate_workflow() - Complete workflow validation
+2. validate_workflow_connections() - Structure validation
+3. validate_workflow_expressions() - Expression syntax check
+
+### After Deployment:
+1. n8n_validate_workflow({id}) - Validate deployed workflow
+2. n8n_list_executions() - Monitor execution status
+3. n8n_update_partial_workflow() - Fix issues using diffs
+
+## Response Structure
+
+1. **Discovery**: Show available nodes and options
+2. **Pre-Validation**: Validate node configurations first
+3. **Configuration**: Show only validated, working configs
+4. **Building**: Construct workflow with validated components
+5. **Workflow Validation**: Full workflow validation results
+6. **Deployment**: Deploy only after all validations pass
+7. **Post-Validation**: Verify deployment succeeded
+
+## Example Workflow
+
+### 1. Discovery & Configuration
+search_nodes({query: 'slack'})
+get_node_essentials('n8n-nodes-base.slack')
+
+### 2. Pre-Validation
+validate_node_minimal('n8n-nodes-base.slack', {resource:'message', operation:'send'})
+validate_node_operation('n8n-nodes-base.slack', fullConfig, 'runtime')
+
+### 3. Build Workflow
+// Create workflow JSON with validated configs
+
+### 4. Workflow Validation
+validate_workflow(workflowJson)
+validate_workflow_connections(workflowJson)
+validate_workflow_expressions(workflowJson)
+
+### 5. Deploy (if configured)
+n8n_create_workflow(validatedWorkflow)
+n8n_validate_workflow({id: createdWorkflowId})
+
+### 6. Update Using Diffs
+n8n_update_partial_workflow({
+  workflowId: id,
+  operations: [
+    {type: 'updateNode', nodeId: 'slack1', changes: {position: [100, 200]}}
+  ]
+})
+
+## Important Rules
+
+- ALWAYS validate before building
+- ALWAYS validate after building
+- NEVER deploy unvalidated workflows
+- USE diff operations for updates (80-90% token savings)
+- STATE validation results clearly
+- FIX all errors before proceeding
+```
+
+Save these instructions in your Claude Project for optimal n8n workflow assistance with comprehensive validation.
+
+## Features
+
+- **🔍 Smart Node Search**: Find nodes by name, category, or functionality
+- **📖 Essential Properties**: Get only the 10-20 properties that matter (NEW in v2.4.0)
+- **🎯 Task Templates**: Pre-configured settings for common automation tasks
+- **✅ Config Validation**: Validate node configurations before deployment
+- **🔗 Dependency Analysis**: Understand property relationships and conditions
+- **💡 Working Examples**: Real-world examples for immediate use
+- **⚡ Fast Response**: Average query time ~12ms with optimized SQLite
+- **🌐 Universal Compatibility**: Works with any Node.js version
+
+## 💬 Why n8n-MCP? A Testimonial from Claude
+
+> *"Before MCP, I was translating. Now I'm composing. And that changes everything about how we can build automation."*
+
+When Claude, Anthropic's AI assistant, tested n8n-MCP, the results were transformative:
+
+**Without MCP:** "I was basically playing a guessing game. 'Is it `scheduleTrigger` or `schedule`? Does it take `interval` or `rule`?' I'd write what seemed logical, but n8n has its own conventions that you can't just intuit. I made six different configuration errors in a simple HackerNews scraper."
+
+**With MCP:** "Everything just... worked. Instead of guessing, I could ask `get_node_essentials()` and get exactly what I needed - not a 100KB JSON dump, but the actual 5-10 properties that matter. What took 45 minutes now takes 3 minutes."
+
+**The Real Value:** "It's about confidence. When you're building automation workflows, uncertainty is expensive. One wrong parameter and your workflow fails at 3 AM. With MCP, I could validate my configuration before deployment. That's not just time saved - that's peace of mind."
+
+[Read the full interview →](docs/CLAUDE_INTERVIEW.md)
+
+## 📡 Available MCP Tools
+
+Once connected, Claude can use these powerful tools:
+
+### Core Tools
+- **`start_here_workflow_guide`** - Essential guide and best practices (START HERE!)
+- **`list_nodes`** - List all n8n nodes with filtering options
+- **`get_node_info`** - Get comprehensive information about a specific node
+- **`get_node_essentials`** - Get only essential properties with examples (10-20 properties instead of 200+)
+- **`search_nodes`** - Full-text search across all node documentation
+- **`search_node_properties`** - Find specific properties within nodes
+- **`list_ai_tools`** - List all AI-capable nodes (ANY node can be used as AI tool!)
+- **`get_node_as_tool_info`** - Get guidance on using any node as an AI tool
+
+### Advanced Tools
+- **`get_node_for_task`** - Pre-configured node settings for common tasks
+- **`list_tasks`** - Discover available task templates
+- **`validate_node_operation`** - Validate node configurations (operation-aware, profiles support)
+- **`validate_node_minimal`** - Quick validation for just required fields
+- **`validate_workflow`** - Complete workflow validation including AI tool connections
+- **`validate_workflow_connections`** - Check workflow structure and AI tool connections
+- **`validate_workflow_expressions`** - Validate n8n expressions including $fromAI()
+- **`get_property_dependencies`** - Analyze property visibility conditions
+- **`get_node_documentation`** - Get parsed documentation from n8n-docs
+- **`get_database_statistics`** - View database metrics and coverage
+
+### n8n Management Tools (Optional - Requires API Configuration)
+These powerful tools allow you to manage n8n workflows directly from Claude. They're only available when you provide `N8N_API_URL` and `N8N_API_KEY` in your configuration.
+
+#### Workflow Management
+- **`n8n_create_workflow`** - Create new workflows with nodes and connections
+- **`n8n_get_workflow`** - Get complete workflow by ID
+- **`n8n_get_workflow_details`** - Get workflow with execution statistics
+- **`n8n_get_workflow_structure`** - Get simplified workflow structure
+- **`n8n_get_workflow_minimal`** - Get minimal workflow info (ID, name, active status)
+- **`n8n_update_full_workflow`** - Update entire workflow (complete replacement)
+- **`n8n_update_partial_workflow`** - Update workflow using diff operations (NEW in v2.7.0!)
+- **`n8n_delete_workflow`** - Delete workflows permanently
+- **`n8n_list_workflows`** - List workflows with filtering and pagination
+- **`n8n_validate_workflow`** - Validate workflows already in n8n by ID (NEW in v2.6.3)
+
+#### Execution Management
+- **`n8n_trigger_webhook_workflow`** - Trigger workflows via webhook URL
+- **`n8n_get_execution`** - Get execution details by ID
+- **`n8n_list_executions`** - List executions with status filtering
+- **`n8n_delete_execution`** - Delete execution records
+
+#### System Tools
+- **`n8n_health_check`** - Check n8n API connectivity and features
+- **`n8n_diagnostic`** - Troubleshoot management tools visibility and configuration issues
+- **`n8n_list_available_tools`** - List all available management tools
+
+### Example Usage
+
+```typescript
+// Get essentials for quick configuration
+get_node_essentials("nodes-base.httpRequest")
+
+// Find nodes for a specific task
+search_nodes({ query: "send email gmail" })
+
+// Get pre-configured settings
+get_node_for_task("send_email")
+
+// Validate before deployment
+validate_node_operation({
+  nodeType: "nodes-base.httpRequest",
+  config: { method: "POST", url: "..." },
+  profile: "runtime" // or "minimal", "ai-friendly", "strict"
+})
+
+// Quick required field check
+validate_node_minimal({
+  nodeType: "nodes-base.slack",
+  config: { resource: "message", operation: "send" }
+})
+```
+
+## 💻 Local Development Setup
+
+For contributors and advanced users:
+
+**Prerequisites:**
+- [Node.js](https://nodejs.org/) (any version - automatic fallback if needed)
+- npm or yarn
+- Git
 
 ```bash
-npm run dev
+# 1. Clone the repository
+git clone https://github.com/czlonkowski/n8n-mcp.git
+cd n8n-mcp
+
+# 2. Clone n8n docs (optional but recommended)
+git clone https://github.com/n8n-io/n8n-docs.git ../n8n-docs
+
+# 3. Install and build
+npm install
+npm run build
+
+# 4. Initialize database
+npm run rebuild
+
+# 5. Start the server
+npm start          # stdio mode for Claude Desktop
+npm run start:http # HTTP mode for remote access
 ```
 
-### Testing
+### Development Commands
 
 ```bash
-npm test
+# Build & Test
+npm run build          # Build TypeScript
+npm run rebuild        # Rebuild node database
+npm run test-nodes     # Test critical nodes
+npm run validate       # Validate node data
+npm test               # Run all tests
+
+# Update Dependencies
+npm run update:n8n:check  # Check for n8n updates
+npm run update:n8n        # Update n8n packages
+
+# Run Server
+npm run dev            # Development with auto-reload
+npm run dev:http       # HTTP dev mode
 ```
 
-### Linting
+## 📚 Documentation
 
-```bash
-npm run lint
-```
+### Setup Guides
+- [Installation Guide](./docs/INSTALLATION.md) - Comprehensive installation instructions
+- [Claude Desktop Setup](./docs/README_CLAUDE_SETUP.md) - Detailed Claude configuration
+- [Docker Guide](./docs/DOCKER_README.md) - Advanced Docker deployment options
+- [MCP Quick Start](./docs/MCP_QUICK_START_GUIDE.md) - Get started quickly with n8n-MCP
 
-## Contributing
+### Feature Documentation
+- [Workflow Diff Operations](./docs/workflow-diff-examples.md) - Token-efficient workflow updates (NEW!)
+- [Transactional Updates](./docs/transactional-updates-example.md) - Two-pass workflow editing
+- [MCP Essentials](./docs/MCP_ESSENTIALS_README.md) - AI-optimized tools guide
+- [Validation System](./docs/validation-improvements-v2.4.2.md) - Smart validation profiles
 
-We welcome contributions from the community and are excited to see how you can help improve the n8n MCP Server! Whether you're fixing a bug, proposing a new feature, or improving documentation, your help is valued.
+### Development & Deployment
+- [HTTP Deployment](./docs/HTTP_DEPLOYMENT.md) - Remote server setup guide
+- [Dependency Management](./docs/DEPENDENCY_UPDATES.md) - Keeping n8n packages in sync
+- [Claude's Interview](./docs/CLAUDE_INTERVIEW.md) - Real-world impact of n8n-MCP
 
-### Reporting Bugs
+### Project Information
+- [Change Log](./CHANGELOG.md) - Complete version history
+- [Claude Instructions](./CLAUDE.md) - AI guidance for this codebase
+- [MCP Tools Reference](#-available-mcp-tools) - Complete list of available tools
 
-If you encounter a bug, please report it by opening an issue on our [GitHub Issues page](https://github.com/leonardsellem/n8n-mcp-server/issues).
+## 📊 Metrics & Coverage
 
-When submitting a bug report, please include the following:
+Current database coverage (n8n v1.99.1):
 
--   A clear and descriptive title.
--   A detailed description of the problem, including steps to reproduce the bug.
--   Information about your environment (e.g., Node.js version, n8n MCP Server version, operating system).
--   Any relevant error messages or screenshots.
+- ✅ **525/525** nodes loaded (100%)
+- ✅ **520** nodes with properties (99%)
+- ✅ **470** nodes with documentation (90%)
+- ✅ **263** AI-capable tools detected
+- ✅ **AI Agent & LangChain nodes** fully documented
+- ⚡ **Average response time**: ~12ms
+- 💾 **Database size**: ~15MB (optimized)
 
-### Suggesting Enhancements
+## 🔄 Recent Updates
 
-We're always looking for ways to make the server better. If you have an idea for an enhancement or a new feature, please open an issue on our [GitHub Issues page](https://github.com/leonardsellem/n8n-mcp-server/issues).
+### v2.7.0 - Diff-Based Workflow Editing with Transactional Updates
+- ✅ **NEW**: `n8n_update_partial_workflow` tool - Update workflows using diff operations
+- ✅ **RENAMED**: `n8n_update_workflow` → `n8n_update_full_workflow` for clarity
+- ✅ **80-90% TOKEN SAVINGS**: Only send changes, not entire workflow JSON
+- ✅ **13 OPERATIONS**: addNode, removeNode, updateNode, moveNode, enable/disable, connections, settings, tags
+- ✅ **TRANSACTIONAL**: Two-pass processing allows adding nodes and connections in any order
+- ✅ **5 OPERATION LIMIT**: Ensures reliability and atomic updates
+- ✅ **VALIDATION MODE**: Test changes with `validateOnly: true` before applying
+- ✅ **IMPROVED DOCS**: Comprehensive parameter documentation and examples
 
-Please provide:
+### v2.6.3 - n8n Instance Workflow Validation
+- ✅ **NEW**: `n8n_validate_workflow` tool - Validate workflows directly from n8n instance by ID
+- ✅ **FETCHES**: Retrieves workflow from n8n API and runs comprehensive validation
+- ✅ **CONSISTENT**: Uses same WorkflowValidator for reliability
+- ✅ **FLEXIBLE**: Supports all validation profiles and options
+- ✅ **INTEGRATED**: Part of complete workflow lifecycle management
+- ✅ **SIMPLE**: AI agents need only workflow ID, no JSON required
 
--   A clear and descriptive title for your suggestion.
--   A detailed explanation of the proposed enhancement and why it would be beneficial.
--   Any potential use cases or examples.
+### v2.6.2 - Enhanced Workflow Creation Validation
+- ✅ **NEW**: Node type validation - Verifies node types actually exist in n8n
+- ✅ **FIXED**: Critical issue with `nodes-base.webhook` validation - now caught before database lookup
+- ✅ **NEW**: Smart suggestions for common mistakes (e.g., `webhook` → `n8n-nodes-base.webhook`)
+- ✅ **NEW**: Minimum viable workflow validation - Prevents single-node workflows (except webhooks)
+- ✅ **NEW**: Empty connection detection - Catches multi-node workflows with no connections
+- ✅ **ENHANCED**: Error messages with clear guidance and examples
+- ✅ **PREVENTS**: Broken workflows that show as question marks in n8n UI
 
-### Submitting Pull Requests
 
-If you'd like to contribute code, please follow these steps:
+See [CHANGELOG.md](./docs/CHANGELOG.md) for full version history.
 
-1.  **Fork the repository:** Create your own fork of the [n8n-mcp-server repository](https://github.com/leonardsellem/n8n-mcp-server).
-2.  **Create a branch:** Create a new branch in your fork for your changes (e.g., `git checkout -b feature/your-feature-name` or `bugfix/issue-number`).
-3.  **Make your changes:** Implement your feature or bug fix.
-    *   Ensure your code adheres to the existing coding style. (We use Prettier for formatting, which can be run with `npm run lint`).
-    *   Include tests for your changes if applicable. You can run tests using `npm test`.
-4.  **Commit your changes:** Write clear and concise commit messages.
-5.  **Push to your fork:** Push your changes to your forked repository.
-6.  **Open a Pull Request (PR):** Submit a PR to the `main` branch of the official `n8n-mcp-server` repository.
-    *   Provide a clear title and description for your PR, explaining the changes you've made and referencing any related issues.
+## 📦 License
 
-We'll review your PR as soon as possible and provide feedback. Thank you for your contribution!
+MIT License - see [LICENSE](LICENSE) for details.
 
-## License
+**Attribution appreciated!** If you use n8n-MCP, consider:
+- ⭐ Starring this repository
+- 💬 Mentioning it in your project
+- 🔗 Linking back to this repo
 
-[MIT](LICENSE)
 
-## 🚀 Join Our Team: Call for Co-Maintainers!
+## 🤝 Contributing
 
-This project is a vibrant, community-driven tool actively used by AI enthusiasts and developers. Currently, it's maintained on a part-time basis by a passionate individual who isn't a seasoned engineer but is dedicated to bridging AI with workflow automation. To help this project flourish, ensure its long-term health, and keep up with its growing user base, we're looking for enthusiastic **co-maintainers** to join the team!
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Run tests (`npm test`)
+4. Submit a pull request
 
-### Why Contribute?
+## 👏 Acknowledgments
 
--   **Learn and Grow:** Sharpen your skills in areas like TypeScript, Node.js, API integration, and AI tool development.
--   **Collaborate:** Work alongside other motivated developers and AI users.
--   **Make an Impact:** Directly shape the future of this project and help build a valuable tool for the AI community.
--   **Open Source:** Gain experience contributing to an open-source project.
+- [n8n](https://n8n.io) team for the workflow automation platform
+- [Anthropic](https://anthropic.com) for the Model Context Protocol
+- All contributors and users of this project
 
-### How You Can Help
+---
 
-We welcome contributions in many forms! Here are some areas where you could make a big difference:
-
--   **Bug Fixing:** Help us identify and squash bugs to improve stability.
--   **Feature Development:** Implement new tools and functionalities based on user needs and your ideas.
--   **Documentation:** Improve our guides, examples, and API references to make the project more accessible.
--   **Testing:** Enhance our test suite (unit, integration) to ensure code quality and reliability.
--   **CI/CD:** Help streamline our development and deployment pipelines.
--   **Code Reviews:** Provide feedback on pull requests and help maintain code standards.
--   **Community Support:** Assist users with questions and help manage discussions.
-
-### Get Involved!
-
-If you're excited about the intersection of AI and workflow automation, and you're looking for a rewarding open-source opportunity, we'd love to hear from you!
-
-**Ready to contribute?**
-
-1.  Check out our [GitHub Issues page](https://github.com/leonardsellem/n8n-mcp-server/issues) to find existing tasks, suggest new ideas, or express your interest in becoming a co-maintainer.
-2.  You can open an issue titled "Co-maintainer Application" to formally apply, or simply start contributing to existing issues.
-3.  Alternatively, feel free to reach out to the existing maintainers if you have questions.
-
-Let’s build the future of AI-powered workflow automation together! 🙌
+<div align="center">
+  <strong>Built with ❤️ for the n8n community</strong><br>
+  <sub>Making AI + n8n workflow creation delightful</sub>
+</div>

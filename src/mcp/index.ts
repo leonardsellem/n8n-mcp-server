@@ -35,11 +35,11 @@ async function main() {
       // Check if we should use the fixed implementation
       if (process.env.USE_FIXED_HTTP === 'true') {
         // Use the fixed HTTP implementation that bypasses StreamableHTTPServerTransport issues
-        const { startFixedHTTPServer } = await import('../http-server.js');
+        const { startFixedHTTPServer } = await import('../http-server');
         await startFixedHTTPServer();
       } else {
         // HTTP mode - for remote deployment with single-session architecture
-        const { SingleSessionHTTPServer } = await import('../http-server-single-session.js');
+        const { SingleSessionHTTPServer } = await import('../http-server-single-session');
         const server = new SingleSessionHTTPServer();
         
         // Graceful shutdown handlers

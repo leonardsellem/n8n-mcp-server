@@ -1,153 +1,61 @@
+# docker-compose.yml
+# For optimized builds with BuildKit, use: docker-compose -f docker-compose.buildkit.yml up
 version: '3.8'
 
 services:
-  n8n-mcp-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    container_name: n8n-mcp-server
+  n8n-mcp:
+    image: ghcr.io/czlonkowski/n8n-mcp:latest
+    container_name: n8n-mcp
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    
+    # Environment configuration
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - LOG_LEVEL=info
-      - N8N_API_URL=${N8N_API_URL:-http://n8n:5678}
-      - N8N_API_KEY=${N8N_API_KEY}
+      # Mode configuration
+      MCP_MODE: ${MCP_MODE:-http}
+      USE_FIXED_HTTP: ${USE_FIXED_HTTP:-true}  # Use fixed implementation for stability
+      AUTH_TOKEN: ${AUTH_TOKEN:?AUTH_TOKEN is required for HTTP mode}
+      
+      # Application settings
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PORT: ${PORT:-3000}
+      
+      # Database
+      NODE_DB_PATH: ${NODE_DB_PATH:-/app/data/nodes.db}
+      REBUILD_ON_START: ${REBUILD_ON_START:-false}
+      
+      # Optional: n8n API configuration (enables 16 additional management tools)
+      # Uncomment and configure to enable n8n workflow management
+      # N8N_API_URL: ${N8N_API_URL}
+      # N8N_API_KEY: ${N8N_API_KEY}
+      # N8N_API_TIMEOUT: ${N8N_API_TIMEOUT:-30000}
+      # N8N_API_MAX_RETRIES: ${N8N_API_MAX_RETRIES:-3}
+    
+    # Volumes for persistence
     volumes:
-      - ./logs:/app/logs
-      - ./cache:/app/cache
-    networks:
-      - n8n-mcp-network
-    healthcheck:
-      test: ["CMD", "node", "-e", "import('./build/utils/health-check.js').then(m => m.healthCheck())"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      - n8n-mcp-data:/app/data
+    
+    # Port mapping
+    ports:
+      - "${PORT:-3000}:3000"
+    
+    # Resource limits
     deploy:
       resources:
         limits:
           memory: 512M
-          cpus: '0.5'
         reservations:
           memory: 256M
-          cpus: '0.25'
-    security_opt:
-      - no-new-privileges:true
-    read_only: true
-    tmpfs:
-      - /tmp:noexec,nosuid,size=100m
-      - /app/tmp:noexec,nosuid,size=50m
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.n8n-mcp.rule=Host(`mcp.yourdomain.com`)"
-      - "traefik.http.routers.n8n-mcp.tls=true"
-      - "traefik.http.routers.n8n-mcp.tls.certresolver=letsencrypt"
-      - "traefik.http.services.n8n-mcp.loadbalancer.server.port=3000"
-
-  # Optional: n8n instance for testing
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: n8n
-    restart: unless-stopped
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-password}
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:5678/
-      - GENERIC_TIMEZONE=UTC
-    volumes:
-      - n8n_data:/home/node/.n8n
-    networks:
-      - n8n-mcp-network
+    
+    # Health check
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 40s
 
-  # Optional: Reverse proxy with Traefik
-  traefik:
-    image: traefik:v2.10
-    container_name: traefik
-    restart: unless-stopped
-    command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.email=your-email@domain.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"  # Traefik dashboard
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./acme.json:/acme.json
-    networks:
-      - n8n-mcp-network
-    profiles:
-      - proxy
-
-  # Optional: Monitoring with Prometheus
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    restart: unless-stopped
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
-    networks:
-      - n8n-mcp-network
-    profiles:
-      - monitoring
-
-  # Optional: Grafana for monitoring dashboards
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    restart: unless-stopped
-    ports:
-      - "3001:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-    networks:
-      - n8n-mcp-network
-    profiles:
-      - monitoring
-
-networks:
-  n8n-mcp-network:
-    driver: bridge
-    name: n8n-mcp-network
-
+# Named volume for data persistence
 volumes:
-  n8n_data:
-    name: n8n_data
-  prometheus_data:
-    name: prometheus_data
-  grafana_data:
-    name: grafana_data
+  n8n-mcp-data:
+    driver: local

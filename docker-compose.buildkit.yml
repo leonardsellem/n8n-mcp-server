@@ -1,0 +1,44 @@
+# Docker Compose file with BuildKit optimizations for faster builds
+# This now builds without n8n dependencies for ultra-fast builds
+version: '3.8'
+
+services:
+  n8n-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Enable BuildKit
+      x-bake:
+        cache-from:
+          - type=gha
+          - type=local,src=/tmp/.buildx-cache
+        cache-to:
+          - type=gha,mode=max
+          - type=local,dest=/tmp/.buildx-cache-new,mode=max
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    image: n8n-mcp:latest
+    container_name: n8n-mcp
+    ports:
+      - "3000:3000"
+    environment:
+      - MCP_MODE=${MCP_MODE:-http}
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - NODE_ENV=${NODE_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - PORT=3000
+    volumes:
+      # Mount data directory for persistence
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+# Use external network if needed
+networks:
+  default:
+    name: n8n-mcp-network

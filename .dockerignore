@@ -1,126 +1,75 @@
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build artifacts
-build/
-dist/
-*.tsbuildinfo
-
-# Environment files
+# .dockerignore
+node_modules
+npm-debug.log
+.git
+.gitignore
 .env
 .env.local
-.env.development
-.env.test
-.env.production
-
-# Logs
-logs/
-*.log
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
+# Exclude all .env.* files except .env.example
+.env.*
+!.env.example
+# Keep nodes.db but exclude other database files
+data/*.db
+data/*.db-*
+!data/nodes.db
 dist
-
-# Vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# Development files
-.vscode/
-.idea/
+.DS_Store
+*.log
+coverage
+.nyc_output
+.vscode
+.idea
 *.swp
 *.swo
 *~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Git
-.git/
-.gitignore
-
-# Docker
-Dockerfile*
-docker-compose*
-.dockerignore
-
-# Documentation
-README.md
-CHANGELOG.md
-LICENSE
-docs/
-
-# Tests
-tests/
-test/
-*.test.js
-*.test.ts
-*.spec.js
-*.spec.ts
-
-# Cache directories
-cache/
+docker-compose.override.yml
+.github
+docs
+tests
+jest.config.js
+.eslintrc.js
+*.md
+!README.md
+!LICENSE
+# Exclude n8n-docs if present
+../n8n-docs
+n8n-docs
+# Exclude extracted nodes
+extracted-nodes/
+# Exclude temp directory
+temp/
 tmp/
-
-# Runtime cache
-.cache/
-.temp/
+# Exclude any backup or temporary files
+*.bak
+*.tmp
+*.temp
+# Exclude build artifacts
+build/
+out/
+# Exclude local development files
+.eslintcache
+.stylelintcache
+# Exclude any large test data
+test-data/
+# Exclude Docker files during build
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+# Exclude development scripts
+scripts/test-*.sh
+scripts/deploy-*.sh
+# Exclude TypeScript cache
+.tscache
+tsconfig.tsbuildinfo
+# Exclude package manager caches
+.npm
+.pnpm-store
+.yarn
+# Exclude git hooks
+.husky
+# Exclude renovate config
+renovate.json
+# Exclude any local notes or TODO files
+TODO*
+NOTES*
+*.todo

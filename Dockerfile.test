@@ -1,0 +1,24 @@
+# Quick test Dockerfile using pre-built files
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only the essentials
+COPY package*.json ./
+COPY dist ./dist
+COPY data ./data
+COPY docker/docker-entrypoint.sh /usr/local/bin/
+COPY .env.example ./
+
+# Install only runtime dependencies
+RUN npm install --production @modelcontextprotocol/sdk better-sqlite3 express dotenv
+
+# Make entrypoint executable
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Set environment
+ENV IS_DOCKER=true
+ENV MCP_MODE=stdio
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["node", "dist/mcp/index.js"]

@@ -1,0 +1,15 @@
+# docker-compose.override.yml
+# Local development overrides (git-ignored)
+# Copy this file to docker-compose.override.yml and customize as needed
+version: '3.8'
+
+services:
+  n8n-mcp:
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+      REBUILD_ON_START: "true"
+    volumes:
+      # Mount source for hot reload
+      - ./src:/app/src:ro
+      - ./scripts:/app/scripts:ro

@@ -1,0 +1,82 @@
+[
+  {
+    "nodeType": "n8n-nodes-base.Slack",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": true,
+    "sourceSize": 1007,
+    "credentialSize": 7553,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.Discord",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": false,
+    "sourceSize": 10049,
+    "credentialSize": 0,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.HttpRequest",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": false,
+    "sourceSize": 1343,
+    "credentialSize": 0,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.Webhook",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": false,
+    "sourceSize": 10667,
+    "credentialSize": 0,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.If",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": false,
+    "sourceSize": 20533,
+    "credentialSize": 0,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.SplitInBatches",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": false,
+    "sourceSize": 1135,
+    "credentialSize": 0,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.Airtable",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": true,
+    "sourceSize": 936,
+    "credentialSize": 5985,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  },
+  {
+    "nodeType": "n8n-nodes-base.Function",
+    "success": true,
+    "hasPackageInfo": true,
+    "hasCredentials": false,
+    "sourceSize": 7449,
+    "credentialSize": 0,
+    "packageName": "n8n-nodes-base",
+    "packageVersion": "1.14.1"
+  }
+]
