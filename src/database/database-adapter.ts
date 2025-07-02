@@ -103,7 +103,7 @@ export async function createDatabaseAdapter(dbPath: string): Promise<DatabaseAda
  */
 async function createBetterSQLiteAdapter(dbPath: string): Promise<DatabaseAdapter> {
   try {
-    const Database = require('better-sqlite3');
+    const { default: Database } = await import('better-sqlite3');
     const db = new Database(dbPath);
     
     return new BetterSQLiteAdapter(db);
@@ -116,7 +116,7 @@ async function createBetterSQLiteAdapter(dbPath: string): Promise<DatabaseAdapte
  * Create sql.js adapter with persistence
  */
 async function createSQLJSAdapter(dbPath: string): Promise<DatabaseAdapter> {
-  const initSqlJs = require('sql.js');
+  const { default: initSqlJs } = await import('sql.js') as any;
   
   // Initialize sql.js
   const SQL = await initSqlJs({

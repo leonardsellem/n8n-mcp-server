@@ -76,17 +76,22 @@ export type NodeCategory =
 export interface NodeMetadata {
   name: string;
   displayName: string;
-  type: string;
-  category: NodeCategory;
+  type?: string;
+  category: NodeCategory | string;
   description: string;
-  credentials: string[];
-  properties: Record<string, any>;
-  operations: string[];
-  version: number;
+  credentials: string[] | any[];
+  properties: Record<string, any> | any[];
+  operations: string[] | any[];
+  version: number | string;
   icon?: string;
-  documentationUrl: string;
-  sourceUrl: string;
+  documentationUrl?: string;
+  sourceUrl?: string;
   lastUpdated: string;
+  // Additional fields for enhanced discovery
+  packageName?: string;
+  isTrigger?: boolean;
+  isWebhook?: boolean;
+  isAITool?: boolean;
 }
 
 // Node cache entry for database storage

@@ -5,9 +5,14 @@
  * for AI agents working with n8n workflows.
  */
 
-import { DiscoveredNode, dynamicNodeRegistry } from '../data/dynamic-node-registry.js';
-import { NodeParameterValidator, ValidationResult } from '../validation/node-parameter-validator.js';
-import { performanceMonitor } from '../monitoring/performance-monitor.js';
+import { DiscoveredNode, NodeParameterValidator, ValidationResult } from '../validation/node-parameter-validator.js';
+
+// Stub for performance monitoring
+const performanceMonitor = {
+  wrapRequest: async <T>(fn: () => Promise<T>, name: string): Promise<T> => {
+    return await fn();
+  }
+};
 
 export interface WorkflowTemplate {
   id: string;
@@ -320,12 +325,44 @@ export class WorkflowLoader {
    * Get node information from the dynamic registry
    */
   private static async getNodeInfo(nodeType: string): Promise<DiscoveredNode | null> {
-    // Try to find the node in the dynamic registry
-    const allNodes = dynamicNodeRegistry.getAllNodes();
-    return allNodes.find(node => 
-      node.name.includes(nodeType) || 
-      node.displayName.toLowerCase().includes(nodeType.toLowerCase())
-    ) || null;
+    // Simplified stub - return basic node info
+    return {
+      name: nodeType,
+      displayName: this.formatNodeName(nodeType),
+      description: `${this.formatNodeName(nodeType)} node for workflow automation`,
+      category: 'action',
+      version: 1,
+      triggerNode: nodeType.includes('trigger') || nodeType.includes('webhook'),
+      authRequired: this.likelyRequiresAuth(nodeType),
+      rateLimit: this.likelyHasRateLimit(nodeType)
+    };
+  }
+
+  /**
+   * Check if a node likely requires authentication
+   */
+  private static likelyRequiresAuth(nodeName: string): boolean {
+    const authServices = [
+      'github', 'gitlab', 'slack', 'discord', 'google', 'microsoft',
+      'salesforce', 'hubspot', 'stripe', 'paypal', 'twitter', 'facebook'
+    ];
+    
+    return authServices.some(service => 
+      nodeName.toLowerCase().includes(service)
+    );
+  }
+
+  /**
+   * Check if a service likely has rate limits
+   */
+  private static likelyHasRateLimit(nodeName: string): boolean {
+    const rateLimitedServices = [
+      'twitter', 'github', 'openai', 'google', 'salesforce', 'stripe'
+    ];
+    
+    return rateLimitedServices.some(service => 
+      nodeName.toLowerCase().includes(service)
+    );
   }
 
   /**

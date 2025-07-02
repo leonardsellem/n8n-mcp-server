@@ -6,7 +6,26 @@
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { DiscoveredNode } from '../data/dynamic-node-registry.js';
+
+export interface DiscoveredNode {
+  name: string;
+  displayName: string;
+  description: string;
+  category?: string;
+  version?: number;
+  properties?: any[];
+  inputs?: any[];
+  outputs?: any[];
+  triggerNode?: boolean;
+  regularNode?: boolean;
+  webhookSupport?: boolean;
+  authRequired?: boolean;
+  rateLimit?: boolean;
+  integrationComplexity?: 'simple' | 'medium' | 'complex';
+  useCases?: string[];
+  searchTags?: string[];
+  aiDescription?: string;
+}
 
 export interface ValidationResult {
   valid: boolean;
