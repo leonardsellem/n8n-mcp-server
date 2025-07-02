@@ -1,42 +1,44 @@
 /**
  * n8n MCP Server Data Export
  * 
- * Central export point for all node definitions, types, and utilities
- * Now powered by dynamic node discovery for 533+ nodes from organized folders
+ * Basic exports for the simplified MCP server
  */
 
 // Core types and interfaces
 export type { NodeTypeInfo, NodeProperty } from './node-types.js';
 
-// Dynamic node registry (NEW - discovers all 533+ nodes automatically)
-export {
-  dynamicNodeRegistry,
-  allDiscoveredNodes,
-  type DiscoveredNode
-} from './dynamic-node-registry.js';
+// Basic node information for the simplified server
+export interface BasicNodeInfo {
+  name: string;
+  displayName: string;
+  description: string;
+  category: string;
+}
 
-// Legacy node registry for backward compatibility
-export {
-  nodeRegistry,
-  nodesByName,
-  nodeStats,
-  getNodesByCategory,
-  searchNodes,
-  getNodesBySubcategory,
-  getTriggerNodes,
-  getWebhookNodes
-} from './node-registry.js';
+// Basic node registry for the simplified server
+export const basicNodes: BasicNodeInfo[] = [
+  {
+    name: 'n8n-nodes-base.slack',
+    displayName: 'Slack',
+    description: 'Send messages and interact with Slack',
+    category: 'Communication'
+  },
+  {
+    name: 'n8n-nodes-base.googleSheets',
+    displayName: 'Google Sheets',
+    description: 'Read and write data to Google Sheets',
+    category: 'Productivity'
+  },
+  {
+    name: 'n8n-nodes-base.httpRequest',
+    displayName: 'HTTP Request',
+    description: 'Make HTTP requests to external APIs',
+    category: 'Core'
+  }
+];
 
-// Legacy allNodes export from node-registry (keeping for backward compatibility)
-export { allNodes as legacyNodes } from './node-registry.js';
+// Export basic nodes as allNodes for compatibility
+export const allNodes = basicNodes;
 
-/**
- * Main export for AI agents - uses dynamic registry with all discovered nodes
- * This is now the primary source of truth with 533+ auto-discovered nodes
- */
-export { allDiscoveredNodes as allNodes } from './dynamic-node-registry.js';
-
-/**
- * Default export provides the dynamic node registry for AI agents
- */
-export { default } from './dynamic-node-registry.js';
+// Default export
+export default basicNodes;

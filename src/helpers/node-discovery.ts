@@ -6,7 +6,7 @@
  */
 
 import { NodeTypeInfo } from '../data/node-types.js';
-import { dynamicNodeRegistry, allDiscoveredNodes } from '../data/index.js';
+import { allNodes as allDiscoveredNodes } from '../data/index.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 
 export class NodeDiscoveryService {
@@ -74,7 +74,13 @@ export class NodeDiscoveryService {
     return performanceMonitor.wrapRequest(async () => {
       const timer = performanceMonitor.createTimer(`search-${query}`);
       
-      const results = dynamicNodeRegistry.searchNodes(query, options) as NodeTypeInfo[];
+      const allNodes = await this.getAvailableNodes();
+      const lowerQuery = query.toLowerCase();
+      const results = allNodes.filter(node => 
+        node.name.toLowerCase().includes(lowerQuery) ||
+        node.displayName.toLowerCase().includes(lowerQuery) ||
+        node.description?.toLowerCase().includes(lowerQuery)
+      );
       
       timer();
       console.log(`[NodeDiscovery] Search '${query}' found ${results.length} results`);
@@ -86,7 +92,11 @@ export class NodeDiscoveryService {
     return performanceMonitor.wrapRequest(async () => {
       const timer = performanceMonitor.createTimer(`category-${category}`);
       
-      const results = dynamicNodeRegistry.getNodesByCategory(category) as NodeTypeInfo[];
+      const allNodes = await this.getAvailableNodes();
+      const results = allNodes.filter(node => 
+        node.category === category ||
+        node.category?.toLowerCase() === category.toLowerCase()
+      );
       
       timer();
       console.log(`[NodeDiscovery] Category '${category}' has ${results.length} nodes`);
