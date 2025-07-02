@@ -15,7 +15,7 @@ import {
   McpError
 } from '@modelcontextprotocol/sdk/types.js';
 import { loadEnvironmentVariables, getEnvConfig } from './environment.js';
-import { allNodes } from '../data/index.js';
+import { GitHubNodeDiscovery } from '../loaders/github-node-discovery.js';
 
 // Load environment variables early
 loadEnvironmentVariables();
@@ -23,6 +23,7 @@ loadEnvironmentVariables();
 class MCPServer {
   private server: Server;
   private config: ReturnType<typeof getEnvConfig>;
+  private nodeDiscovery: GitHubNodeDiscovery;
 
   constructor() {
     this.server = new Server(
@@ -42,6 +43,7 @@ class MCPServer {
     );
     
     this.config = getEnvConfig();
+    this.nodeDiscovery = new GitHubNodeDiscovery();
     this.setupHandlers();
   }
 
@@ -80,7 +82,7 @@ class MCPServer {
           },
           {
             name: 'discover_nodes',
-            description: 'Discover available n8n node types by category or search query',
+            description: 'Discover available n8n node types by category or search query (Live from GitHub)',
             inputSchema: {
               type: 'object',
               properties: {
@@ -100,6 +102,47 @@ class MCPServer {
               },
               required: []
             }
+          },
+          {
+            name: 'get_node_details',
+            description: 'Get detailed information about a specific n8n node',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                nodeName: {
+                  type: 'string',
+                  description: 'Name of the node to get details for'
+                }
+              },
+              required: ['nodeName']
+            }
+          },
+          {
+            name: 'sync_nodes_from_github',
+            description: 'Force refresh nodes from GitHub repository',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+              required: []
+            }
+          },
+          {
+            name: 'get_cache_stats',
+            description: 'Get statistics about the node cache',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+              required: []
+            }
+          },
+          {
+            name: 'list_node_categories',
+            description: 'List all available node categories',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+              required: []
+            }
           }
         ]
       };
@@ -117,6 +160,14 @@ class MCPServer {
             return await this.handleGetWorkflow(args);
           case 'discover_nodes':
             return await this.handleDiscoverNodes(args);
+          case 'get_node_details':
+            return await this.handleGetNodeDetails(args);
+          case 'sync_nodes_from_github':
+            return await this.handleSyncNodesFromGitHub(args);
+          case 'get_cache_stats':
+            return await this.handleGetCacheStats(args);
+          case 'list_node_categories':
+            return await this.handleListNodeCategories(args);
           default:
             throw new McpError(
               ErrorCode.MethodNotFound,
@@ -289,28 +340,20 @@ class MCPServer {
 
   private async handleDiscoverNodes(args: any) {
     try {
-      let filteredNodes = [...allNodes];
+      let nodes;
 
-      // Apply search filter
+      // Use different discovery methods based on args
       if (args?.search) {
-        const searchTerm = args.search.toLowerCase();
-        filteredNodes = filteredNodes.filter(node => 
-          node.name.toLowerCase().includes(searchTerm) ||
-          node.displayName?.toLowerCase().includes(searchTerm) ||
-          node.description?.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      // Apply category filter
-      if (args?.category) {
-        filteredNodes = filteredNodes.filter(node => 
-          node.category === args.category
-        );
+        nodes = await this.nodeDiscovery.searchNodes(args.search);
+      } else if (args?.category) {
+        nodes = await this.nodeDiscovery.getNodesByCategory(args.category);
+      } else {
+        nodes = await this.nodeDiscovery.discoverNodes();
       }
 
       // Apply limit
       const limit = args?.limit || 50;
-      filteredNodes = filteredNodes.slice(0, limit);
+      const filteredNodes = nodes.slice(0, limit);
 
       return {
         content: [
@@ -320,7 +363,9 @@ class MCPServer {
               nodes: filteredNodes,
               total: filteredNodes.length,
               searchTerm: args?.search,
-              category: args?.category
+              category: args?.category,
+              source: 'GitHub n8n Repository',
+              lastUpdated: new Date().toISOString()
             }, null, 2)
           }
         ]
@@ -329,6 +374,112 @@ class MCPServer {
       throw new McpError(
         ErrorCode.InternalError,
         `Failed to discover nodes: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  private async handleGetNodeDetails(args: any) {
+    if (!args?.nodeName) {
+      throw new McpError(ErrorCode.InvalidParams, 'nodeName is required');
+    }
+
+    try {
+      const node = await this.nodeDiscovery.getNodeDetails(args.nodeName);
+      
+      if (!node) {
+        throw new McpError(ErrorCode.InvalidParams, `Node '${args.nodeName}' not found`);
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              node,
+              source: 'GitHub n8n Repository',
+              lastUpdated: new Date().toISOString()
+            }, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to get node details: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  private async handleSyncNodesFromGitHub(args: any) {
+    try {
+      console.error('🔄 Starting GitHub node sync...');
+      await this.nodeDiscovery.forceRefresh();
+      const stats = await this.nodeDiscovery.getCacheStats();
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              message: 'Successfully synced nodes from GitHub',
+              stats,
+              syncedAt: new Date().toISOString()
+            }, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to sync nodes from GitHub: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  private async handleGetCacheStats(args: any) {
+    try {
+      const stats = await this.nodeDiscovery.getCacheStats();
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              cacheStats: stats,
+              retrievedAt: new Date().toISOString()
+            }, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to get cache stats: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  private async handleListNodeCategories(args: any) {
+    try {
+      const categories = await this.nodeDiscovery.getAvailableCategories();
+      
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              categories,
+              total: categories.length,
+              source: 'GitHub n8n Repository',
+              lastUpdated: new Date().toISOString()
+            }, null, 2)
+          }
+        ]
+      };
+    } catch (error) {
+      throw new McpError(
+        ErrorCode.InternalError,
+        `Failed to list node categories: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

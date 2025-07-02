@@ -53,3 +53,114 @@ export interface Execution {
   };
   [key: string]: any;
 }
+
+// Node categories for organizing n8n nodes
+export type NodeCategory = 
+  | 'Core Nodes'
+  | 'Trigger Nodes'
+  | 'Actions'
+  | 'Communication'
+  | 'Database'
+  | 'Cloud Services'
+  | 'File Management'
+  | 'Marketing'
+  | 'Productivity'
+  | 'Development'
+  | 'E-commerce'
+  | 'Analytics'
+  | 'Social Media'
+  | 'Security'
+  | 'Other';
+
+// Node metadata interface for dynamic node discovery
+export interface NodeMetadata {
+  name: string;
+  displayName: string;
+  type: string;
+  category: NodeCategory;
+  description: string;
+  credentials: string[];
+  properties: Record<string, any>;
+  operations: string[];
+  version: number;
+  icon?: string;
+  documentationUrl: string;
+  sourceUrl: string;
+  lastUpdated: string;
+}
+
+// Node cache entry for database storage
+export interface NodeCacheEntry {
+  id?: number;
+  node_name: string;
+  metadata: string; // JSON stringified NodeMetadata
+  category: string;
+  last_updated: string;
+  created_at?: string;
+}
+
+// GitHub API response types
+export interface GitHubApiResponse {
+  sha: string;
+  url: string;
+  tree?: any[];
+  truncated?: boolean;
+}
+
+// Node parameter definition
+export interface NodeParameter {
+  displayName: string;
+  name: string;
+  type: string;
+  required?: boolean;
+  default?: any;
+  options?: Array<{
+    name: string;
+    value: string;
+    description?: string;
+  }>;
+  placeholder?: string;
+  description?: string;
+  displayOptions?: {
+    show?: Record<string, any>;
+    hide?: Record<string, any>;
+  };
+  typeOptions?: Record<string, any>;
+}
+
+// Node credential definition
+export interface NodeCredential {
+  name: string;
+  required: boolean;
+  displayName: string;
+}
+
+// Node example definition
+export interface NodeExample {
+  description: string;
+  workflow: {
+    nodes: Array<{
+      name: string;
+      type: string;
+      parameters: Record<string, any>;
+    }>;
+  };
+}
+
+// Complete node type information
+export interface NodeTypeInfo {
+  name: string;
+  displayName: string;
+  description: string;
+  category: string;
+  subcategory?: string;
+  version: number;
+  properties: NodeParameter[];
+  inputs: string[];
+  outputs: string[];
+  credentials?: NodeCredential[];
+  options?: NodeParameter[];
+  examples?: NodeExample[];
+  aiToolCompatible?: boolean;
+  aiToolDescription?: string;
+}

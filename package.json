@@ -1,7 +1,7 @@
 {
   "name": "@leonardsellem/n8n-mcp-server",
-  "version": "0.1.4",
-  "description": "Model Context Protocol (MCP) server for n8n workflow automation",
+  "version": "1.0.0",
+  "description": "Enhanced Model Context Protocol (MCP) server for n8n workflow automation with dynamic GitHub node discovery",
   "main": "build/index.js",
   "type": "module",
   "scripts": {
@@ -25,7 +25,10 @@
     "docker:dev": "docker-compose up --build",
     "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d",
     "docker:logs": "docker-compose logs -f n8n-mcp-server",
-    "docker:health": "docker-compose exec n8n-mcp-server node build/utils/health-check.js"
+    "docker:health": "docker-compose exec n8n-mcp-server node build/utils/health-check.js",
+    "sync:nodes": "node build/scripts/sync-github-nodes.js",
+    "validate:nodes": "node build/scripts/validate-nodes.js",
+    "test:github": "node build/scripts/test-github-integration.js"
   },
   "bin": {
     "n8n-mcp-server": "build/index.js"
@@ -35,7 +38,10 @@
     "n8n",
     "workflow",
     "automation",
-    "ai"
+    "ai",
+    "github",
+    "dynamic",
+    "nodes"
   ],
   "author": "Leonard Sellem (https://sellem.me)",
   "license": "MIT",
@@ -51,14 +57,23 @@
     "build",
     "README.md",
     "LICENSE",
-    "package.json"
+    "package.json",
+    "docker-entrypoint.sh"
   ],
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.7.0",
-    "axios": "^1.6.2",
+    "@modelcontextprotocol/sdk": "^1.13.2",
+    "@n8n/n8n-nodes-langchain": "^1.99.0",
+    "axios": "^1.10.0",
+    "better-sqlite3": "^11.10.0",
     "compression": "^1.7.4",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
     "find-config": "^1.0.0",
+    "n8n": "^1.100.1",
+    "n8n-core": "^1.99.0",
+    "n8n-workflow": "^1.97.0",
+    "sql.js": "^1.13.0",
+    "uuid": "^10.0.0",
     "winston": "^3.11.0",
     "zod": "^3.22.4"
   },
@@ -67,18 +82,23 @@
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-typescript": "^7.26.0",
+    "@types/better-sqlite3": "^7.6.11",
     "@types/compression": "^1.7.5",
+    "@types/express": "^5.0.3",
     "@types/find-config": "^1.0.4",
     "@types/jest": "^29.5.14",
-    "@types/node": "^20.10.0",
+    "@types/node": "^22.15.30",
+    "@types/uuid": "^10.0.0",
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
     "babel-jest": "^29.7.0",
     "eslint": "^8.54.0",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.3.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -88,5 +108,11 @@
     "timeout": "5s",
     "interval": "30s",
     "retries": 3
+  },
+  "n8n": {
+    "githubRepo": "https://api.github.com/repos/n8n-io/n8n",
+    "nodesPath": "packages/nodes-base/nodes",
+    "syncInterval": 1800000,
+    "cacheEnabled": true
   }
 }
