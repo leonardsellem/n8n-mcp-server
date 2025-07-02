@@ -1,62 +1,37 @@
 /**
  * Simple in-memory cache with TTL support
+ * No external dependencies needed
  */
 export class SimpleCache {
-  private cache = new Map<string, { value: any; expires: number }>();
-
-  /**
-   * Get value from cache
-   */
+  private cache = new Map<string, { data: any; expires: number }>();
+  
+  constructor() {
+    // Clean up expired entries every minute
+    setInterval(() => {
+      const now = Date.now();
+      for (const [key, item] of this.cache.entries()) {
+        if (item.expires < now) this.cache.delete(key);
+      }
+    }, 60000);
+  }
+  
   get(key: string): any {
-    const entry = this.cache.get(key);
-    if (!entry) return null;
-    
-    if (Date.now() > entry.expires) {
+    const item = this.cache.get(key);
+    if (!item || item.expires < Date.now()) {
       this.cache.delete(key);
       return null;
     }
-    
-    return entry.value;
+    return item.data;
   }
-
-  /**
-   * Set value in cache with TTL in seconds
-   */
-  set(key: string, value: any, ttlSeconds: number = 3600): void {
-    const expires = Date.now() + (ttlSeconds * 1000);
-    this.cache.set(key, { value, expires });
+  
+  set(key: string, data: any, ttlSeconds: number = 300): void {
+    this.cache.set(key, {
+      data,
+      expires: Date.now() + (ttlSeconds * 1000)
+    });
   }
-
-  /**
-   * Delete value from cache
-   */
-  delete(key: string): boolean {
-    return this.cache.delete(key);
-  }
-
-  /**
-   * Clear all cached values
-   */
+  
   clear(): void {
     this.cache.clear();
-  }
-
-  /**
-   * Get cache size
-   */
-  size(): number {
-    return this.cache.size;
-  }
-
-  /**
-   * Clean expired entries
-   */
-  cleanup(): void {
-    const now = Date.now();
-    for (const [key, entry] of this.cache.entries()) {
-      if (now > entry.expires) {
-        this.cache.delete(key);
-      }
-    }
   }
 }

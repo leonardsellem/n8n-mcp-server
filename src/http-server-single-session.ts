@@ -6,9 +6,9 @@
  */
 import express from 'express';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { N8NDocumentationMCPServer } from './mcp/server.js';
-import { ConsoleManager } from './utils/console-manager.js';
-import { logger } from './utils/logger.js';
+import { N8NDocumentationMCPServer } from './mcp/server';
+import { ConsoleManager } from './utils/console-manager';
+import { logger } from './utils/logger';
 import dotenv from 'dotenv';
 
 dotenv.config();

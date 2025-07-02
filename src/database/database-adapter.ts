@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import * as fsSync from 'fs';
 import path from 'path';
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger';
 
 /**
  * Unified database interface that abstracts better-sqlite3 and sql.js
@@ -103,7 +103,7 @@ export async function createDatabaseAdapter(dbPath: string): Promise<DatabaseAda
  */
 async function createBetterSQLiteAdapter(dbPath: string): Promise<DatabaseAdapter> {
   try {
-    const { default: Database } = await import('better-sqlite3');
+    const Database = require('better-sqlite3');
     const db = new Database(dbPath);
     
     return new BetterSQLiteAdapter(db);
@@ -116,7 +116,7 @@ async function createBetterSQLiteAdapter(dbPath: string): Promise<DatabaseAdapte
  * Create sql.js adapter with persistence
  */
 async function createSQLJSAdapter(dbPath: string): Promise<DatabaseAdapter> {
-  const { default: initSqlJs } = await import('sql.js') as any;
+  const initSqlJs = require('sql.js');
   
   // Initialize sql.js
   const SQL = await initSqlJs({

@@ -1,4 +1,4 @@
-import { ToolDefinition } from '../types/index.js';
+import { ToolDefinition } from '../types';
 
 /**
  * n8n Documentation MCP Tools - FINAL OPTIMIZED VERSION

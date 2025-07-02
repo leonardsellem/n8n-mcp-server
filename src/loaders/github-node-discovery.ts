@@ -394,26 +394,26 @@ export class GitHubNodeDiscovery {
     ];
     
     if (coreNodes.some(core => name.includes(core))) {
-      return 'Core Nodes';
+      return 'Core';
     }
     
     // Trigger nodes
     if (content.includes('implements ITriggerNode') || 
         name.includes('trigger') || 
         name.includes('webhook')) {
-      return 'Trigger Nodes';
+      return 'Trigger';
     }
     
     // Database nodes
     const dbNodes = ['mysql', 'postgres', 'mongodb', 'redis', 'sqlite', 'influxdb'];
     if (dbNodes.some(db => name.includes(db))) {
-      return 'Database';
+      return 'Data & Storage';
     }
     
     // Cloud/Storage nodes
     const cloudNodes = ['aws', 'google', 'azure', 'dropbox', 'box', 's3', 'drive'];
     if (cloudNodes.some(cloud => name.includes(cloud))) {
-      return 'Cloud Services';
+      return 'Data & Storage';
     }
     
     // Communication nodes
@@ -422,8 +422,8 @@ export class GitHubNodeDiscovery {
       return 'Communication';
     }
     
-    // Default to Actions
-    return 'Actions';
+    // Default to Action
+    return 'Action';
   }
 
   /**
@@ -449,13 +449,13 @@ export class GitHubNodeDiscovery {
     return match ? match[1] : undefined;
   }
 
-  private extractCredentials(content: string): string[] {
-    const credentials: string[] = [];
+  private extractCredentials(content: string): Array<{name: string; required?: boolean}> {
+    const credentials: Array<{name: string; required?: boolean}> = [];
     
     // Look for credential references in the auth property
     const authMatch = content.match(/auth:\s*[\s\S]*?['"`]([^'"`]*[Cc]redential[^'"`]*)['"`]/);
     if (authMatch) {
-      credentials.push(authMatch[1]);
+      credentials.push({ name: authMatch[1], required: true });
     }
     
     // Look for credential references in the credentials array
@@ -464,7 +464,7 @@ export class GitHubNodeDiscovery {
       const credContent = credentialsArrayMatch[1];
       const credMatches = credContent.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g);
       for (const match of credMatches) {
-        credentials.push(match[1]);
+        credentials.push({ name: match[1], required: true });
       }
     }
     
@@ -474,11 +474,16 @@ export class GitHubNodeDiscovery {
       const credName = match[1];
       // Only add if it exists in our credentials cache
       if (this.credentialsCache.has(credName) || this.credentialsCache.has(credName.replace('Credential', ''))) {
-        credentials.push(credName);
+        credentials.push({ name: credName, required: true });
       }
     }
     
-    return [...new Set(credentials)]; // Remove duplicates
+    // Remove duplicates by name
+    const unique = credentials.filter((cred, index, self) => 
+      index === self.findIndex(c => c.name === cred.name)
+    );
+    
+    return unique;
   }
 
   private extractProperties(content: string): Record<string, any> {

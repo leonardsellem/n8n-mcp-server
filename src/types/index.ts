@@ -1,11 +1,9 @@
-/**
- * Core Types Module
- * 
- * This module provides type definitions used throughout the application
- * and bridges compatibility with the MCP SDK.
- */
+export interface MCPServerConfig {
+  port: number;
+  host: string;
+  authToken?: string;
+}
 
-// Tool definition for MCP tools
 export interface ToolDefinition {
   name: string;
   description: string;
@@ -13,159 +11,122 @@ export interface ToolDefinition {
     type: string;
     properties: Record<string, any>;
     required?: string[];
+    additionalProperties?: boolean | Record<string, any>;
   };
 }
 
-// Tool call result for MCP tool responses
-export interface ToolCallResult {
-  content: Array<{
-    type: string;
-    text: string;
-  }>;
-  isError?: boolean;
+export interface ResourceDefinition {
+  uri: string;
+  name: string;
+  description?: string;
+  mimeType?: string;
 }
 
-// Type for n8n workflow object
+export interface PromptDefinition {
+  name: string;
+  description?: string;
+  arguments?: Array<{
+    name: string;
+    description?: string;
+    required?: boolean;
+  }>;
+}
+
+// n8n workflow and execution types
 export interface Workflow {
   id: string;
   name: string;
   active: boolean;
   nodes: any[];
-  connections: any;
+  connections: Record<string, any>;
   createdAt: string;
   updatedAt: string;
-  [key: string]: any;
+  tags?: string[];
+  staticData?: Record<string, any>;
+  settings?: Record<string, any>;
+  pinData?: Record<string, any>;
+  versionId?: string;
 }
 
-// Type for n8n execution object
 export interface Execution {
   id: string;
-  workflowId: string;
   finished: boolean;
   mode: string;
-  startedAt: string;
-  stoppedAt: string;
-  status: string;
-  data: {
-    resultData: {
-      runData: any;
-    };
-  };
-  [key: string]: any;
+  retryOf?: string;
+  retrySuccessId?: string;
+  startedAt: Date;
+  stoppedAt?: Date;
+  workflowId: string;
+  workflowData?: Workflow;
+  data?: Record<string, any>;
+  status: 'new' | 'running' | 'success' | 'error' | 'waiting' | 'canceled';
 }
 
-// Node categories for organizing n8n nodes
-export type NodeCategory = 
-  | 'Core Nodes'
-  | 'Trigger Nodes'
-  | 'Actions'
-  | 'Communication'
-  | 'Database'
-  | 'Cloud Services'
-  | 'File Management'
-  | 'Marketing'
-  | 'Productivity'
-  | 'Development'
-  | 'E-commerce'
-  | 'Analytics'
-  | 'Social Media'
-  | 'Security'
-  | 'Other';
-
-// Node metadata interface for dynamic node discovery
+// Node metadata types
 export interface NodeMetadata {
   name: string;
   displayName: string;
-  type?: string;
-  category: NodeCategory | string;
   description: string;
-  credentials: string[] | any[];
-  properties: Record<string, any> | any[];
-  operations: string[] | any[];
-  version: number | string;
+  type?: string;
   icon?: string;
+  iconUrl?: string;
+  category: NodeCategory;
+  version: number;
+  lastUpdated: string;
+  defaults?: Record<string, any>;
+  inputs?: string[];
+  outputs?: string[];
+  properties?: Record<string, any>;
+  credentials?: Array<{
+    name: string;
+    required?: boolean;
+  }>;
+  operations?: string[];
   documentationUrl?: string;
   sourceUrl?: string;
-  lastUpdated: string;
-  // Additional fields for enhanced discovery
-  packageName?: string;
-  isTrigger?: boolean;
-  isWebhook?: boolean;
-  isAITool?: boolean;
+  requestDefaults?: Record<string, any>;
+  codex?: {
+    alias?: string[];
+    categories?: string[];
+    subcategories?: Record<string, string[]>;
+    resources?: {
+      primaryDocumentation?: Array<{
+        url: string;
+      }>;
+      credentialDocumentation?: Array<{
+        url: string;
+      }>;
+    };
+  };
 }
 
-// Node cache entry for database storage
 export interface NodeCacheEntry {
-  id?: number;
-  node_name: string;
-  metadata: string; // JSON stringified NodeMetadata
-  category: string;
-  last_updated: string;
-  created_at?: string;
-}
-
-// GitHub API response types
-export interface GitHubApiResponse {
-  sha: string;
-  url: string;
-  tree?: any[];
-  truncated?: boolean;
-}
-
-// Node parameter definition
-export interface NodeParameter {
-  displayName: string;
-  name: string;
-  type: string;
-  required?: boolean;
-  default?: any;
-  options?: Array<{
-    name: string;
-    value: string;
-    description?: string;
-  }>;
-  placeholder?: string;
-  description?: string;
-  displayOptions?: {
-    show?: Record<string, any>;
-    hide?: Record<string, any>;
-  };
-  typeOptions?: Record<string, any>;
-}
-
-// Node credential definition
-export interface NodeCredential {
-  name: string;
-  required: boolean;
-  displayName: string;
-}
-
-// Node example definition
-export interface NodeExample {
-  description: string;
-  workflow: {
-    nodes: Array<{
-      name: string;
-      type: string;
-      parameters: Record<string, any>;
-    }>;
-  };
-}
-
-// Complete node type information
-export interface NodeTypeInfo {
+  id: string;
   name: string;
   displayName: string;
   description: string;
-  category: string;
-  subcategory?: string;
+  category: NodeCategory;
   version: number;
-  properties: NodeParameter[];
-  inputs: string[];
-  outputs: string[];
-  credentials?: NodeCredential[];
-  options?: NodeParameter[];
-  examples?: NodeExample[];
-  aiToolCompatible?: boolean;
-  aiToolDescription?: string;
+  lastUpdated: string;
+  metadata: NodeMetadata;
 }
+
+export type NodeCategory = 
+  | 'Core'
+  | 'Trigger'
+  | 'Action'
+  | 'Transform'
+  | 'Files'
+  | 'Communication'
+  | 'Data & Storage'
+  | 'Marketing'
+  | 'Sales'
+  | 'Productivity'
+  | 'Development'
+  | 'Analytics'
+  | 'AI'
+  | 'Social'
+  | 'Finance'
+  | 'IoT'
+  | 'Security'
+  | 'Cluster';

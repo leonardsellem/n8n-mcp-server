@@ -1,5 +1,5 @@
-import { DatabaseAdapter } from './database-adapter.js';
-import { ParsedNode } from '../parsers/node-parser.js';
+import { DatabaseAdapter } from './database-adapter';
+import { ParsedNode } from '../parsers/node-parser';
 
 export class NodeRepository {
   constructor(private db: DatabaseAdapter) {}

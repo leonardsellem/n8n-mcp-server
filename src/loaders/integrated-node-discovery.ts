@@ -214,15 +214,11 @@ export class IntegratedNodeDiscovery {
               name: parsed.nodeType,
               displayName: parsed.displayName,
               description: parsed.description || '',
-              category: parsed.category || 'misc',
-              version: parsed.version || '1',
+              category: (parsed.category as any) || 'Action',
+              version: parseInt(parsed.version || '1', 10),
               properties: parsed.properties,
               credentials: parsed.credentials,
               operations: parsed.operations,
-              isTrigger: parsed.isTrigger,
-              isWebhook: parsed.isWebhook,
-              isAITool: parsed.isAITool,
-              packageName: parsed.packageName,
               lastUpdated: new Date().toISOString()
             };
             parsedNodes.push(nodeMetadata);

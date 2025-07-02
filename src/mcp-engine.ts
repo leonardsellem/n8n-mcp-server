@@ -6,8 +6,8 @@
  * multi-tenancy, rate limiting, etc.
  */
 import { Request, Response } from 'express';
-import { SingleSessionHTTPServer } from './http-server-single-session.js';
-import { logger } from './utils/logger.js';
+import { SingleSessionHTTPServer } from './http-server-single-session';
+import { logger } from './utils/logger';
 
 export interface EngineHealth {
   status: 'healthy' | 'unhealthy';

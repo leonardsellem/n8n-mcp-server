@@ -1,66 +1,55 @@
-# Multi-stage Docker build for n8n MCP Server
-# Optimized for production deployment with security and performance considerations
-
-FROM node:18-alpine AS base
+# Simplified Docker build for production testing
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install security updates and required packages
-RUN apk update && apk upgrade && \
-    apk add --no-cache \
-    dumb-init \
-    && rm -rf /var/cache/apk/*
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 -G nodejs
-
-# Dependencies stage
-FROM base AS dependencies
+# Install build dependencies including @octokit/rest
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci
 
-# Build stage
-FROM base AS build
-COPY package*.json ./
-RUN npm ci --include=dev
-COPY . .
-RUN npm run build && \
-    npm prune --production
+# Copy source and build
+COPY src ./src
+COPY tsconfig.json ./
+RUN npm run build
 
 # Production stage
-FROM base AS production
+FROM node:20-alpine AS runtime
+WORKDIR /app
 
-# Install only production dependencies
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=build /app/build ./build
-COPY --from=build /app/package*.json ./
+# Install curl for health checks
+RUN apk add --no-cache curl && \
+    rm -rf /var/cache/apk/*
 
-# Create necessary directories with proper permissions
-RUN mkdir -p /app/logs /app/cache /app/tmp && \
+# Copy runtime package.json and install dependencies
+COPY package.runtime.json package.json
+RUN npm install --production --no-audit --no-fund
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
+
+# Copy environment file
+COPY .env.example .env
+
+# Create data directory for SQLite cache
+RUN mkdir -p /app/data && \
+    chmod 755 /app/data
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
     chown -R nodejs:nodejs /app
 
-# Switch to non-root user
 USER nodejs
 
-# Health check configuration
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD node -e "import('./build/utils/health-check.js').then(m => m.healthCheck())" || exit 1
-
-# Environment variables
+# Set Docker environment flag
+ENV IS_DOCKER=true
 ENV NODE_ENV=production
-ENV PORT=3000
-ENV LOG_LEVEL=info
 
-# Expose port
+# Expose HTTP port
 EXPOSE 3000
 
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://127.0.0.1:3000/health || exit 1
 
 # Start the application
-CMD ["node", "build/index.js"]
-
-# Metadata
-LABEL maintainer="Leonard Sellem <https://sellem.me>"
-LABEL description="n8n MCP Server - Model Context Protocol server for n8n workflow automation"
-LABEL version="0.1.4"
+CMD ["node", "dist/mcp/index.js"]

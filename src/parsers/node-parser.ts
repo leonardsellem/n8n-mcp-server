@@ -1,4 +1,4 @@
-import { PropertyExtractor } from './property-extractor.js';
+import { PropertyExtractor } from './property-extractor';
 
 export interface ParsedNode {
   style: 'declarative' | 'programmatic';

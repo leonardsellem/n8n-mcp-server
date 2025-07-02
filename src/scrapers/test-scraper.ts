@@ -430,7 +430,7 @@ export async function runScraperTests(): Promise<boolean> {
 }
 
 // Allow direct execution
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   runScraperTests()
     .then(success => {
       process.exit(success ? 0 : 1);

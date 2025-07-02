@@ -1,76 +1,83 @@
-import { logger } from './logger.js';
-
 /**
- * ConsoleManager - Handles console output wrapping for MCP operations
- * Prevents MCP protocol interference with stdout/stderr
+ * Console Manager for MCP HTTP Server
+ * 
+ * Prevents console output from interfering with StreamableHTTPServerTransport
+ * by silencing console methods during MCP request handling.
  */
 export class ConsoleManager {
-  private originalConsole: {
-    log: typeof console.log;
-    error: typeof console.error;
-    warn: typeof console.warn;
-    info: typeof console.info;
-    debug: typeof console.debug;
+  private originalConsole = {
+    log: console.log,
+    error: console.error,
+    warn: console.warn,
+    info: console.info,
+    debug: console.debug,
+    trace: console.trace
   };
-
-  constructor() {
-    // Store original console methods
-    this.originalConsole = {
-      log: console.log,
-      error: console.error,
-      warn: console.warn,
-      info: console.info,
-      debug: console.debug,
-    };
-  }
-
+  
+  private isSilenced = false;
+  
   /**
-   * Temporarily redirect console output to logger during MCP operations
+   * Silence all console output
    */
-  private redirectConsole(): void {
-    console.log = (...args: any[]) => logger.info('Console.log:', args.join(' '));
-    console.error = (...args: any[]) => logger.error('Console.error:', args.join(' '));
-    console.warn = (...args: any[]) => logger.warn('Console.warn:', args.join(' '));
-    console.info = (...args: any[]) => logger.info('Console.info:', args.join(' '));
-    console.debug = (...args: any[]) => logger.debug('Console.debug:', args.join(' '));
+  public silence(): void {
+    if (this.isSilenced || process.env.MCP_MODE !== 'http') {
+      return;
+    }
+    
+    this.isSilenced = true;
+    process.env.MCP_REQUEST_ACTIVE = 'true';
+    console.log = () => {};
+    console.error = () => {};
+    console.warn = () => {};
+    console.info = () => {};
+    console.debug = () => {};
+    console.trace = () => {};
   }
-
+  
   /**
    * Restore original console methods
    */
-  private restoreConsole(): void {
+  public restore(): void {
+    if (!this.isSilenced) {
+      return;
+    }
+    
+    this.isSilenced = false;
+    process.env.MCP_REQUEST_ACTIVE = 'false';
     console.log = this.originalConsole.log;
     console.error = this.originalConsole.error;
     console.warn = this.originalConsole.warn;
     console.info = this.originalConsole.info;
     console.debug = this.originalConsole.debug;
+    console.trace = this.originalConsole.trace;
   }
-
+  
   /**
-   * Wrap an operation to prevent console interference with MCP protocol
+   * Wrap an operation with console silencing
+   * Automatically restores console on completion or error
    */
-  async wrapOperation<T>(operation: () => Promise<T>): Promise<T> {
-    // For HTTP transport, we don't need to redirect console
-    // This is mainly for stdio transport where console interferes with MCP protocol
+  public async wrapOperation<T>(operation: () => T | Promise<T>): Promise<T> {
+    this.silence();
     try {
-      return await operation();
+      const result = operation();
+      if (result instanceof Promise) {
+        return await result.finally(() => this.restore());
+      }
+      this.restore();
+      return result;
     } catch (error) {
-      logger.error('Console-wrapped operation failed:', error);
+      this.restore();
       throw error;
     }
   }
-
+  
   /**
-   * Safely log a message without interfering with MCP protocol
+   * Check if console is currently silenced
    */
-  safelog(message: string, ...args: any[]): void {
-    logger.info(message, ...args);
-  }
-
-  /**
-   * Safely log an error without interfering with MCP protocol  
-   */
-  safeError(message: string, error?: any): void {
-    logger.error(message, error);
+  public get isActive(): boolean {
+    return this.isSilenced;
   }
 }
+
+// Export singleton instance for easy use
+export const consoleManager = new ConsoleManager();

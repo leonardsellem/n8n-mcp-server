@@ -1,6 +1,6 @@
 import { Octokit } from '@octokit/rest';
 import * as ts from 'typescript';
-import { ParsedNode } from '../parsers/node-parser.js';
+import { ParsedNode } from '../parsers/node-parser';
 
 export interface RemoteNodeFile {
   path: string;
