@@ -15,7 +15,7 @@ import {
   McpError
 } from '@modelcontextprotocol/sdk/types.js';
 import { loadEnvironmentVariables, getEnvConfig } from './environment.js';
-import { GitHubNodeDiscovery } from '../loaders/github-node-discovery.js';
+import { EnhancedRemoteNodeDiscovery } from '../loaders/enhanced-remote-node-discovery.js';
 
 // Load environment variables early
 loadEnvironmentVariables();
@@ -23,7 +23,7 @@ loadEnvironmentVariables();
 class MCPServer {
   private server: Server;
   private config: ReturnType<typeof getEnvConfig>;
-  private nodeDiscovery: GitHubNodeDiscovery;
+  private nodeDiscovery: EnhancedRemoteNodeDiscovery;
 
   constructor() {
     this.server = new Server(
@@ -43,7 +43,7 @@ class MCPServer {
     );
     
     this.config = getEnvConfig();
-    this.nodeDiscovery = new GitHubNodeDiscovery();
+    this.nodeDiscovery = new EnhancedRemoteNodeDiscovery(this.config.githubToken);
     this.setupHandlers();
   }
 

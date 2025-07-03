@@ -11,9 +11,10 @@ COPY tsconfig.json ./
 # Create minimal package.json and install ONLY build dependencies
 RUN --mount=type=cache,target=/root/.npm \
     echo '{}' > package.json && \
-    npm install --no-save typescript@^5.8.3 @types/node@^22.15.30 @types/express@^5.0.3 \
-        @modelcontextprotocol/sdk@^1.12.1 dotenv@^16.5.0 express@^5.1.0 axios@^1.10.0 \
-        n8n-workflow@^1.96.0 uuid@^11.0.5 @types/uuid@^10.0.0
+    npm install --no-save typescript@^5.8.3 @types/node@^20.10.0 @types/express@^4.17.21 \
+        @modelcontextprotocol/sdk@^1.13.2 dotenv@^16.5.0 express@^5.1.0 axios@^1.7.2 \
+        uuid@^10.0.0 @types/uuid@^10.0.0 better-sqlite3@^11.10.0 @types/better-sqlite3@^7.6.8 \
+        winston@^3.11.0 @octokit/rest@^20.0.2 zod@^3.23.8
 
 # Copy source and build
 COPY src ./src

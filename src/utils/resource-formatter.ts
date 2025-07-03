@@ -44,9 +44,7 @@ export function formatWorkflowDetails(workflow: Workflow): Record<string, any> {
       parameters: node.parameters,
     })),
     connections: workflow.connections,
-    staticData: workflow.staticData,
-    settings: workflow.settings,
-    tags: workflow.tags,
+    active: workflow.active,
     // Exclude potentially sensitive or unnecessary information
     // like pinData or other internal fields
   };

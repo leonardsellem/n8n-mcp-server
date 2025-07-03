@@ -217,7 +217,7 @@ export class GitHubNodeDiscovery {
    */
   private extractCredentialDisplayName(content: string): string {
     const match = content.match(/displayName:\s*['"`]([^'"`]+)['"`]/);
-    return match ? match[1] : 'Unknown Credential';
+    return match?.[1] ? String(match[1]) : 'Unknown Credential';
   }
 
   /**
@@ -225,7 +225,7 @@ export class GitHubNodeDiscovery {
    */
   private extractCredentialDescription(content: string): string {
     const match = content.match(/description:\s*['"`]([^'"`]+)['"`]/);
-    return match ? match[1] : 'No description available';
+    return match?.[1] ? String(match[1]) : 'No description available';
   }
 
   /**
@@ -236,12 +236,14 @@ export class GitHubNodeDiscovery {
     
     // Look for property definitions in the properties array
     const propertiesMatch = content.match(/properties:\s*\[([\s\S]*?)\]/);
-    if (propertiesMatch) {
-      const propertiesContent = propertiesMatch[1];
-      const nameMatches = propertiesContent.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g);
+    if (propertiesMatch?.[1]) {
+      const propertiesContent = String(propertiesMatch[1]);
+      const nameMatches = Array.from(propertiesContent.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g));
       
       for (const match of nameMatches) {
-        properties[match[1]] = { type: 'string', required: true };
+        if (match?.[1]) {
+          properties[String(match[1])] = { type: 'string', required: true };
+        }
       }
     }
     
@@ -346,18 +348,17 @@ export class GitHubNodeDiscovery {
     
     return {
       name: nodeName,
-      displayName: this.extractDisplayName(content) || nodeName,
-      type: nodeType,
-      category,
+      displayName: this.extractDisplayName(content) ?? nodeName,
       description,
-      credentials,
-      properties,
-      operations,
       version: this.extractVersion(content),
-      icon: this.extractIcon(content),
-      documentationUrl: this.generateDocumentationUrl(nodeName),
-      sourceUrl: `https://github.com/n8n-io/n8n/tree/master/packages/nodes-base/nodes/${directoryName}`,
-      lastUpdated: new Date().toISOString()
+      defaults: {},
+      inputs: ['main'],
+      outputs: ['main'],
+      properties,
+      credentials,
+      category,
+      operations,
+      lastUpdated: Date.now()
     };
   }
 
@@ -431,22 +432,22 @@ export class GitHubNodeDiscovery {
    */
   private extractDisplayName(content: string): string | undefined {
     const match = content.match(/displayName:\s*['"`]([^'"`]+)['"`]/);
-    return match ? match[1] : undefined;
+    return match?.[1] ? String(match[1]) : undefined;
   }
 
   private extractDescription(content: string): string {
     const match = content.match(/description:\s*['"`]([^'"`]+)['"`]/);
-    return match ? match[1] : 'No description available';
+    return match?.[1] ? String(match[1]) : 'No description available';
   }
 
   private extractVersion(content: string): number {
     const match = content.match(/version:\s*(\d+)/);
-    return match ? parseInt(match[1], 10) : 1;
+    return match?.[1] ? parseInt(String(match[1]), 10) : 1;
   }
 
   private extractIcon(content: string): string | undefined {
     const match = content.match(/icon:\s*['"`]([^'"`]+)['"`]/);
-    return match ? match[1] : undefined;
+    return match?.[1] ? String(match[1]) : undefined;
   }
 
   private extractCredentials(content: string): Array<{name: string; required?: boolean}> {
@@ -454,27 +455,33 @@ export class GitHubNodeDiscovery {
     
     // Look for credential references in the auth property
     const authMatch = content.match(/auth:\s*[\s\S]*?['"`]([^'"`]*[Cc]redential[^'"`]*)['"`]/);
-    if (authMatch) {
-      credentials.push({ name: authMatch[1], required: true });
+    if (authMatch?.[1]) {
+      const credName = String(authMatch[1]);
+      credentials.push({ name: credName, required: true });
     }
     
-    // Look for credential references in the credentials array
-    const credentialsArrayMatch = content.match(/credentials:\s*\[([\s\S]*?)\]/);
-    if (credentialsArrayMatch) {
-      const credContent = credentialsArrayMatch[1];
-      const credMatches = credContent.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g);
-      for (const match of credMatches) {
-        credentials.push({ name: match[1], required: true });
+  // Look for credential references in the credentials array
+  const credentialsArrayMatch = content.match(/credentials:\s*\[([\s\S]*?)\]/);
+  if (credentialsArrayMatch?.[1]) {
+    const credContent = String(credentialsArrayMatch[1]);
+    const credMatches = Array.from(credContent.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g));
+    for (const match of credMatches) {
+      if (match?.[1]) {
+        credentials.push({ name: String(match[1]), required: true });
       }
     }
+  }
     
     // Look for direct credential name patterns
-    const directMatches = content.matchAll(/['"`]([^'"`]*[Cc]redential[^'"`]*)['"`]/g);
+    const directMatches = Array.from(content.matchAll(/['"`]([^'"`]*[Cc]redential[^'"`]*)['"`]/g));
     for (const match of directMatches) {
-      const credName = match[1];
-      // Only add if it exists in our credentials cache
-      if (this.credentialsCache.has(credName) || this.credentialsCache.has(credName.replace('Credential', ''))) {
-        credentials.push({ name: credName, required: true });
+      if (match?.[1]) {
+        const credentialName = String(match[1]);
+        // Only add if it exists in our credentials cache
+        const baseCredName = credentialName.replace(/Credential$/, '');
+        if (this.credentialsCache.has(credentialName) || this.credentialsCache.has(baseCredName)) {
+          credentials.push({ name: credentialName, required: true });
+        }
       }
     }
     
@@ -490,24 +497,29 @@ export class GitHubNodeDiscovery {
     const properties: Record<string, any> = {};
     
     // Extract basic properties (simplified for now)
-    const propertyMatches = content.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g);
+    const propertyMatches = Array.from(content.matchAll(/name:\s*['"`]([^'"`]+)['"`]/g));
     for (const match of propertyMatches) {
-      properties[match[1]] = { type: 'string' };
+      if (match?.[1]) {
+        properties[String(match[1])] = { type: 'string' };
+      }
     }
     
     return properties;
   }
 
-  private extractOperations(content: string): string[] {
-    const operations: string[] = [];
-    const matches = content.matchAll(/value:\s*['"`]([^'"`]+)['"`].*?name:\s*['"`]([^'"`]+)['"`]/gs);
+  private extractOperations(content: string): Record<string, any> {
+    const operations: Record<string, any> = {};
+    const matches = Array.from(content.matchAll(/value:\s*['"`]([^'"`]+)['"`].*?name:\s*['"`]([^'"`]+)['"`]/gs));
     for (const match of matches) {
-      operations.push(match[2]);
+      if (match?.[1] && match?.[2]) {
+        operations[String(match[1])] = { name: String(match[2]) };
+      }
     }
-    return [...new Set(operations)]; // Remove duplicates
+    return operations;
   }
 
   private generateDocumentationUrl(nodeName: string): string {
+    if (!nodeName) return '';
     const kebabCase = nodeName.toLowerCase().replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
     return `https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.${kebabCase}/`;
   }
@@ -572,7 +584,9 @@ export class GitHubNodeDiscovery {
     const categories = new Set<string>();
     
     for (const node of allNodes) {
-      categories.add(node.category);
+      if (node.category) {
+        categories.add(node.category);
+      }
     }
     
     return Array.from(categories).sort();

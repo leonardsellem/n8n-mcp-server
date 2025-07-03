@@ -15,7 +15,7 @@ import { Execution } from '../types/index.js';
  */
 export function formatExecutionSummary(execution: Execution): Record<string, any> {
   // Calculate duration
-  const startedAt = new Date(execution.startedAt);
+  const startedAt = execution.startedAt ? new Date(execution.startedAt) : new Date();
   const stoppedAt = execution.stoppedAt ? new Date(execution.stoppedAt) : new Date();
   const durationMs = stoppedAt.getTime() - startedAt.getTime();
   const durationSeconds = Math.round(durationMs / 1000);
@@ -30,7 +30,7 @@ export function formatExecutionSummary(execution: Execution): Record<string, any
     startedAt: execution.startedAt,
     stoppedAt: execution.stoppedAt || 'In progress',
     duration: `${durationSeconds}s`,
-    finished: execution.finished
+    finished: execution.status === 'success' || execution.status === 'error'
   };
 }
 

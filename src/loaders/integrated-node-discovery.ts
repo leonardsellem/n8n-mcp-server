@@ -480,10 +480,13 @@ export class IntegratedNodeDiscovery {
       description: node.description || '',
       category: node.category || 'misc',
       version: parseInt(node.version || '1', 10),
+      defaults: {},
+      inputs: ['main'],
+      outputs: ['main'],
       properties: node.properties || [],
       credentials: node.credentials || [],
       operations: node.operations || [],
-      lastUpdated: new Date().toISOString()
+      lastUpdated: Date.now()
     };
   }
 }
