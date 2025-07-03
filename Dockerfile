@@ -1,26 +1,22 @@
 # syntax=docker/dockerfile:1.7
-# Ultra-optimized Dockerfile - minimal runtime dependencies (no n8n packages)
 
-# Stage 1: Builder (TypeScript compilation only)
+# Stage 1: Builder (Full dependencies for TypeScript compilation)
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy tsconfig for TypeScript compilation
-COPY tsconfig.json ./
+# Copy package files for dependency installation
+COPY package.json package-lock.json ./
 
-# Create minimal package.json and install ONLY build dependencies
+# Install ALL dependencies (including n8n packages needed for compilation)
 RUN --mount=type=cache,target=/root/.npm \
-    echo '{}' > package.json && \
-    npm install --no-save typescript@^5.8.3 @types/node@^20.10.0 @types/express@^4.17.21 \
-        @modelcontextprotocol/sdk@^1.13.2 dotenv@^16.5.0 express@^5.1.0 axios@^1.7.2 \
-        uuid@^10.0.0 @types/uuid@^10.0.0 better-sqlite3@^11.10.0 @types/better-sqlite3@^7.6.8 \
-        winston@^3.11.0 @octokit/rest@^20.0.2 zod@^3.23.8
+    npm ci --include=dev
 
-# Copy source and build
+# Copy TypeScript config and source code
+COPY tsconfig.json ./
 COPY src ./src
-# Note: src/n8n contains TypeScript types needed for compilation
-# These will be compiled but not included in runtime
-RUN npx tsc
+
+# Build TypeScript (now has all required dependencies)
+RUN npm run build
 
 # Stage 2: Runtime (minimal dependencies)
 FROM node:20-alpine AS runtime
@@ -37,23 +33,14 @@ COPY package.runtime.json package.json
 RUN --mount=type=cache,target=/root/.npm \
     npm install --production --no-audit --no-fund
 
-# Copy built application
+# Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Copy pre-built database and required files
-COPY data/nodes.db ./data/
-COPY src/database/schema-optimized.sql ./src/database/
+# Create data directory for SQLite cache
+RUN mkdir -p /app/data
+
+# Copy required files
 COPY .env.example ./
-
-# Copy entrypoint script
-COPY docker/docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# Add container labels
-LABEL org.opencontainers.image.source="https://github.com/czlonkowski/n8n-mcp"
-LABEL org.opencontainers.image.description="n8n MCP Server - Runtime Only"
-LABEL org.opencontainers.image.licenses="MIT"
-LABEL org.opencontainers.image.title="n8n-mcp"
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -65,14 +52,12 @@ USER nodejs
 
 # Set Docker environment flag
 ENV IS_DOCKER=true
+ENV NODE_ENV=production
 
-# Expose HTTP port
+# Expose MCP port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://127.0.0.1:3000/health || exit 1
+# Note: No health check needed for MCP stdio mode
 
-# Optimized entrypoint
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# Start MCP server
 CMD ["node", "dist/mcp/index.js"]
