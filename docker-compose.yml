@@ -26,10 +26,10 @@ services:
       
       # Optional: n8n API configuration (enables 16 additional management tools)
       # Uncomment and configure to enable n8n workflow management
-      # N8N_API_URL: ${N8N_API_URL}
-      # N8N_API_KEY: ${N8N_API_KEY}
-      # N8N_API_TIMEOUT: ${N8N_API_TIMEOUT:-30000}
-      # N8N_API_MAX_RETRIES: ${N8N_API_MAX_RETRIES:-3}
+      N8N_API_URL: ${N8N_API_URL}
+      N8N_API_KEY: ${N8N_API_KEY}
+      N8N_API_TIMEOUT: ${N8N_API_TIMEOUT:-30000}
+      N8N_API_MAX_RETRIES: ${N8N_API_MAX_RETRIES:-3}
     
     # Volumes for persistence
     volumes:

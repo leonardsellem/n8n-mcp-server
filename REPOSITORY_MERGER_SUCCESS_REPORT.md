@@ -148,7 +148,7 @@ set MCP_MODE=http && set USE_FIXED_HTTP=true && node dist/mcp/index.js
 - **Database**: SQLite cache persistent and optimized
 - **Cross-Platform**: Windows/Linux/macOS compatibility confirmed
 
-## 🎉 Merger Success Metrics
+## � Merger Success Metrics
 
 ### Quantitative Results
 - **Codebase Reduction**: 90%+ reduction (eliminated 700+ static files)
