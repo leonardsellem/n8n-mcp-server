@@ -42,7 +42,10 @@
       "Bash(cd:*)",
       "Bash(docker logs:*)",
       "Bash(cd:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(source .env)",
+      "Bash(./test-github-auto-update.sh:*)",
+      "Bash(bash:*)"
     ],
     "deny": []
   }
