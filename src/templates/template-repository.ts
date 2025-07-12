@@ -139,6 +139,29 @@ export class TemplateRepository {
       LIMIT ?
     `).all(limit) as StoredTemplate[];
   }
+
+  /**
+   * Get templates by category
+   */
+  getTemplatesByCategory(category: string, limit: number = 10): StoredTemplate[] {
+    return this.db.prepare(`
+      SELECT * FROM templates 
+      WHERE categories LIKE ?
+      ORDER BY views DESC, created_at DESC
+      LIMIT ?
+    `).all(`%${category}%`, limit) as StoredTemplate[];
+  }
+
+  /**
+   * Get popular templates
+   */
+  getPopularTemplates(limit: number = 10): StoredTemplate[] {
+    return this.db.prepare(`
+      SELECT * FROM templates 
+      ORDER BY views DESC, created_at DESC
+      LIMIT ?
+    `).all(limit) as StoredTemplate[];
+  }
   
   /**
    * Get total template count

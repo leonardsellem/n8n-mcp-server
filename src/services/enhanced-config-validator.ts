@@ -35,6 +35,24 @@ export interface OperationContext {
 }
 
 export class EnhancedConfigValidator extends ConfigValidator {
+  constructor(nodeRepository?: any) {
+    super();
+    // Optional repository for enhanced validation
+  }
+
+  /**
+   * Instance method to validate configuration
+   */
+  validateConfig(
+    nodeType: string,
+    config: Record<string, any>,
+    properties: any[],
+    mode: ValidationMode = 'operation',
+    profile: ValidationProfile = 'ai-friendly'
+  ): EnhancedValidationResult {
+    return EnhancedConfigValidator.validateWithMode(nodeType, config, properties, mode, profile);
+  }
+
   /**
    * Validate with operation awareness
    */

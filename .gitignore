@@ -88,3 +88,9 @@ data/integrations/
 
 # Windows specific artifacts
 nul
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

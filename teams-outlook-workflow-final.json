@@ -1,0 +1,501 @@
+{
+  "name": "Teams-Outlook Email & Calendar Manager",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Teams Bot Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ],
+      "parameters": {
+        "path": "teams-assistant",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "ai-intent-parser",
+      "name": "AI Intent Parser",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        350,
+        300
+      ],
+      "parameters": {
+        "resource": "text",
+        "operation": "complete",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an email and calendar assistant. Parse the user's natural language input and extract:\n\n1. INTENT: one of [summarize_email, send_email, draft_email, create_event, reschedule_event, attach_file, follow_up, get_calendar]\n2. ENTITIES: extract relevant details like:\n   - email_subject, recipients, message_content\n   - event_title, event_date, event_time, attendees\n   - file_name, draft_number\n   - search_query, folder_name\n\nRespond in JSON format ONLY:\n{\n  \"intent\": \"intent_name\",\n  \"entities\": {\n    \"key\": \"value\"\n  },\n  \"confidence\": 0.95\n}\n\nExamples:\n- \"Summarize unread emails from Acme\" → {\"intent\": \"summarize_email\", \"entities\": {\"sender\": \"Acme\", \"filter\": \"unread\"}}\n- \"Send draft #2 with proposal.pdf\" → {\"intent\": \"send_email\", \"entities\": {\"draft_number\": \"2\", \"attachment\": \"proposal.pdf\"}}\n- \"Schedule meeting with Jane tomorrow 3pm\" → {\"intent\": \"create_event\", \"entities\": {\"attendees\": \"Jane\", \"date\": \"tomorrow\", \"time\": \"3pm\"}}"
+            },
+            {
+              "role": "user",
+              "content": "={{ $json.body.text || $json.body.message || 'No message provided' }}"
+            }
+          ]
+        },
+        "prompt": "You are an email and calendar assistant. Parse the user's natural language input and extract intent and entities. Respond in JSON format ONLY. User input: {{ $json.body.text || $json.body.message || 'No message provided' }}"
+      }
+    },
+    {
+      "id": "intent-router",
+      "name": "Intent Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "summarize_email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "summarize_email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "send_email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "send_email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "create_event",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "create_event"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "draft_email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "draft_email"
+            }
+          ]
+        },
+        "fallbackOutput": "fallback"
+      }
+    },
+    {
+      "id": "email-summarizer",
+      "name": "Email Summarizer",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        900,
+        100
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "filters": {
+          "fields": "id,subject,from,bodyPreview,receivedDateTime,isRead"
+        },
+        "additionalFields": {
+          "filter": "isRead eq false"
+        }
+      }
+    },
+    {
+      "id": "ai-email-summary",
+      "name": "AI Email Summary",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        100
+      ],
+      "parameters": {
+        "resource": "text",
+        "operation": "complete",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Summarize the provided emails into a concise, actionable summary. Group by sender/topic and highlight urgent items. Format for Teams display."
+            },
+            {
+              "role": "user",
+              "content": "Please summarize these emails:\n\n{{ $json.map(item => `From: ${item.from.emailAddress.name} <${item.from.emailAddress.address}>\\nSubject: ${item.subject}\\nPreview: ${item.bodyPreview}\\nReceived: ${item.receivedDateTime}\\n---`).join('\\n') }}"
+            }
+          ]
+        },
+        "prompt": "Summarize the provided emails into a concise, actionable summary. Group by sender/topic and highlight urgent items. Format for Teams display. Emails: {{ $json }}"
+      }
+    },
+    {
+      "id": "draft-handler",
+      "name": "Draft Handler",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        900,
+        200
+      ],
+      "parameters": {
+        "resource": "draft",
+        "operation": "get"
+      }
+    },
+    {
+      "id": "email-sender",
+      "name": "Email Sender",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "={{ $json.choices?.[0]?.message?.content ? JSON.parse($json.choices[0].message.content).entities.recipients : 'user@company.com' }}",
+        "subject": "={{ $json.choices?.[0]?.message?.content ? JSON.parse($json.choices[0].message.content).entities.subject : 'Email from AI Assistant' }}",
+        "message": "={{ $json.choices?.[0]?.message?.content ? JSON.parse($json.choices[0].message.content).entities.message : 'Message sent via AI Assistant' }}",
+        "messageType": "html"
+      }
+    },
+    {
+      "id": "calendar-manager",
+      "name": "Calendar Manager",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ],
+      "parameters": {
+        "resource": "event",
+        "operation": "create",
+        "calendarId": {
+          "mode": "list",
+          "value": "primary"
+        },
+        "subject": "={{ $json.choices?.[0]?.message?.content ? JSON.parse($json.choices[0].message.content).entities.title : 'New Meeting' }}",
+        "startDateTime": "={{ $json.choices?.[0]?.message?.content ? JSON.parse($json.choices[0].message.content).entities.start_time : new Date(Date.now() + 3600000).toISOString() }}",
+        "endDateTime": "={{ $json.choices?.[0]?.message?.content ? JSON.parse($json.choices[0].message.content).entities.end_time : new Date(Date.now() + 7200000).toISOString() }}",
+        "additionalFields": {
+          "body": "={{ JSON.parse($('AI Intent Parser').first().json.choices[0].message.content).entities.description || 'Meeting created by AI Assistant' }}",
+          "attendees": "={{ JSON.parse($('AI Intent Parser').first().json.choices[0].message.content).entities.attendees || '' }}"
+        }
+      }
+    },
+    {
+      "id": "teams-response-formatter",
+      "name": "Teams Response Formatter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        300
+      ],
+      "parameters": {
+        "functionCode": "// Format response for Teams Adaptive Card\nconst intent = JSON.parse($input.first().json.choices[0].message.content).intent;\nconst entities = JSON.parse($input.first().json.choices[0].message.content).entities;\n\nlet responseCard = {\n  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n  \"type\": \"AdaptiveCard\",\n  \"version\": \"1.3\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"text\": \"🤖 AI Assistant Response\",\n      \"weight\": \"Bolder\",\n      \"size\": \"Medium\"\n    }\n  ],\n  \"actions\": []\n};\n\n// Handle different response types\nif (intent === 'summarize_email') {\n  const summary = $input.all()[1]?.json?.choices?.[0]?.message?.content || 'Email summary processed';\n  responseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": \"📧 **Email Summary:**\\n\\n\" + summary,\n    \"wrap\": true\n  });\n  responseCard.actions.push({\n    \"type\": \"Action.Submit\",\n    \"title\": \"Mark All Read\",\n    \"data\": { \"action\": \"mark_read\" }\n  });\n} else if (intent === 'send_email') {\n  responseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": \"✅ **Email Sent Successfully!**\\n\\nTo: \" + (entities.recipients || 'Recipients') + \"\\nSubject: \" + (entities.subject || 'Subject'),\n    \"wrap\": true\n  });\n} else if (intent === 'create_event') {\n  responseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": \"📅 **Calendar Event Created!**\\n\\nTitle: \" + (entities.title || 'Meeting') + \"\\nTime: \" + (entities.start_time || 'Scheduled'),\n    \"wrap\": true\n  });\n  responseCard.actions.push({\n    \"type\": \"Action.Submit\",\n    \"title\": \"View Calendar\",\n    \"data\": { \"action\": \"view_calendar\" }\n  });\n} else if (intent === 'draft_email') {\n  responseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": \"📝 **Draft Email Ready for Review**\",\n    \"wrap\": true\n  });\n  responseCard.actions.push(\n    {\n      \"type\": \"Action.Submit\",\n      \"title\": \"✅ Send Now\",\n      \"data\": { \"action\": \"send_draft\" }\n    },\n    {\n      \"type\": \"Action.Submit\",\n      \"title\": \"✏️ Edit Draft\",\n      \"data\": { \"action\": \"edit_draft\" }\n    }\n  );\n} else {\n  responseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": \"⚠️ I didn't understand that request. Try:\\n\\n• 'Summarize unread emails'\\n• 'Send email to john@company.com'\\n• 'Schedule meeting with team tomorrow'\",\n    \"wrap\": true\n  });\n}\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: responseCard\n    }]\n  }\n};"
+      }
+    },
+    {
+      "id": "teams-responder",
+      "name": "Teams Responder",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        300
+      ],
+      "parameters": {
+        "resource": "chatMessage",
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Teams Bot Webhook').first().json.body.conversation.id }}",
+        "message": "{{ $json.attachments[0].content }}",
+        "messageType": "adaptiveCard"
+      }
+    },
+    {
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Request processed successfully\" } }}"
+      }
+    },
+    {
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        500
+      ],
+      "parameters": {
+        "functionCode": "// Handle errors and create user-friendly error response\nconst error = $input.first().json.error || 'Unknown error occurred';\n\nconst errorCard = {\n  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n  \"type\": \"AdaptiveCard\",\n  \"version\": \"1.3\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"text\": \"❌ Error Processing Request\",\n      \"weight\": \"Bolder\",\n      \"size\": \"Medium\",\n      \"color\": \"Attention\"\n    },\n    {\n      \"type\": \"TextBlock\",\n      \"text\": \"I encountered an issue: \" + error + \"\\n\\nPlease try again or contact support if the problem persists.\",\n      \"wrap\": true\n    }\n  ],\n  \"actions\": [\n    {\n      \"type\": \"Action.Submit\",\n      \"title\": \"Try Again\",\n      \"data\": { \"action\": \"retry\" }\n    }\n  ]\n};\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: errorCard\n    }]\n  }\n};"
+      }
+    },
+    {
+      "id": "attachment-handler",
+      "name": "Attachment Handler",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        900,
+        500
+      ],
+      "parameters": {
+        "resource": "messageAttachment",
+        "operation": "add",
+        "messageId": "={{ JSON.parse($('AI Intent Parser').first().json.choices[0].message.content).entities.message_id }}",
+        "binaryPropertyName": "attachment"
+      }
+    }
+  ],
+  "connections": {
+    "Teams Bot Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Intent Parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Intent Parser": {
+      "main": [
+        [
+          {
+            "node": "Intent Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intent Router": {
+      "main": [
+        [
+          {
+            "node": "Email Summarizer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Sender",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Calendar Manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Draft Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Teams Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Summarizer": {
+      "main": [
+        [
+          {
+            "node": "AI Email Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Email Summary": {
+      "main": [
+        [
+          {
+            "node": "Teams Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Handler": {
+      "main": [
+        [
+          {
+            "node": "Teams Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Sender": {
+      "main": [
+        [
+          {
+            "node": "Teams Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Manager": {
+      "main": [
+        [
+          {
+            "node": "Teams Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teams Response Formatter": {
+      "main": [
+        [
+          {
+            "node": "Teams Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teams Responder": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Teams Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment Handler": {
+      "main": [
+        [
+          {
+            "node": "Teams Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
+  }
+}

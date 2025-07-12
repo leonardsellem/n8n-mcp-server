@@ -9,6 +9,9 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { n8nDocumentationToolsFinal } from './tools';
 import { n8nManagementTools } from './tools-n8n-manager';
+// import { browserTools, handleBrowserTool } from './browser-tools';
+// import { visualVerificationTools, handleVisualVerificationTool } from './tools-visual-verification';
+import { enhancedVisualVerificationTools, executeEnhancedVisualTool } from './tools-enhanced-visual-verification';
 import { logger } from '../utils/logger';
 import { NodeRepository } from '../database/node-repository';
 import { DatabaseAdapter, createDatabaseAdapter } from '../database/database-adapter';
@@ -51,6 +54,13 @@ export class N8NDocumentationMCPServer {
   private templateService: TemplateService | null = null;
   private initialized: Promise<void>;
   private cache = new SimpleCache();
+  private nodeListCache = new Map<string, any>();
+  private nodeInfoCache = new Map<string, any>();
+  private performanceMetrics = {
+    cacheHits: 0,
+    cacheMisses: 0,
+    avgResponseTime: 0
+  };
 
   constructor() {
     // Try multiple database paths
@@ -81,10 +91,10 @@ export class N8NDocumentationMCPServer {
     // Log n8n API configuration status at startup
     const apiConfigured = isN8nApiConfigured();
     const totalTools = apiConfigured ? 
-      n8nDocumentationToolsFinal.length + n8nManagementTools.length : 
-      n8nDocumentationToolsFinal.length;
+      n8nDocumentationToolsFinal.length + enhancedVisualVerificationTools.length + n8nManagementTools.length : 
+      n8nDocumentationToolsFinal.length + enhancedVisualVerificationTools.length;
     
-    logger.info(`MCP server initialized with ${totalTools} tools (n8n API: ${apiConfigured ? 'configured' : 'not configured'})`);
+    logger.info(`MCP server initialized with ${totalTools} tools (n8n API: ${apiConfigured ? 'configured' : 'not configured'}, Enhanced Visual: enabled)`);
     
     this.server = new Server(
       {
@@ -107,6 +117,13 @@ export class N8NDocumentationMCPServer {
       this.repository = new NodeRepository(this.db);
       this.templateService = new TemplateService(this.db);
       logger.info(`Initialized database from: ${dbPath}`);
+      
+      // Start cache warming in background
+      if (process.env.ENABLE_CACHE_WARMING !== 'false') {
+        const { CacheWarmer } = await import('../utils/cache-warmer');
+        const warmer = new CacheWarmer(this.repository);
+        warmer.warmCacheInBackground();
+      }
     } catch (error) {
       logger.error('Failed to initialize database:', error);
       throw new Error(`Failed to open database: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -144,15 +161,18 @@ export class N8NDocumentationMCPServer {
 
     // Handle tool listing
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      // Combine documentation tools with management tools if API is configured
+      // Combine documentation tools with management tools and enhanced visual verification
       const tools = [...n8nDocumentationToolsFinal];
       const isConfigured = isN8nApiConfigured();
       
+      // Add enhanced visual verification tools
+      tools.push(...enhancedVisualVerificationTools);
+      
       if (isConfigured) {
         tools.push(...n8nManagementTools);
-        logger.debug(`Tool listing: ${tools.length} tools available (${n8nDocumentationToolsFinal.length} documentation + ${n8nManagementTools.length} management)`);
+        logger.debug(`Tool listing: ${tools.length} tools available (${n8nDocumentationToolsFinal.length} documentation + ${enhancedVisualVerificationTools.length} visual + ${n8nManagementTools.length} management)`);
       } else {
-        logger.debug(`Tool listing: ${tools.length} tools available (documentation only)`);
+        logger.debug(`Tool listing: ${tools.length} tools available (${n8nDocumentationToolsFinal.length} documentation + ${enhancedVisualVerificationTools.length} visual)`);
       }
       
       return { tools };
@@ -190,63 +210,105 @@ export class N8NDocumentationMCPServer {
   }
 
   async executeTool(name: string, args: any): Promise<any> {
+    const startTime = Date.now();
+    
+    try {
+      // Strict input validation
+      this.validateToolInput(name, args);
+      
+      const result = await this.executeToolInternal(name, args);
+      
+      // Update performance metrics
+      const responseTime = Date.now() - startTime;
+      this.performanceMetrics.avgResponseTime = 
+        (this.performanceMetrics.avgResponseTime + responseTime) / 2;
+      
+      return result;
+    } catch (error) {
+      // Enhanced error messages for AI agents
+      throw new Error(this.formatErrorForAI(name, args, error));
+    }
+  }
+  
+  private validateToolInput(name: string, args: any): void {
     switch (name) {
-      case 'start_here_workflow_guide':
-        return this.getWorkflowGuide(args.topic);
-      case 'list_nodes':
-        return this.listNodes(args);
       case 'get_node_info':
-        return this.getNodeInfo(args.nodeType);
-      case 'search_nodes':
-        return this.searchNodes(args.query, args.limit);
-      case 'list_ai_tools':
-        return this.listAITools();
-      case 'get_node_documentation':
-        return this.getNodeDocumentation(args.nodeType);
+        if (!args.nodeType) {
+          throw new Error('REQUIRED: nodeType parameter missing. Use exact format like "nodes-base.slack" from list_nodes results.');
+        }
+        if (!args.nodeType.includes('.')) {
+          throw new Error(`INVALID: nodeType "${args.nodeType}" must include prefix. Use "nodes-base.${args.nodeType}" or "nodes-langchain.${args.nodeType}".`);
+        }
+        break;
+      case 'list_nodes':
+        if (args.category && !['trigger', 'transform', 'output', 'input', 'AI'].includes(args.category)) {
+          throw new Error(`INVALID: category "${args.category}". Valid options: trigger, transform, output, input, AI.`);
+        }
+        break;
+      case 'validate_workflow':
+        if (args.mode === 'remote' && !args.workflowId) {
+          throw new Error('REQUIRED: workflowId parameter missing for remote mode. Use workflow ID from n8n instance.');
+        }
+        if (!args.mode || args.mode === 'full') {
+          if (!args.workflow) {
+            throw new Error('REQUIRED: workflow parameter missing. Provide complete workflow JSON with nodes and connections.');
+          }
+          if (!args.workflow.nodes || !Array.isArray(args.workflow.nodes)) {
+            throw new Error('REQUIRED: workflow.nodes array missing. Workflow must have nodes array.');
+          }
+          if (!args.workflow.connections || typeof args.workflow.connections !== 'object') {
+            throw new Error('REQUIRED: workflow.connections object missing. Workflow must have connections object.');
+          }
+        }
+        break;
+    }
+  }
+  
+  private formatErrorForAI(toolName: string, args: any, error: any): string {
+    const baseMessage = error.message || 'Unknown error';
+    
+    // Add specific guidance based on tool and error
+    if (toolName === 'get_node_info' && baseMessage.includes('not found')) {
+      return `${baseMessage}\n\nFIX: Use list_nodes() first to get valid nodeType values. Example: "nodes-base.slack" not "slack".`;
+    }
+    
+    if (toolName === 'validate_workflow' && baseMessage.includes('missing')) {
+      return `${baseMessage}\n\nFIX: Workflow must have this structure: {nodes: [...], connections: {...}}. Use get_workflow_guide() for examples.`;
+    }
+    
+    if (baseMessage.includes('REQUIRED') || baseMessage.includes('INVALID')) {
+      return baseMessage; // Already formatted for AI
+    }
+    
+    return `${toolName} failed: ${baseMessage}\n\nSUGGESTION: Check parameter format and required fields. Use get_workflow_guide() for examples.`;
+  }
+  
+  private async executeToolInternal(name: string, args: any): Promise<any> {
+    switch (name) {
+      case 'get_workflow_guide':
+        return this.getWorkflowGuide(args.scenario);
+      case 'find_nodes':
+        return this.findNodesUnified(args);
+      case 'get_node_info':
+        return this.getNodeInfoUnified(args);
       case 'get_database_statistics':
-        return this.getDatabaseStatistics();
-      case 'get_node_essentials':
-        return this.getNodeEssentials(args.nodeType);
-      case 'search_node_properties':
-        return this.searchNodeProperties(args.nodeType, args.query, args.maxResults);
-      case 'get_node_for_task':
-        return this.getNodeForTask(args.task);
-      case 'list_tasks':
-        return this.listTasks(args.category);
-      case 'validate_node_operation':
-        return this.validateNodeConfig(args.nodeType, args.config, 'operation', args.profile);
-      case 'validate_node_minimal':
-        return this.validateNodeMinimal(args.nodeType, args.config);
-      case 'get_property_dependencies':
-        return this.getPropertyDependencies(args.nodeType, args.config);
-      case 'get_node_as_tool_info':
-        return this.getNodeAsToolInfo(args.nodeType);
-      case 'list_node_templates':
-        return this.listNodeTemplates(args.nodeTypes, args.limit);
+        return this.getDatabaseStatistics(args.includePerformance);
+      case 'get_node_config':
+        return this.getNodeConfigUnified(args);
+      case 'validate_node':
+        return this.validateNodeUnified(args);
+      case 'find_templates':
+        return this.findTemplatesUnified(args);
       case 'get_template':
         return this.getTemplate(args.templateId);
-      case 'search_templates':
-        return this.searchTemplates(args.query, args.limit);
-      case 'get_templates_for_task':
-        return this.getTemplatesForTask(args.task);
       case 'validate_workflow':
-        return this.validateWorkflow(args.workflow, args.options);
-      case 'validate_workflow_connections':
-        return this.validateWorkflowConnections(args.workflow);
-      case 'validate_workflow_expressions':
-        return this.validateWorkflowExpressions(args.workflow);
+        return this.validateWorkflowUnified(args);
       
       // n8n Management Tools (if API is configured)
       case 'n8n_create_workflow':
         return n8nHandlers.handleCreateWorkflow(args);
       case 'n8n_get_workflow':
-        return n8nHandlers.handleGetWorkflow(args);
-      case 'n8n_get_workflow_details':
-        return n8nHandlers.handleGetWorkflowDetails(args);
-      case 'n8n_get_workflow_structure':
-        return n8nHandlers.handleGetWorkflowStructure(args);
-      case 'n8n_get_workflow_minimal':
-        return n8nHandlers.handleGetWorkflowMinimal(args);
+        return this.handleGetWorkflowUnified(args);
       case 'n8n_update_full_workflow':
         return n8nHandlers.handleUpdateWorkflow(args);
       case 'n8n_update_partial_workflow':
@@ -255,10 +317,6 @@ export class N8NDocumentationMCPServer {
         return n8nHandlers.handleDeleteWorkflow(args);
       case 'n8n_list_workflows':
         return n8nHandlers.handleListWorkflows(args);
-      case 'n8n_validate_workflow':
-        await this.ensureInitialized();
-        if (!this.repository) throw new Error('Repository not initialized');
-        return n8nHandlers.handleValidateWorkflow(args, this.repository);
       case 'n8n_trigger_webhook_workflow':
         return n8nHandlers.handleTriggerWebhookWorkflow(args);
       case 'n8n_get_execution':
@@ -267,18 +325,90 @@ export class N8NDocumentationMCPServer {
         return n8nHandlers.handleListExecutions(args);
       case 'n8n_delete_execution':
         return n8nHandlers.handleDeleteExecution(args);
-      case 'n8n_health_check':
-        return n8nHandlers.handleHealthCheck();
-      case 'n8n_list_available_tools':
-        return n8nHandlers.handleListAvailableTools();
-      case 'n8n_diagnostic':
-        return n8nHandlers.handleDiagnostic({ params: { arguments: args } });
+      case 'n8n_system':
+        return this.handleN8nSystemUnified(args);
+      
+      // Browser tools - temporarily disabled due to native module issues
+      /*
+      case 'browser_create_session':
+      case 'browser_navigate':
+      case 'browser_take_screenshot':
+      case 'browser_click':
+      case 'browser_type':
+      case 'browser_fill':
+      case 'browser_wait':
+      case 'browser_get_text':
+      case 'browser_get_attribute':
+      case 'browser_evaluate':
+      case 'browser_login':
+      case 'browser_store_credentials':
+      case 'browser_save_session':
+      case 'browser_restore_session':
+      case 'browser_close_session':
+      case 'browser_list_sessions':
+      case 'browser_get_page_info':
+      case 'browser_hover':
+      case 'browser_select_option':
+      case 'browser_upload_file':
+      case 'browser_get_cookies':
+      case 'browser_set_cookie':
+      case 'browser_drag_and_drop':
+      case 'browser_go_back':
+      case 'browser_go_forward':
+      case 'browser_reload':
+      case 'browser_get_logs':
+      case 'browser_list_credentials':
+        return handleBrowserTool(name, args);
+      */
+        
+      // Enhanced Visual Verification Tools - NOW ENABLED!
+      case 'setup_enhanced_visual_verification':
+      case 'analyze_workflow_comprehensively':
+      case 'detect_enhanced_visual_issues':
+      case 'generate_ai_recommendations':
+      case 'start_execution_monitoring':
+      case 'stop_execution_monitoring':
+      case 'get_live_execution_data':
+      case 'get_workflow_intelligence_report':
+      case 'compare_workflow_states_enhanced':
+      case 'auto_fix_visual_issues':
+      case 'cleanup_enhanced_visual_verification':
+        return executeEnhancedVisualTool(name, args);
         
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
   }
 
+  private async listNodesOptimized(filters: any = {}): Promise<any> {
+    // Apply intelligent defaults for AI agents
+    const optimizedFilters = {
+      ...filters,
+      limit: filters.limit || 200  // AI agents need complete results by default
+    };
+    
+    // If no specific filter, default to most useful categories for AI agents
+    if (!optimizedFilters.category && !optimizedFilters.package && !optimizedFilters.isAITool) {
+      optimizedFilters.category = 'trigger';  // Most AI agents start with triggers
+    }
+    
+    // Check cache first
+    const cacheKey = JSON.stringify(optimizedFilters);
+    if (this.nodeListCache.has(cacheKey)) {
+      this.performanceMetrics.cacheHits++;
+      return this.nodeListCache.get(cacheKey);
+    }
+    
+    this.performanceMetrics.cacheMisses++;
+    const result = await this.listNodes(optimizedFilters);
+    
+    // Cache for 5 minutes (node list is relatively static)
+    this.nodeListCache.set(cacheKey, result);
+    setTimeout(() => this.nodeListCache.delete(cacheKey), 5 * 60 * 1000);
+    
+    return result;
+  }
+  
   private async listNodes(filters: any = {}): Promise<any> {
     await this.ensureInitialized();
     
@@ -531,7 +661,7 @@ Full documentation is being prepared. For now, use get_node_essentials for confi
     };
   }
 
-  private async getDatabaseStatistics(): Promise<any> {
+  private async getDatabaseStatistics(includePerformance: boolean = true): Promise<any> {
     await this.ensureInitialized();
     if (!this.db) throw new Error('Database not initialized');
     const stats = this.db!.prepare(`
@@ -552,7 +682,7 @@ Full documentation is being prepared. For now, use get_node_essentials for confi
       GROUP BY package_name
     `).all() as any[];
     
-    return {
+    const baseStats = {
       totalNodes: stats.total,
       statistics: {
         aiTools: stats.ai_tools,
@@ -568,6 +698,55 @@ Full documentation is being prepared. For now, use get_node_essentials for confi
         nodeCount: pkg.count,
       })),
     };
+    
+    if (includePerformance) {
+      const totalCacheOperations = this.performanceMetrics.cacheHits + this.performanceMetrics.cacheMisses;
+      const cacheHitRate = totalCacheOperations > 0 ? 
+        Math.round((this.performanceMetrics.cacheHits / totalCacheOperations) * 100) : 0;
+      
+      return {
+        ...baseStats,
+        performance: {
+          cacheStatistics: {
+            hitRate: `${cacheHitRate}%`,
+            totalHits: this.performanceMetrics.cacheHits,
+            totalMisses: this.performanceMetrics.cacheMisses,
+            activeNodeListCache: this.nodeListCache.size,
+            activeNodeInfoCache: this.nodeInfoCache.size
+          },
+          responseTime: {
+            averageMs: Math.round(this.performanceMetrics.avgResponseTime),
+            status: this.performanceMetrics.avgResponseTime < 100 ? 'excellent' : 
+                   this.performanceMetrics.avgResponseTime < 500 ? 'good' : 'slow'
+          },
+          recommendations: this.getPerformanceRecommendations(cacheHitRate)
+        }
+      };
+    }
+    
+    return baseStats;
+  }
+  
+  private getPerformanceRecommendations(cacheHitRate: number): string[] {
+    const recommendations: string[] = [];
+    
+    if (cacheHitRate < 50) {
+      recommendations.push('LOW CACHE HIT RATE: Use consistent parameters for better caching');
+    }
+    
+    if (this.performanceMetrics.avgResponseTime > 500) {
+      recommendations.push('SLOW RESPONSES: Use essentials detail level instead of complete');
+    }
+    
+    if (this.nodeInfoCache.size > 100) {
+      recommendations.push('HIGH MEMORY USAGE: Cache will auto-clean in 10 minutes');
+    }
+    
+    if (recommendations.length === 0) {
+      recommendations.push('PERFORMANCE OPTIMAL: Server running efficiently');
+    }
+    
+    return recommendations;
   }
 
   private async getNodeEssentials(nodeType: string): Promise<any> {
@@ -1180,7 +1359,148 @@ Full documentation is being prepared. For now, use get_node_essentials for confi
     };
   }
 
-  private async getWorkflowGuide(topic?: string): Promise<any> {
+  private async getWorkflowGuide(scenario?: string): Promise<any> {
+    // Return precise, actionable guidance for specific scenarios
+    const scenarios: Record<string, any> = {
+      webhook_to_api: {
+        title: "Webhook → API Call Pattern",
+        nodes: [
+          { type: "nodes-base.webhook", role: "trigger", required: true },
+          { type: "nodes-base.httpRequest", role: "action", required: true }
+        ],
+        connections: [
+          { from: "Webhook", to: "HTTP Request", port: "main" }
+        ],
+        configuration: {
+          webhook: {
+            path: "/webhook-endpoint",
+            httpMethod: "POST",
+            responseMode: "onReceived"
+          },
+          httpRequest: {
+            method: "POST",
+            url: "{{ $json.targetUrl }}",
+            sendBody: true,
+            jsonBody: "{{ $json }}"
+          }
+        },
+        validation: [
+          "Webhook must have unique path",
+          "HTTP Request URL must be valid",
+          "Response mode affects workflow execution"
+        ]
+      },
+      
+      ai_agent_tools: {
+        title: "AI Agent with Tools Pattern",
+        nodes: [
+          { type: "nodes-langchain.agent", role: "orchestrator", required: true },
+          { type: "nodes-base.slack", role: "tool", required: false },
+          { type: "nodes-base.httpRequest", role: "tool", required: false }
+        ],
+        connections: [
+          { from: "AI Agent", to: "Slack", port: "ai_tool" },
+          { from: "AI Agent", to: "HTTP Request", port: "ai_tool" }
+        ],
+        configuration: {
+          agent: {
+            model: "gpt-4",
+            toolDescription: "Use clear, specific descriptions for each tool",
+            systemMessage: "You are a helpful automation assistant"
+          },
+          tools: {
+            slack: {
+              channel: "{{ $fromAI('channel', 'Slack channel to post to') }}",
+              text: "{{ $fromAI('message', 'Message content to send') }}"
+            }
+          }
+        },
+        validation: [
+          "AI Agent must be connected to tools via ai_tool port",
+          "Tools must use $fromAI() expressions for dynamic values",
+          "Tool descriptions must be clear and specific"
+        ]
+      },
+      
+      data_processing: {
+        title: "Data Processing Pipeline",
+        nodes: [
+          { type: "nodes-base.webhook", role: "trigger", required: true },
+          { type: "nodes-base.set", role: "transform", required: true },
+          { type: "nodes-base.if", role: "control", required: false },
+          { type: "nodes-base.code", role: "transform", required: false }
+        ],
+        connections: [
+          { from: "Webhook", to: "Set", port: "main" },
+          { from: "Set", to: "IF", port: "main" },
+          { from: "IF", to: "Code", port: "true" }
+        ],
+        configuration: {
+          set: {
+            mode: "manual",
+            values: [
+              { name: "processedData", value: "{{ $json.inputData | upper }}" },
+              { name: "timestamp", value: "{{ $now }}" }
+            ]
+          },
+          if: {
+            conditions: {
+              number: [
+                { value1: "{{ $json.amount }}", operation: "greaterThan", value2: 100 }
+              ]
+            }
+          }
+        },
+        validation: [
+          "Set node values must have unique names",
+          "IF conditions must reference valid data paths",
+          "Code node must return valid JSON object"
+        ]
+      }
+    };
+
+    if (scenario && scenarios[scenario]) {
+      return {
+        scenario,
+        ...scenarios[scenario],
+        implementation: {
+          steps: [
+            "1. Create nodes in the specified order",
+            "2. Configure each node with the provided settings",
+            "3. Connect nodes using the connection patterns",
+            "4. Validate configuration using validate_workflow",
+            "5. Test with sample data before production"
+          ],
+          performance: {
+            caching: "Enable for nodes that process static data",
+            retries: "Configure retry logic for external API calls",
+            timeout: "Set appropriate timeouts for long-running operations"
+          }
+        }
+      };
+    }
+
+    // Default overview for AI agents
+    return {
+      title: "n8n Workflow Patterns for AI Agents",
+      availableScenarios: Object.keys(scenarios),
+      quickStart: [
+        "1. Choose a scenario: webhook_to_api, ai_agent_tools, data_processing",
+        "2. Call get_workflow_guide({scenario: 'chosen_scenario'})",
+        "3. Use list_nodes({category: 'trigger'}) to find starting points",
+        "4. Use get_node_info({nodeType: 'exact_type'}) for configuration",
+        "5. Use validate_workflow() before deployment"
+      ],
+      commonPatterns: {
+        triggers: ["webhook", "schedule", "manual"],
+        transforms: ["set", "code", "merge"],
+        outputs: ["httpRequest", "slack", "gmail"],
+        control: ["if", "switch", "merge"]
+      }
+    };
+  }
+  
+  private async getWorkflowGuideOld(topic?: string): Promise<any> {
     const guides: Record<string, any> = {
       overview: {
         title: "n8n MCP Tools Quick Start Guide",
@@ -1672,6 +1992,297 @@ Full documentation is being prepared. For now, use get_node_essentials for confi
     return descriptions[task] || 'Workflow templates for this task';
   }
 
+  private async validateWorkflowUnified(args: any): Promise<any> {
+    const { workflow, workflowId, mode = 'full', options = {} } = args;
+    
+    // Handle remote mode - validate workflow from n8n instance
+    if (mode === 'remote') {
+      if (!workflowId) {
+        throw new Error('workflowId is required for remote mode');
+      }
+      
+      await this.ensureInitialized();
+      if (!this.repository) throw new Error('Repository not initialized');
+      
+      // Use n8n management handler for remote validation
+      return n8nHandlers.handleValidateWorkflow({ id: workflowId, options }, this.repository);
+    }
+    
+    // For local validation, workflow is required
+    if (!workflow) {
+      throw new Error('workflow is required for local validation modes');
+    }
+    
+    // Set mode-specific options
+    const validationOptions = { ...options };
+    
+    switch (mode) {
+      case 'full':
+        validationOptions.validateNodes = options.validateNodes ?? true;
+        validationOptions.validateConnections = options.validateConnections ?? true;
+        validationOptions.validateExpressions = options.validateExpressions ?? true;
+        break;
+      case 'structure':
+        validationOptions.validateNodes = options.validateNodes ?? false;
+        validationOptions.validateConnections = options.validateConnections ?? true;
+        validationOptions.validateExpressions = options.validateExpressions ?? false;
+        break;
+      case 'connections':
+        validationOptions.validateNodes = false;
+        validationOptions.validateConnections = true;
+        validationOptions.validateExpressions = false;
+        break;
+      case 'expressions':
+        validationOptions.validateNodes = false;
+        validationOptions.validateConnections = false;
+        validationOptions.validateExpressions = true;
+        break;
+      case 'nodes':
+        validationOptions.validateNodes = true;
+        validationOptions.validateConnections = false;
+        validationOptions.validateExpressions = false;
+        break;
+      default:
+        throw new Error(`Unknown validation mode: ${mode}`);
+    }
+    
+    // Call the appropriate validation method based on mode
+    if (mode === 'connections') {
+      return this.validateWorkflowConnections(workflow);
+    } else if (mode === 'expressions') {
+      return this.validateWorkflowExpressions(workflow);
+    } else {
+      // For full, structure, and nodes modes, use the main validation method
+      const result = await this.validateWorkflow(workflow, validationOptions);
+      
+      // Add mode information to the response
+      return {
+        ...result,
+        mode,
+        validationOptions,
+        modeDescription: this.getModeDescription(mode)
+      };
+    }
+  }
+  
+  private getModeDescription(mode: string): string {
+    const descriptions: Record<string, string> = {
+      'full': 'Complete validation including nodes, connections, and expressions',
+      'structure': 'Workflow structure and connections validation only',
+      'connections': 'Node connections and flow validation only',
+      'expressions': 'n8n expressions syntax and references validation only',
+      'nodes': 'Individual node configurations validation only',
+      'remote': 'Validation of workflow from n8n instance by ID'
+    };
+    return descriptions[mode] || 'Unknown validation mode';
+  }
+  
+  private async handleGetWorkflowUnified(args: any): Promise<any> {
+    const { id, detail = 'complete' } = args;
+    
+    // Route to appropriate handler based on detail level
+    switch (detail) {
+      case 'complete':
+        return n8nHandlers.handleGetWorkflow(args);
+      case 'details':
+        return n8nHandlers.handleGetWorkflowDetails(args);
+      case 'structure':
+        return n8nHandlers.handleGetWorkflowStructure(args);
+      case 'minimal':
+        return n8nHandlers.handleGetWorkflowMinimal(args);
+      default:
+        throw new Error(`Unknown detail level: ${detail}. Valid options: complete, details, structure, minimal`);
+    }
+  }
+  
+  private async getNodeInfoUnified(args: any): Promise<any> {
+    const { nodeType, detail = 'essentials' } = args;
+    
+    // Check cache first for expensive operations
+    const cacheKey = `${nodeType}:${detail}`;
+    if ((detail === 'complete' || detail === 'essentials') && this.nodeInfoCache.has(cacheKey)) {
+      this.performanceMetrics.cacheHits++;
+      return this.nodeInfoCache.get(cacheKey);
+    }
+    
+    this.performanceMetrics.cacheMisses++;
+    
+    // Route to appropriate handler based on detail level
+    let result: any;
+    switch (detail) {
+      case 'essentials':
+        result = await this.getNodeEssentials(nodeType);
+        break;
+      case 'complete':
+        result = await this.getNodeInfo(nodeType);
+        break;
+      case 'ai_tool':
+        result = await this.getNodeAsToolInfo(nodeType);
+        break;
+      default:
+        throw new Error(`INVALID: detail "${detail}" not supported. Valid options: essentials, complete, ai_tool.`);
+    }
+    
+    // Ensure predictable response schema
+    const standardizedResult = this.standardizeNodeInfoResponse(result, detail);
+    
+    // Cache expensive operations for 10 minutes
+    if (detail === 'complete' || detail === 'essentials') {
+      this.nodeInfoCache.set(cacheKey, standardizedResult);
+      setTimeout(() => this.nodeInfoCache.delete(cacheKey), 10 * 60 * 1000);
+    }
+    
+    return standardizedResult;
+  }
+  
+  private standardizeNodeInfoResponse(data: any, detail: string): any {
+    // Ensure predictable schema to prevent AI hallucination
+    const base = {
+      nodeType: data.nodeType || '',
+      displayName: data.displayName || '',
+      description: data.description || '',
+      responseType: detail,
+      performance: {
+        cached: this.nodeInfoCache.has(`${data.nodeType}:${detail}`),
+        responseTime: 'fast'
+      }
+    };
+    
+    switch (detail) {
+      case 'essentials':
+        return {
+          ...base,
+          requiredProperties: data.requiredProperties || [],
+          commonProperties: data.commonProperties || [],
+          operations: data.operations || [],
+          examples: data.examples || {},
+          metadata: {
+            ...data.metadata,
+            totalProperties: data.metadata?.totalProperties || 0,
+            isAITool: data.metadata?.isAITool || false
+          }
+        };
+      case 'complete':
+        return {
+          ...base,
+          properties: data.properties || [],
+          operations: data.operations || [],
+          credentials: data.credentials || [],
+          version: data.version || '1',
+          aiToolCapabilities: data.aiToolCapabilities || null
+        };
+      case 'ai_tool':
+        return {
+          ...base,
+          canBeUsedAsTool: data.aiToolCapabilities?.canBeUsedAsTool || true,
+          connectionType: 'ai_tool',
+          requirements: data.aiToolCapabilities?.requirements || {},
+          examples: data.aiToolCapabilities?.examples || {},
+          commonUseCases: data.aiToolCapabilities?.commonUseCases || []
+        };
+      default:
+        return { ...base, ...data };
+    }
+  }
+  
+  private async findNodesUnified(args: any): Promise<any> {
+    const { query, category, limit = 50 } = args;
+    
+    if (query) {
+      // Search mode
+      return this.searchNodes(query, limit);
+    } else if (category) {
+      // Category mode - handle special ai_tools category
+      if (category === 'ai_tools') {
+        return this.listAITools();
+      } else {
+        return this.listNodesOptimized({ category, limit });
+      }
+    } else {
+      // Default to triggers for AI agents
+      return this.listNodesOptimized({ category: 'trigger', limit });
+    }
+  }
+  
+  private async getNodeConfigUnified(args: any): Promise<any> {
+    const { nodeType, mode = 'task', task, query, config } = args;
+    
+    switch (mode) {
+      case 'task':
+        if (!task) {
+          throw new Error('REQUIRED: task parameter missing for task mode. Use mode="list_tasks" to see available tasks.');
+        }
+        return this.getNodeForTask(task);
+      case 'search_properties':
+        if (!nodeType || !query) {
+          throw new Error('REQUIRED: nodeType and query parameters missing for search_properties mode.');
+        }
+        return this.searchNodeProperties(nodeType, query, 20);
+      case 'dependencies':
+        if (!nodeType) {
+          throw new Error('REQUIRED: nodeType parameter missing for dependencies mode.');
+        }
+        return this.getPropertyDependencies(nodeType, config);
+      case 'list_tasks':
+        return this.listTasks();
+      default:
+        throw new Error(`INVALID: mode "${mode}". Valid options: task, search_properties, dependencies, list_tasks.`);
+    }
+  }
+  
+  private async validateNodeUnified(args: any): Promise<any> {
+    const { nodeType, config, mode = 'full' } = args;
+    
+    if (mode === 'minimal') {
+      return this.validateNodeMinimal(nodeType, config);
+    } else {
+      return this.validateNodeConfig(nodeType, config, 'operation', 'ai-friendly');
+    }
+  }
+  
+  private async handleN8nSystemUnified(args: any): Promise<any> {
+    const { operation = 'health', verbose = false } = args;
+    
+    switch (operation) {
+      case 'health':
+        return n8nHandlers.handleHealthCheck();
+      case 'list_tools':
+        return n8nHandlers.handleListAvailableTools();
+      case 'diagnose':
+        return n8nHandlers.handleDiagnostic({ params: { arguments: { verbose } } });
+      default:
+        throw new Error(`INVALID: operation "${operation}". Valid options: health, list_tools, diagnose.`);
+    }
+  }
+  
+  private async findTemplatesUnified(args: any): Promise<any> {
+    const { mode = 'keywords', nodeTypes, query, task, limit = 20 } = args;
+    
+    // Route to appropriate handler based on mode
+    switch (mode) {
+      case 'nodes':
+        if (!nodeTypes || nodeTypes.length === 0) {
+          throw new Error('nodeTypes array is required for nodes mode');
+        }
+        return this.listNodeTemplates(nodeTypes, limit);
+      case 'keywords':
+        if (!query) {
+          throw new Error('query is required for keywords mode');
+        }
+        return this.searchTemplates(query, limit);
+      case 'task':
+        if (!task) {
+          throw new Error('task is required for task mode');
+        }
+        return this.getTemplatesForTask(task);
+      case 'all':
+        // For all mode, use search with empty query to get all templates
+        return this.searchTemplates('', limit);
+      default:
+        throw new Error(`Unknown search mode: ${mode}. Valid options: nodes, keywords, task, all`);
+    }
+  }
+  
   private async validateWorkflow(workflow: any, options?: any): Promise<any> {
     await this.ensureInitialized();
     if (!this.repository) throw new Error('Repository not initialized');

@@ -4,16 +4,20 @@ version: '3.8'
 
 services:
   n8n-mcp:
-    image: ghcr.io/czlonkowski/n8n-mcp:latest
+    image: n8n-mcp:auto-update
     container_name: n8n-mcp
     restart: unless-stopped
     
     # Environment configuration
     environment:
-      # Mode configuration
+      # Mode configuration (http or simple-auto)
       MCP_MODE: ${MCP_MODE:-http}
       USE_FIXED_HTTP: ${USE_FIXED_HTTP:-true}  # Use fixed implementation for stability
       AUTH_TOKEN: ${AUTH_TOKEN:?AUTH_TOKEN is required for HTTP mode}
+      
+      # Auto-update configuration (for simple-auto mode)
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}  # Optional: enables GitHub auto-updates
+      UPDATE_INTERVAL_MINUTES: ${UPDATE_INTERVAL_MINUTES:-15}
       
       # Application settings
       NODE_ENV: ${NODE_ENV:-production}

@@ -1,126 +1,132 @@
-export enum LogLevel {
-  ERROR = 0,
-  WARN = 1,
-  INFO = 2,
-  DEBUG = 3,
+// src/utils/logger.ts
+
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
+import path from 'path';
+
+export interface LogLevel {
+  ERROR: 0;
+  WARN: 1;
+  INFO: 2;
+  DEBUG: 3;
 }
 
-export interface LoggerConfig {
-  level: LogLevel;
-  prefix?: string;
-  timestamp?: boolean;
+export const LOG_LEVELS: LogLevel = {
+  ERROR: 0,
+  WARN: 1,
+  INFO: 2,
+  DEBUG: 3
+};
+
+export interface LogEntry {
+  timestamp: string;
+  level: keyof LogLevel;
+  message: string;
+  data?: any;
+  component?: string;
 }
 
-export class Logger {
-  private config: LoggerConfig;
-  private static instance: Logger;
-  private useFileLogging = false;
-  private fileStream: any = null;
-  // Cache environment variables for performance
-  private readonly isStdio = process.env.MCP_MODE === 'stdio';
-  private readonly isDisabled = process.env.DISABLE_CONSOLE_OUTPUT === 'true';
-  private readonly isHttp = process.env.MCP_MODE === 'http';
+class Logger {
+  private currentLevel: number;
+  private logStream?: NodeJS.WritableStream;
+  private enableConsole: boolean;
+  private enableFile: boolean;
+  private prefix: string;
 
-  constructor(config?: Partial<LoggerConfig>) {
-    this.config = {
-      level: LogLevel.INFO,
-      prefix: 'n8n-mcp',
-      timestamp: true,
-      ...config,
-    };
+  constructor(options?: { prefix?: string }) {
+    this.currentLevel = this.getLogLevelFromEnv();
+    this.enableConsole = process.env.NODE_ENV !== 'production';
+    this.enableFile = process.env.ENABLE_FILE_LOGGING === 'true';
+    this.prefix = options?.prefix || '';
+    
+    if (this.enableFile) {
+      this.initializeFileLogging();
+    }
   }
 
-  static getInstance(config?: Partial<LoggerConfig>): Logger {
-    if (!Logger.instance) {
-      Logger.instance = new Logger(config);
-    }
-    return Logger.instance;
+  private getLogLevelFromEnv(): number {
+    const envLevel = process.env.LOG_LEVEL?.toUpperCase() || 'INFO';
+    return LOG_LEVELS[envLevel as keyof LogLevel] ?? LOG_LEVELS.INFO;
   }
 
-  private formatMessage(level: string, message: string): string {
-    const parts: string[] = [];
-    
-    if (this.config.timestamp) {
-      parts.push(`[${new Date().toISOString()}]`);
-    }
-    
-    if (this.config.prefix) {
-      parts.push(`[${this.config.prefix}]`);
-    }
-    
-    parts.push(`[${level}]`);
-    parts.push(message);
-    
-    return parts.join(' ');
-  }
-
-  private log(level: LogLevel, levelName: string, message: string, ...args: any[]): void {
-    // Check environment variables FIRST, before level check
-    // In stdio mode, suppress ALL console output to avoid corrupting JSON-RPC
-    if (this.isStdio || this.isDisabled) {
-      // Silently drop all logs in stdio mode
-      return;
-    }
-    
-    if (level <= this.config.level) {
-      const formattedMessage = this.formatMessage(levelName, message);
-      
-      // In HTTP mode during request handling, suppress console output
-      // The ConsoleManager will handle this, but we add a safety check
-      if (this.isHttp && process.env.MCP_REQUEST_ACTIVE === 'true') {
-        // Silently drop the log during active MCP requests
-        return;
+  private initializeFileLogging(): void {
+    try {
+      const logDir = path.join(process.cwd(), 'logs');
+      if (!existsSync(logDir)) {
+        mkdirSync(logDir, { recursive: true });
       }
       
-      switch (level) {
-        case LogLevel.ERROR:
-          console.error(formattedMessage, ...args);
-          break;
-        case LogLevel.WARN:
-          console.warn(formattedMessage, ...args);
-          break;
-        default:
-          console.log(formattedMessage, ...args);
+      const logFile = path.join(logDir, `mcp-server-${new Date().toISOString().split('T')[0]}.log`);
+      this.logStream = createWriteStream(logFile, { flags: 'a' });
+    } catch (error) {
+      console.error('Failed to initialize file logging:', error);
+      this.enableFile = false;
+    }
+  }
+
+  private formatMessage(level: keyof LogLevel, message: string, data?: any, component?: string): string {
+    const timestamp = new Date().toISOString();
+    const prefixStr = this.prefix ? `${this.prefix} ` : '';
+    const componentStr = component ? `[${component}] ` : '';
+    const dataStr = data ? ` ${JSON.stringify(data)}` : '';
+    return `${timestamp} [${level}] ${prefixStr}${componentStr}${message}${dataStr}`;
+  }
+
+  private log(level: keyof LogLevel, message: string, data?: any, component?: string): void {
+    const levelNum = LOG_LEVELS[level];
+    
+    if (levelNum <= this.currentLevel) {
+      const formattedMessage = this.formatMessage(level, message, data, component);
+      
+      if (this.enableConsole) {
+        switch (level) {
+          case 'ERROR':
+            console.error(formattedMessage);
+            break;
+          case 'WARN':
+            console.warn(formattedMessage);
+            break;
+          case 'INFO':
+            console.info(formattedMessage);
+            break;
+          case 'DEBUG':
+            console.debug(formattedMessage);
+            break;
+        }
+      }
+      
+      if (this.enableFile && this.logStream) {
+        this.logStream.write(formattedMessage + '\n');
       }
     }
   }
 
-  error(message: string, ...args: any[]): void {
-    this.log(LogLevel.ERROR, 'ERROR', message, ...args);
+  error(message: string, data?: any, component?: string): void {
+    this.log('ERROR', message, data, component);
   }
 
-  warn(message: string, ...args: any[]): void {
-    this.log(LogLevel.WARN, 'WARN', message, ...args);
+  warn(message: string, data?: any, component?: string): void {
+    this.log('WARN', message, data, component);
   }
 
-  info(message: string, ...args: any[]): void {
-    this.log(LogLevel.INFO, 'INFO', message, ...args);
+  info(message: string, data?: any, component?: string): void {
+    this.log('INFO', message, data, component);
   }
 
-  debug(message: string, ...args: any[]): void {
-    this.log(LogLevel.DEBUG, 'DEBUG', message, ...args);
+  debug(message: string, data?: any, component?: string): void {
+    this.log('DEBUG', message, data, component);
   }
 
-  setLevel(level: LogLevel): void {
-    this.config.level = level;
+  setLevel(level: keyof LogLevel): void {
+    this.currentLevel = LOG_LEVELS[level];
+    this.info(`Log level set to: ${level}`);
   }
 
-  static parseLogLevel(level: string): LogLevel {
-    switch (level.toLowerCase()) {
-      case 'error':
-        return LogLevel.ERROR;
-      case 'warn':
-        return LogLevel.WARN;
-      case 'debug':
-        return LogLevel.DEBUG;
-      case 'info':
-      default:
-        return LogLevel.INFO;
+  close(): void {
+    if (this.logStream) {
+      this.logStream.end();
     }
   }
 }
 
-// Create a default logger instance
-export const logger = Logger.getInstance({
-  level: Logger.parseLogLevel(process.env.LOG_LEVEL || 'info'),
-});
+export const logger = new Logger();
+export { Logger };

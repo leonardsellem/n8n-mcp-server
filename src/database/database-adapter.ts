@@ -42,7 +42,7 @@ export interface ColumnDefinition {
 
 /**
  * Factory function to create a database adapter
- * Tries better-sqlite3 first, falls back to sql.js if needed
+ * Uses sql.js for universal compatibility (pure JavaScript, no native dependencies)
  */
 export async function createDatabaseAdapter(dbPath: string): Promise<DatabaseAdapter> {
   // Log Node.js version information
@@ -55,62 +55,21 @@ export async function createDatabaseAdapter(dbPath: string): Promise<DatabaseAda
     logger.info(`Platform: ${process.platform} ${process.arch}`);
   }
   
-  // First, try to use better-sqlite3
+  // Use sql.js for universal compatibility
   try {
+    const adapter = await createSQLJSAdapter(dbPath);
     if (process.env.MCP_MODE !== 'stdio') {
-      logger.info('Attempting to use better-sqlite3...');
-    }
-    const adapter = await createBetterSQLiteAdapter(dbPath);
-    if (process.env.MCP_MODE !== 'stdio') {
-      logger.info('Successfully initialized better-sqlite3 adapter');
+      logger.info('Successfully initialized sql.js adapter (pure JavaScript, no native dependencies)');
     }
     return adapter;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    
-    // Check if it's a version mismatch error
-    if (errorMessage.includes('NODE_MODULE_VERSION') || errorMessage.includes('was compiled against a different Node.js version')) {
-      if (process.env.MCP_MODE !== 'stdio') {
-        logger.warn(`Node.js version mismatch detected. Better-sqlite3 was compiled for a different Node.js version.`);
-      }
-      if (process.env.MCP_MODE !== 'stdio') {
-        logger.warn(`Current Node.js version: ${process.version}`);
-      }
-    }
-    
+  } catch (sqlJsError) {
     if (process.env.MCP_MODE !== 'stdio') {
-      logger.warn('Failed to initialize better-sqlite3, falling back to sql.js', error);
+      logger.error('Failed to initialize sql.js adapter', sqlJsError);
     }
-    
-    // Fall back to sql.js
-    try {
-      const adapter = await createSQLJSAdapter(dbPath);
-      if (process.env.MCP_MODE !== 'stdio') {
-        logger.info('Successfully initialized sql.js adapter (pure JavaScript, no native dependencies)');
-      }
-      return adapter;
-    } catch (sqlJsError) {
-      if (process.env.MCP_MODE !== 'stdio') {
-        logger.error('Failed to initialize sql.js adapter', sqlJsError);
-      }
-      throw new Error('Failed to initialize any database adapter');
-    }
+    throw new Error('Failed to initialize database adapter');
   }
 }
 
-/**
- * Create better-sqlite3 adapter
- */
-async function createBetterSQLiteAdapter(dbPath: string): Promise<DatabaseAdapter> {
-  try {
-    const Database = require('better-sqlite3');
-    const db = new Database(dbPath);
-    
-    return new BetterSQLiteAdapter(db);
-  } catch (error) {
-    throw new Error(`Failed to create better-sqlite3 adapter: ${error}`);
-  }
-}
 
 /**
  * Create sql.js adapter with persistence
@@ -144,37 +103,6 @@ async function createSQLJSAdapter(dbPath: string): Promise<DatabaseAdapter> {
   return new SQLJSAdapter(db, dbPath);
 }
 
-/**
- * Adapter for better-sqlite3
- */
-class BetterSQLiteAdapter implements DatabaseAdapter {
-  constructor(private db: any) {}
-  
-  prepare(sql: string): PreparedStatement {
-    const stmt = this.db.prepare(sql);
-    return new BetterSQLiteStatement(stmt);
-  }
-  
-  exec(sql: string): void {
-    this.db.exec(sql);
-  }
-  
-  close(): void {
-    this.db.close();
-  }
-  
-  pragma(key: string, value?: any): any {
-    return this.db.pragma(key, value);
-  }
-  
-  get inTransaction(): boolean {
-    return this.db.inTransaction;
-  }
-  
-  transaction<T>(fn: () => T): T {
-    return this.db.transaction(fn)();
-  }
-}
 
 /**
  * Adapter for sql.js with persistence
@@ -257,52 +185,6 @@ class SQLJSAdapter implements DatabaseAdapter {
   }
 }
 
-/**
- * Statement wrapper for better-sqlite3
- */
-class BetterSQLiteStatement implements PreparedStatement {
-  constructor(private stmt: any) {}
-  
-  run(...params: any[]): RunResult {
-    return this.stmt.run(...params);
-  }
-  
-  get(...params: any[]): any {
-    return this.stmt.get(...params);
-  }
-  
-  all(...params: any[]): any[] {
-    return this.stmt.all(...params);
-  }
-  
-  iterate(...params: any[]): IterableIterator<any> {
-    return this.stmt.iterate(...params);
-  }
-  
-  pluck(toggle?: boolean): this {
-    this.stmt.pluck(toggle);
-    return this;
-  }
-  
-  expand(toggle?: boolean): this {
-    this.stmt.expand(toggle);
-    return this;
-  }
-  
-  raw(toggle?: boolean): this {
-    this.stmt.raw(toggle);
-    return this;
-  }
-  
-  columns(): ColumnDefinition[] {
-    return this.stmt.columns();
-  }
-  
-  bind(...params: any[]): this {
-    this.stmt.bind(...params);
-    return this;
-  }
-}
 
 /**
  * Statement wrapper for sql.js

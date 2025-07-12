@@ -1,0 +1,96 @@
+# Docker Compose for Simple Auto-Update n8n MCP Server
+# Provides bulletproof one-shot reliability for AI agents
+
+version: '3.8'
+
+services:
+  n8n-mcp-simple-auto:
+    build:
+      context: .
+      dockerfile: Dockerfile.simple-auto
+    container_name: n8n-mcp-simple-auto
+    restart: unless-stopped
+    
+    # Environment configuration
+    environment:
+      # Auto-update configuration
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}  # Optional: for auto-updates from GitHub
+      UPDATE_INTERVAL_MINUTES: ${UPDATE_INTERVAL_MINUTES:-15}
+      
+      # Application settings
+      NODE_ENV: production
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      
+      # Database settings
+      NODE_DB_PATH: /app/data/nodes.db
+      
+      # Optional: n8n API integration (enables workflow management tools)
+      N8N_API_URL: ${N8N_API_URL:-}
+      N8N_API_KEY: ${N8N_API_KEY:-}
+    
+    # Volumes for persistence
+    volumes:
+      - n8n-mcp-data:/app/data
+      - github-cache:/app/data/github-cache
+    
+    # Resource limits (simple auto-update is lightweight)
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]  # Simple health check
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Optional: HTTP mode for remote access
+  n8n-mcp-http:
+    build:
+      context: .
+      dockerfile: Dockerfile.simple-auto
+    container_name: n8n-mcp-http
+    restart: unless-stopped
+    profiles: ["http"]  # Only start with: docker compose --profile http up
+    
+    # Override command for HTTP mode
+    command: ["node", "-e", "
+      process.env.MCP_MODE = 'http';
+      process.env.PORT = '3000';
+      process.env.AUTH_TOKEN = process.env.AUTH_TOKEN || 'default-token';
+      require('./dist/mcp/simple-auto-server.js').createSimpleAutoMCPServer().start();
+    "]
+    
+    environment:
+      MCP_MODE: http
+      PORT: 3000
+      AUTH_TOKEN: ${AUTH_TOKEN:-simple-auto-token}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      UPDATE_INTERVAL_MINUTES: ${UPDATE_INTERVAL_MINUTES:-15}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    
+    volumes:
+      - n8n-mcp-data:/app/data
+      - github-cache:/app/data/github-cache
+    
+    ports:
+      - "${PORT:-3000}:3000"
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# Named volumes for data persistence
+volumes:
+  n8n-mcp-data:
+    driver: local
+  github-cache:
+    driver: local

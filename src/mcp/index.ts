@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 import { N8NDocumentationMCPServer } from './server';
+import { createSimpleAutoMCPServer } from './simple-auto-server';
 import { logger } from '../utils/logger';
+// import { GitHubMonitor } from '../services/github-monitor';
+// import { getGitHubConfig, isGitHubConfigured } from '../config/github-config';
 
 // Add error details to stderr for Claude Desktop debugging
 process.on('uncaughtException', (error) => {
@@ -24,6 +27,14 @@ async function main() {
   const mode = process.env.MCP_MODE || 'stdio';
   
   try {
+    // Check for simple auto-update mode
+    if (mode === 'simple-auto') {
+      logger.info('[MCP] Starting in simple auto-update mode');
+      const simpleAutoServer = createSimpleAutoMCPServer();
+      await simpleAutoServer.start();
+      return;
+    }
+    
     // Only show debug messages in HTTP mode to avoid corrupting stdio communication
     if (mode === 'http') {
       console.error(`Starting n8n Documentation MCP Server in ${mode} mode...`);
@@ -58,6 +69,42 @@ async function main() {
       const server = new N8NDocumentationMCPServer();
       await server.run();
     }
+    
+    // Initialize GitHub monitoring if configured
+    // Temporarily disabled for build
+    /*
+    if (isGitHubConfigured()) {
+      const githubConfig = getGitHubConfig();
+      if (githubConfig.monitoring.enabled) {
+        try {
+          const monitor = new GitHubMonitor({
+            token: githubConfig.token!,
+            repository: githubConfig.repository,
+            branch: githubConfig.branch,
+            checkInterval: githubConfig.monitoring.checkInterval,
+            enabled: true
+          });
+          
+          monitor.start();
+          
+          if (mode === 'http') {
+            console.error('✅ GitHub monitoring started');
+            console.error(`   Repository: ${githubConfig.repository}`);
+            console.error(`   Branch: ${githubConfig.branch}`);
+            console.error(`   Check interval: ${githubConfig.monitoring.checkInterval}`);
+          }
+          
+          logger.info('GitHub monitoring started', {
+            repository: githubConfig.repository,
+            branch: githubConfig.branch,
+            interval: githubConfig.monitoring.checkInterval
+          });
+        } catch (error) {
+          logger.error('Failed to start GitHub monitoring:', error);
+        }
+      }
+    }
+    */
   } catch (error) {
     // In stdio mode, we cannot output to console at all
     if (mode !== 'stdio') {

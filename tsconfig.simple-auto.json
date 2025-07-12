@@ -1,0 +1,42 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/index-simple-auto.ts",
+    "src/mcp/simple-auto-server.ts",
+    "src/services/simple-auto-update.ts",
+    "src/loaders/reliable-auto-loader.ts",
+    "src/services/github-sync.ts",
+    "src/loaders/node-loader.ts",
+    "src/parsers/node-parser.ts",
+    "src/parsers/property-extractor.ts",
+    "src/mappers/docs-mapper.ts",
+    "src/database/database-adapter.ts",
+    "src/database/node-repository.ts",
+    "src/services/property-filter.ts",
+    "src/services/example-generator.ts",
+    "src/services/task-templates.ts",
+    "src/config/n8n-api.ts",
+    "src/utils/logger.ts",
+    "src/utils/version.ts",
+    "src/types/index.ts",
+    "src/types/n8n-api.ts",
+    "src/mcp/tools.ts",
+    "src/mcp/tools-n8n-manager.ts",
+    "src/mcp/handlers-n8n-manager.ts",
+    "src/mcp/handlers-workflow-diff.ts"
+  ],
+  "exclude": [
+    "src/loaders/hybrid-node-loader.ts",
+    "src/loaders/secure-hybrid-loader.ts", 
+    "src/database/hot-reload-repository.ts",
+    "src/mcp/server-auto-update.ts",
+    "src/services/secure-*.ts",
+    "src/services/auto-update-service.ts",
+    "src/utils/error-handling.ts",
+    "src/utils/memory-manager.ts"
+  ]
+}

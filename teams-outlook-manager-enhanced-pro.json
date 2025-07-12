@@ -1,0 +1,636 @@
+{
+  "name": "Teams-Outlook Manager Enhanced Pro",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "output": "raw",
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ],
+      "id": "outlook-trigger-main",
+      "name": "Microsoft Outlook Trigger"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Here is an incoming email: {{ $json.body.content }}"
+            },
+            {
+              "content": "Take the incoming email and clean it up so it is more readable. Get rid of the HTML tagging, but don't get rid of any of the email content. Don't include a subject.",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        300,
+        300
+      ],
+      "id": "clean-email-ai",
+      "name": "Clean Email"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.message.content }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "High Priority",
+              "description": "Emails that require immediate attention, often involving urgent issues, escalations, system failures, or critical business matters. Common Words/Phrases: Urgent, ASAP, Immediate action required, Critical issue, Escalation, Emergency, System outage, High priority, Downtime, Affected customers, Please respond quickly, Need resolution, Time-sensitive."
+            },
+            {
+              "category": "Billing",
+              "description": "Emails related to payments, invoices, subscriptions, financial transactions, or account balances. These emails often contain due dates, payment instructions, or financial statements. Common Words/Phrases: Invoice, Billing statement, Payment due, Past due, Outstanding balance, Subscription renewal, Payment confirmation, Charge notice, Overdue notice, Auto-renewal, Finance department, ACH transfer, Bank details."
+            },
+            {
+              "category": "Promotion",
+              "description": "Emails related to marketing campaigns, sales offers, discounts, partnership opportunities, or advertisements. These emails are often sent in bulk and contain promotional language. Common Words/Phrases: Special offer, Limited-time deal, Exclusive discount, Save big, Flash sale, Promo code, Get 20% off, Earn rewards, Best deals, New product launch, Marketing campaign, Subscription offer, Early access, Upgrade now, Act fast."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        300
+      ],
+      "id": "email-classifier",
+      "name": "Email Text Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        450
+      ],
+      "id": "classification-llm-main",
+      "name": "Classification LLM"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $('Microsoft Outlook Trigger').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        700,
+        200
+      ],
+      "id": "high-priority-move",
+      "name": "High Priority Folder"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $('Microsoft Outlook Trigger').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        700,
+        300
+      ],
+      "id": "billing-move",
+      "name": "Billing Folder"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "messageId": {
+          "__rl": true,
+          "value": "={{ $('Microsoft Outlook Trigger').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        700,
+        400
+      ],
+      "id": "promotion-move",
+      "name": "Promotion Folder"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Here is the email: {{ $('Clean Email').item.json.message.content }}",
+        "options": {
+          "systemMessage": "# Overview\nYou are an enhanced billing assistant with Teams integration. Your job is to respond to billing emails professionally and efficiently.\n\n## Enhanced Capabilities\n- Create detailed draft responses\n- Handle complex billing inquiries\n- Provide clear explanations\n- Format responses for Teams notifications\n\n## Tools Available\n- Create Draft: Use to create professional email drafts\n- Teams Notification: Use to send rich Teams notifications\n\nAlways be professional, thorough, and helpful in your responses."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        900,
+        300
+      ],
+      "id": "enhanced-billing-agent",
+      "name": "Enhanced Billing Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Here is the promotional email: {{ $('Clean Email').item.json.message.content }}",
+        "options": {
+          "systemMessage": "# Overview\nYou are an enhanced promotion management assistant. Your job is to intelligently handle promotional emails with sophisticated responses.\n\n## Enhanced Capabilities\n- Analyze promotional offers\n- Create contextual decline responses\n- Identify potentially valuable opportunities\n- Format responses appropriately\n\n## Tools Available\n- Send Email: Use to send professional decline responses\n- Teams Notification: Use for important promotional alerts\n\nAnalyze each promotion carefully and respond appropriately."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        900,
+        400
+      ],
+      "id": "enhanced-promotion-agent",
+      "name": "Enhanced Promotion Agent"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $fromAI('Subject', 'Re: Billing Inquiry', 'string') }}",
+        "bodyContent": "={{ $fromAI('Message', 'Thank you for your inquiry. We will review and respond promptly.', 'string') }}",
+        "additionalFields": {
+          "toRecipients": "={{ $('Microsoft Outlook Trigger').item.json.sender.emailAddress.address }}"
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        250
+      ],
+      "id": "create-draft-tool",
+      "name": "Create Draft Tool"
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('Microsoft Outlook Trigger').item.json.from.emailAddress.address }}",
+        "subject": "Not Interested",
+        "bodyContent": "={{ $fromAI('Message', 'Thank you for your offer, but we are not interested at this time.', 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        450
+      ],
+      "id": "send-email-tool",
+      "name": "Send Email Tool"
+    },
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "channelId": "19:general",
+        "message": {
+          "body": {
+            "contentType": "html",
+            "content": "🚨 <strong>High Priority Email Alert</strong><br><br><strong>From:</strong> {{ $('Microsoft Outlook Trigger').item.json.sender.emailAddress.name }}<br><strong>Subject:</strong> {{ $('Microsoft Outlook Trigger').item.json.subject }}<br><strong>Received:</strong> {{ $now.format('yyyy-MM-dd HH:mm') }}<br><br>⚠️ This email has been automatically moved to the High Priority folder and requires immediate attention."
+          }
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 1,
+      "position": [
+        900,
+        200
+      ],
+      "id": "teams-high-priority",
+      "name": "High Priority Teams Alert"
+    },
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "channelId": "19:general",
+        "message": {
+          "body": {
+            "contentType": "html",
+            "content": "💰 <strong>New Billing Inquiry</strong><br><br>📧 Received at {{ $now.format('hh:mm a') }} from {{ $('Microsoft Outlook Trigger').item.json.sender.emailAddress.name }}<br><br>✅ A professional draft response has been created and is waiting in your Outlook drafts folder for review."
+          }
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        300
+      ],
+      "id": "teams-billing-notification",
+      "name": "Billing Teams Notification"
+    },
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "channelId": "19:general",
+        "message": {
+          "body": {
+            "contentType": "html",
+            "content": "📢 <strong>Promotional Email Handled</strong><br><br>📧 From: {{ $('Microsoft Outlook Trigger').item.json.sender.emailAddress.name }}<br>📋 Subject: {{ $('Microsoft Outlook Trigger').item.json.subject }}<br><br>✅ Promotional email has been automatically declined and moved to the appropriate folder."
+          }
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        400
+      ],
+      "id": "teams-promotion-notification",
+      "name": "Promotion Teams Notification"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "teams-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        600
+      ],
+      "id": "teams-webhook-trigger",
+      "name": "Teams Chat Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "{{ $json.text || $json.message || 'Hello' }}",
+        "options": {
+          "systemMessage": "# Teams-Outlook Manager Assistant\n\nYou are an intelligent assistant that helps users manage their Outlook emails and calendar through Microsoft Teams chat.\n\n## Core Capabilities\n- **Email Management**: Search, read, send, and organize emails\n- **Calendar Functions**: Schedule meetings, check availability, manage events\n- **Smart Automation**: Provide insights and recommendations\n- **Interactive Responses**: Use Teams adaptive cards for rich interactions\n\n## Available Tools\n- Email Search: Find emails by criteria\n- Email Composer: Create and send emails\n- Calendar Manager: Handle calendar operations\n- Teams Responder: Send rich responses to Teams\n\n## Response Style\n- Be conversational and helpful\n- Use clear, actionable language\n- Provide step-by-step guidance when needed\n- Always confirm before taking important actions\n\nHow can I help you with your emails and calendar today?"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        300,
+        600
+      ],
+      "id": "interactive-teams-agent",
+      "name": "Interactive Teams Agent"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "limit": 10,
+        "filtersUI": {
+          "values": {
+            "filters": {
+              "search": "={{ $fromAI('search_query', '', 'string') }}",
+              "sender": "={{ $fromAI('sender_filter', '', 'string') }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "typeVersion": 2,
+      "position": [
+        500,
+        550
+      ],
+      "id": "email-search-tool",
+      "name": "Email Search Tool"
+    },
+    {
+      "parameters": {
+        "subject": "={{ $fromAI('email_subject', 'Email from Teams Assistant', 'string') }}",
+        "bodyContent": "={{ $fromAI('email_body', 'This email was sent via Teams Assistant.', 'string') }}",
+        "toRecipients": "={{ $fromAI('email_recipients', '', 'string') }}"
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "typeVersion": 2,
+      "position": [
+        500,
+        650
+      ],
+      "id": "email-composer-tool",
+      "name": "Email Composer Tool"
+    },
+    {
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "startDateTime": "={{ $fromAI('start_date', $now.toISOString(), 'string') }}",
+        "endDateTime": "={{ $fromAI('end_date', $now.plus({days: 7}).toISOString(), 'string') }}"
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTool",
+      "typeVersion": 2,
+      "position": [
+        700,
+        550
+      ],
+      "id": "calendar-tool",
+      "name": "Calendar Tool"
+    },
+    {
+      "parameters": {
+        "responseBody": "={{ $json.output || 'Task completed successfully' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        600
+      ],
+      "id": "teams-response",
+      "name": "Teams Response"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        150
+      ],
+      "id": "main-llm-model",
+      "name": "Main LLM Model"
+    }
+  ],
+  "connections": {
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Clean Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Email": {
+      "main": [
+        [
+          {
+            "node": "Email Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classification LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "High Priority Folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Billing Folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Promotion Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority Folder": {
+      "main": [
+        [
+          {
+            "node": "High Priority Teams Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Billing Folder": {
+      "main": [
+        [
+          {
+            "node": "Enhanced Billing Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promotion Folder": {
+      "main": [
+        [
+          {
+            "node": "Enhanced Promotion Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enhanced Billing Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhanced Billing Agent": {
+      "main": [
+        [
+          {
+            "node": "Billing Teams Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Enhanced Promotion Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhanced Promotion Agent": {
+      "main": [
+        [
+          {
+            "node": "Promotion Teams Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Teams Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Interactive Teams Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interactive Teams Agent": {
+      "main": [
+        [
+          {
+            "node": "Teams Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interactive Teams Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Composer Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interactive Teams Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Interactive Teams Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main LLM Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Enhanced Billing Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Enhanced Promotion Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Interactive Teams Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 3600,
+    "timezone": "UTC"
+  },
+  "staticData": {},
+  "meta": {},
+  "tags": []
+}

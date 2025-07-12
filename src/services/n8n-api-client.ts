@@ -35,11 +35,13 @@ export interface N8nApiClientConfig {
 export class N8nApiClient {
   private client: AxiosInstance;
   private maxRetries: number;
+  public readonly baseUrl: string;
 
   constructor(config: N8nApiClientConfig) {
     const { baseUrl, apiKey, timeout = 30000, maxRetries = 3 } = config;
 
     this.maxRetries = maxRetries;
+    this.baseUrl = baseUrl;
 
     // Ensure baseUrl ends with /api/v1
     const apiUrl = baseUrl.endsWith('/api/v1') 
@@ -387,4 +389,5 @@ export class N8nApiClient {
       throw handleN8nApiError(error);
     }
   }
+
 }

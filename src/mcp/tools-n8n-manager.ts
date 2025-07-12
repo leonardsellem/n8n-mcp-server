@@ -70,55 +70,39 @@ export const n8nManagementTools: ToolDefinition[] = [
   },
   {
     name: 'n8n_get_workflow',
-    description: `Get a workflow by ID. Returns the complete workflow including nodes, connections, and settings.`,
+    description: `Unified workflow retrieval tool with multiple detail levels. Get workflows from n8n instance by ID with different amounts of information based on your needs.
+
+DETAIL LEVELS:
+• complete (default) - Full workflow with nodes, connections, settings, and metadata
+• details - Workflow with metadata, version, and execution statistics
+• structure - Simplified view with only nodes and connections (no parameters)
+• minimal - Basic info only (ID, name, active status, tags) - fastest option
+
+USAGE EXAMPLES:
+• get_workflow({id: "123"}) - Complete workflow (same as detail: "complete")
+• get_workflow({id: "123", detail: "structure"}) - Just nodes and connections
+• get_workflow({id: "123", detail: "minimal"}) - Just name, status, tags
+• get_workflow({id: "123", detail: "details"}) - With execution stats
+
+PERFORMANCE:
+• minimal - Fastest, smallest response
+• structure - Good for understanding workflow flow
+• details - Includes execution statistics 
+• complete - Full data, largest response
+
+All modes require N8N_API_URL and N8N_API_KEY to be configured.`,
     inputSchema: {
       type: 'object',
       properties: {
         id: { 
           type: 'string', 
           description: 'Workflow ID' 
-        }
-      },
-      required: ['id']
-    }
-  },
-  {
-    name: 'n8n_get_workflow_details',
-    description: `Get detailed workflow information including metadata, version, and execution statistics. More comprehensive than get_workflow.`,
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { 
-          type: 'string', 
-          description: 'Workflow ID' 
-        }
-      },
-      required: ['id']
-    }
-  },
-  {
-    name: 'n8n_get_workflow_structure',
-    description: `Get simplified workflow structure showing only nodes and their connections. Useful for understanding workflow flow without parameter details.`,
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { 
-          type: 'string', 
-          description: 'Workflow ID' 
-        }
-      },
-      required: ['id']
-    }
-  },
-  {
-    name: 'n8n_get_workflow_minimal',
-    description: `Get minimal workflow information (ID, name, active status, tags). Fast and lightweight for listing purposes.`,
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { 
-          type: 'string', 
-          description: 'Workflow ID' 
+        },
+        detail: {
+          type: 'string',
+          enum: ['complete', 'details', 'structure', 'minimal'],
+          description: 'Detail level for the response. Default "complete" returns full workflow.',
+          default: 'complete'
         }
       },
       required: ['id']
@@ -331,43 +315,6 @@ Validation example:
       }
     }
   },
-  {
-    name: 'n8n_validate_workflow',
-    description: `Validate a workflow from n8n instance by ID. Fetches the workflow and runs comprehensive validation including node configurations, connections, and expressions. Returns detailed validation report with errors, warnings, and suggestions.`,
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { 
-          type: 'string', 
-          description: 'Workflow ID to validate' 
-        },
-        options: {
-          type: 'object',
-          description: 'Validation options',
-          properties: {
-            validateNodes: { 
-              type: 'boolean', 
-              description: 'Validate node configurations (default: true)' 
-            },
-            validateConnections: { 
-              type: 'boolean', 
-              description: 'Validate workflow connections (default: true)' 
-            },
-            validateExpressions: { 
-              type: 'boolean', 
-              description: 'Validate n8n expressions (default: true)' 
-            },
-            profile: { 
-              type: 'string', 
-              enum: ['minimal', 'runtime', 'ai-friendly', 'strict'],
-              description: 'Validation profile to use (default: runtime)' 
-            }
-          }
-        }
-      },
-      required: ['id']
-    }
-  },
 
   // Execution Management Tools
   {
@@ -455,7 +402,7 @@ Validation example:
   },
   {
     name: 'n8n_delete_execution',
-    description: `Delete an execution record. This only removes the execution history, not any data processed.`,
+    description: `Delete execution record. Only removes history, not processed data.`,
     inputSchema: {
       type: 'object',
       properties: {
@@ -470,30 +417,21 @@ Validation example:
 
   // System Tools
   {
-    name: 'n8n_health_check',
-    description: `Check n8n instance health and API connectivity. Returns status and available features.`,
-    inputSchema: {
-      type: 'object',
-      properties: {}
-    }
-  },
-  {
-    name: 'n8n_list_available_tools',
-    description: `List all available n8n management tools and their capabilities. Useful for understanding what operations are possible.`,
-    inputSchema: {
-      type: 'object',
-      properties: {}
-    }
-  },
-  {
-    name: 'n8n_diagnostic',
-    description: `Diagnose n8n API configuration and management tools availability. Shows current configuration status, which tools are enabled/disabled, and helps troubleshoot why management tools might not be appearing. Returns detailed diagnostic information including environment variables, API connectivity, and tool registration status.`,
+    name: 'n8n_system',
+    description: `n8n system operations. Check health, list tools, or diagnose issues. One tool for all system management.`,
     inputSchema: {
       type: 'object',
       properties: {
+        operation: {
+          type: 'string',
+          enum: ['health', 'list_tools', 'diagnose'],
+          description: 'health=check connectivity, list_tools=show available tools, diagnose=troubleshoot issues.',
+          default: 'health'
+        },
         verbose: {
           type: 'boolean',
-          description: 'Include detailed debug information (default: false)'
+          description: 'Include detailed debug info for diagnose operation.',
+          default: false
         }
       }
     }

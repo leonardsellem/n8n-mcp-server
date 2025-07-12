@@ -1,0 +1,306 @@
+{
+  "createdAt": "2025-07-06T13:59:44.761Z",
+  "updatedAt": "2025-07-06T14:56:36.985Z",
+  "id": "A9h8Zsm6kYpsmilu",
+  "name": "Teams-Outlook Manager - Step by Step",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "teams-outlook-test",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Teams Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ],
+      "webhookId": "345bd88d-3d1e-4592-ac26-3d8c76092125"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Received Teams message successfully",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Simple input processing\nconst body = $json.body || {};\nconst text = body.text || '';\nconst conversationId = body.conversation?.id || 'default';\nconst userId = body.from?.id || 'anonymous';\n\nreturn {\n  json: {\n    originalText: text,\n    cleanText: text.replace(/<[^>]*>/g, '').trim(),\n    conversationId,\n    userId,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "input-processor",
+      "name": "Input Processor",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        350,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.7
+        }
+      },
+      "id": "openai-model",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        600,
+        150
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Teams-Outlook Manager assistant. Help users with email and calendar tasks."
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## I'm a note \n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)\n\nYOU ASLO NEED TO ADD NOTES!!!\n",
+        "height": 280,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -280,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "0d5e0c7e-e0fe-4aeb-97f9-f6b03dba8375",
+      "name": "Sticky Note"
+    },
+    {
+      "id": "note-success",
+      "name": "Success Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ],
+      "parameters": {
+        "content": "## 🎉 AI Agent SUCCESS!\n\n**KEY BREAKTHROUGH:**\n- AI Agent node works perfectly\n- Issue was workflow complexity, not the AI Agent itself\n- Building incrementally prevents blank screen\n\n**Next Steps:**\n1. Add more AI tools as needed\n2. Connect Outlook API properly\n3. Add Teams response formatting",
+        "height": 200,
+        "width": 350
+      }
+    },
+    {
+      "id": "note-flow",
+      "name": "Workflow Flow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {
+        "content": "## 📋 Workflow Flow\n\n**1. Teams Webhook** → Receives Teams messages\n**2. Input Processor** → Cleans and formats input\n**3. AI Agent** → Powered by OpenAI Chat Model\n**4. Outlook API** → Handles email/calendar ops\n**5. Webhook Response** → Sends response to Teams\n\n**Current Status:** Core AI Agent working ✅",
+        "height": 180,
+        "width": 320
+      }
+    },
+    {
+      "id": "outlook-email-reader",
+      "name": "Outlook Email Reader",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        200
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "outlook-email-sender",
+      "name": "Outlook Email Sender",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "subject": "={{ $fromAI('subject') }}",
+        "bodyContent": "={{ $fromAI('body') }}",
+        "toRecipients": "={{ $fromAI('recipients') }}",
+        "bodyContentType": "html"
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "outlook-calendar",
+      "name": "Outlook Calendar",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "resource": "calendar",
+        "operation": "createEvent",
+        "subject": "={{ $fromAI('subject') }}",
+        "start": "={{ $fromAI('startDateTime') }}",
+        "end": "={{ $fromAI('endDateTime') }}",
+        "additionalFields": {
+          "bodyContent": "={{ $fromAI('description', '') }}",
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Teams Webhook": {
+      "main": [
+        [
+          {
+            "node": "Input Processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Processor": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Email Reader": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Email Sender": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Calendar": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "94109f8c-864f-45ed-97fe-cdecac4ed3b1",
+  "triggerCount": 0
+}

@@ -1,0 +1,353 @@
+{
+  "name": "Teams-Outlook Manager Pro",
+  "nodes": [
+    {
+      "id": "teams-webhook",
+      "name": "Teams Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "parameters": {
+        "path": "teams-outlook-manager",
+        "httpMethod": "POST",
+        "responseMode": "responseNode"
+      }
+    },
+    {
+      "id": "intent-analyzer",
+      "name": "AI Intent Analyzer",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [500, 300],
+      "parameters": {
+        "resource": "text",
+        "operation": "complete",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a Microsoft Teams email and calendar assistant. Analyze the user's natural language input and determine their intent. Respond with JSON only:\n\n{\n  \"intent\": \"status|respond|calendar|help\",\n  \"action\": \"specific_action\",\n  \"confidence\": 0.95,\n  \"entities\": {\n    \"recipient\": \"extracted_email_if_any\",\n    \"subject\": \"extracted_subject_if_any\",\n    \"message\": \"extracted_message_content\",\n    \"timeframe\": \"today|week|month\"\n  }\n}\n\nINTENT MAPPING:\n- status: \"check inbox\", \"any emails?\", \"what's new?\", \"email status\"\n- respond: \"draft email\", \"compose\", \"send message\", \"write to\"\n- calendar: \"schedule\", \"calendar\", \"meetings\", \"events\", \"what's today?\"\n- help: \"help\", \"what can you do?\", \"commands\", unclear requests\n\nExtract entities when possible for better processing."
+            },
+            {
+              "role": "user",
+              "content": "{{ $json.body.text || 'help' }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "command-router",
+      "name": "Command Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [800, 300],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "status",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "status"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "respond",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "respond"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.choices[0].message.content).intent }}",
+                    "rightValue": "calendar",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "calendar"
+            }
+          ]
+        },
+        "fallbackOutput": "help"
+      }
+    },
+    {
+      "id": "email-checker",
+      "name": "Email Status Checker",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [1200, 200],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10
+      }
+    },
+    {
+      "id": "help-response",
+      "name": "Help Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1200, 400],
+      "parameters": {
+        "functionCode": "return {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: {\n        \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n        \"type\": \"AdaptiveCard\",\n        \"version\": \"1.3\",\n        \"body\": [\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"🤖 Teams-Outlook Manager Pro\",\n            \"weight\": \"Bolder\",\n            \"size\": \"Large\",\n            \"color\": \"Accent\"\n          },\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"Your AI-powered email and calendar assistant. Just chat naturally!\",\n            \"wrap\": true,\n            \"spacing\": \"Medium\"\n          },\n          {\n            \"type\": \"FactSet\",\n            \"facts\": [\n              {\n                \"title\": \"📊 Check Status:\",\n                \"value\": \"\\\"What's in my inbox?\\\" or \\\"Any new emails?\\\"\"\n              },\n              {\n                \"title\": \"📝 Draft Emails:\",\n                \"value\": \"\\\"Draft email to John about the meeting\\\"\"\n              },\n              {\n                \"title\": \"📅 Calendar:\",\n                \"value\": \"\\\"What's on my calendar today?\\\"\"\n              },\n              {\n                \"title\": \"❓ Help:\",\n                \"value\": \"\\\"help\\\" or \\\"what can you do?\\\"\"\n              }\n            ]\n          }\n        ],\n        \"actions\": [\n          {\n            \"type\": \"Action.Submit\",\n            \"title\": \"📊 Check Inbox\",\n            \"data\": { \"message\": \"status\" }\n          },\n          {\n            \"type\": \"Action.Submit\",\n            \"title\": \"📅 View Calendar\",\n            \"data\": { \"message\": \"calendar\" }\n          }\n        ]\n      }\n    }]\n  }\n};"
+      }
+    },
+    {
+      "id": "teams-response",
+      "name": "Teams Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1600, 300],
+      "parameters": {
+        "options": {},
+        "respondWith": "json"
+      }
+    },
+    {
+      "id": "calendar-checker",
+      "name": "Calendar Checker",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [1200, 100],
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "additionalFields": {
+          "filter": "start/dateTime ge '{{ $now.format('yyyy-MM-dd') }}T00:00:00.000Z'"
+        }
+      }
+    },
+    {
+      "id": "draft-composer",
+      "name": "AI Draft Composer",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [1200, 500],
+      "parameters": {
+        "resource": "text",
+        "operation": "complete",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Create professional email drafts. Return JSON: {\"subject\": \"subject\", \"body\": \"email body\", \"tone\": \"professional\"}"
+            },
+            {
+              "role": "user",
+              "content": "{{ $('AI Intent Analyzer').item.json.choices[0].message.content }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "status-formatter",
+      "name": "Status Formatter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1500, 200],
+      "parameters": {
+        "functionCode": "const emails = $input.all();\nconst unreadCount = emails.length;\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: {\n        \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n        \"type\": \"AdaptiveCard\",\n        \"version\": \"1.3\",\n        \"body\": [\n          {\n            \"type\": \"TextBlock\",\n            \"text\": `📧 Inbox Status: ${unreadCount} unread emails`,\n            \"weight\": \"Bolder\",\n            \"size\": \"Medium\",\n            \"color\": unreadCount > 0 ? \"Attention\" : \"Good\"\n          },\n          {\n            \"type\": \"TextBlock\",\n            \"text\": unreadCount > 0 ? `You have ${unreadCount} unread emails to review.` : \"✅ All caught up! No unread emails.\",\n            \"wrap\": true\n          }\n        ],\n        \"actions\": [\n          {\n            \"type\": \"Action.Submit\",\n            \"title\": \"🔄 Refresh\",\n            \"data\": { \"message\": \"status\" }\n          }\n        ]\n      }\n    }]\n  }\n};"
+      }
+    },
+    {
+      "id": "calendar-formatter",
+      "name": "Calendar Formatter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1500, 100],
+      "parameters": {
+        "functionCode": "const events = $input.all();\nconst eventCount = events.length;\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: {\n        \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n        \"type\": \"AdaptiveCard\",\n        \"version\": \"1.3\",\n        \"body\": [\n          {\n            \"type\": \"TextBlock\",\n            \"text\": `📅 Today's Calendar: ${eventCount} events`,\n            \"weight\": \"Bolder\",\n            \"size\": \"Medium\",\n            \"color\": \"Accent\"\n          },\n          {\n            \"type\": \"TextBlock\",\n            \"text\": eventCount > 0 ? `You have ${eventCount} events scheduled for today.` : \"🆓 No events scheduled for today.\",\n            \"wrap\": true\n          }\n        ],\n        \"actions\": [\n          {\n            \"type\": \"Action.Submit\",\n            \"title\": \"🔄 Refresh\",\n            \"data\": { \"message\": \"calendar\" }\n          }\n        ]\n      }\n    }]\n  }\n};"
+      }
+    },
+    {
+      "id": "draft-formatter",
+      "name": "Draft Formatter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1500, 500],
+      "parameters": {
+        "functionCode": "const aiResponse = JSON.parse($json.choices[0].message.content);\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: {\n        \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n        \"type\": \"AdaptiveCard\",\n        \"version\": \"1.3\",\n        \"body\": [\n          {\n            \"type\": \"TextBlock\",\n            \"text\": \"✏️ Email Draft Created\",\n            \"weight\": \"Bolder\",\n            \"size\": \"Medium\",\n            \"color\": \"Good\"\n          },\n          {\n            \"type\": \"FactSet\",\n            \"facts\": [\n              {\n                \"title\": \"Subject:\",\n                \"value\": aiResponse.subject || 'No subject'\n              },\n              {\n                \"title\": \"Tone:\",\n                \"value\": aiResponse.tone || 'Professional'\n              }\n            ]\n          },\n          {\n            \"type\": \"TextBlock\",\n            \"text\": (aiResponse.body || 'No content').length > 200 ? (aiResponse.body || 'No content').substring(0, 200) + '...' : (aiResponse.body || 'No content'),\n            \"wrap\": true\n          }\n        ],\n        \"actions\": [\n          {\n            \"type\": \"Action.Submit\",\n            \"title\": \"✏️ Edit Draft\",\n            \"data\": { \"action\": \"edit\" }\n          }\n        ]\n      }\n    }]\n  }\n};"
+      }
+    }
+  ],
+  "connections": {
+    "Teams Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Intent Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Intent Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Command Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Command Router": {
+      "main": [
+        [
+          {
+            "node": "Email Status Checker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Help Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "calendar": [
+        [
+          {
+            "node": "Calendar Checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "respond": [
+        [
+          {
+            "node": "AI Draft Composer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Status Checker": {
+      "main": [
+        [
+          {
+            "node": "Teams Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Status Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Help Response": {
+      "main": [
+        [
+          {
+            "node": "Teams Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Checker": {
+      "main": [
+        [
+          {
+            "node": "Calendar Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Draft Composer": {
+      "main": [
+        [
+          {
+            "node": "Draft Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Status Formatter": {
+      "main": [
+        [
+          {
+            "node": "Teams Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Formatter": {
+      "main": [
+        [
+          {
+            "node": "Teams Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Formatter": {
+      "main": [
+        [
+          {
+            "node": "Teams Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York"
+  }
+}

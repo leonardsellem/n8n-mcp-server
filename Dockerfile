@@ -4,19 +4,26 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Install build dependencies for native packages
+RUN apk add --no-cache python3 make g++ cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+
 # Copy package files for dependency installation
 COPY package.json package-lock.json ./
 
 # Install ALL dependencies (including n8n packages needed for compilation)
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --include=dev
+    npm install
 
 # Copy TypeScript config and source code
 COPY tsconfig.json ./
+COPY tsconfig.simple-auto.json ./
 COPY src ./src
 
-# Build TypeScript (now has all required dependencies)
-RUN npm run build
+# Build the simple auto-update system only (avoids problematic files)
+RUN npx tsc -p tsconfig.simple-auto.json
+
+# Copy pre-built database if it exists locally (speeds up build)
+COPY data ./data
 
 # Stage 2: Runtime (minimal dependencies)
 FROM node:20-alpine AS runtime
@@ -33,11 +40,12 @@ COPY package.runtime.json package.json
 RUN --mount=type=cache,target=/root/.npm \
     npm install --production --no-audit --no-fund
 
-# Copy built application from builder stage
+# Copy built application and database from builder stage
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/data ./data
 
-# Create data directory for SQLite cache
-RUN mkdir -p /app/data
+# Create GitHub cache directory for auto-updates
+RUN mkdir -p /app/data/github-cache
 
 # Copy required files
 COPY .env.example ./
@@ -59,5 +67,5 @@ EXPOSE 3000
 
 # Note: No health check needed for MCP stdio mode
 
-# Start MCP server
-CMD ["node", "dist/mcp/index.js"]
+# Start simple auto-update MCP server
+CMD ["node", "dist/index-simple-auto.js"]

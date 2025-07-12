@@ -33,6 +33,13 @@ export interface DependencyAnalysis {
 
 export class PropertyDependencies {
   /**
+   * Analyze property dependencies for a node (alias for analyze)
+   */
+  static analyzeDependencies(properties: any[]): DependencyAnalysis {
+    return this.analyze(properties);
+  }
+
+  /**
    * Analyze property dependencies for a node
    */
   static analyze(properties: any[]): DependencyAnalysis {

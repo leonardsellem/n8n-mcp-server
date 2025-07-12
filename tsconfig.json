@@ -28,5 +28,15 @@
     "moduleResolution": "node"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "exclude": [
+    "node_modules", 
+    "dist", 
+    "**/*.test.ts",
+    "src/mcp/server-refactored.ts",
+    "src/scripts/rebuild-github.ts",
+    "src/services/error-handler.ts",
+    "src/services/github-monitor.ts",
+    "src/services/github-sync.ts",
+    "src/database/optimized-*.ts"
+  ]
 }

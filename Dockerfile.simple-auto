@@ -1,0 +1,72 @@
+# Dockerfile for Simple Auto-Update n8n MCP Server
+# Provides bulletproof one-shot reliability for AI agents
+
+# Stage 1: Builder (includes n8n dependencies for building)
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache git python3 make g++
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install ALL dependencies (needed for TypeScript compilation)
+RUN npm ci --include=dev
+
+# Copy source code and build configuration
+COPY src ./src
+COPY tsconfig.simple-auto.json ./
+COPY tsconfig.json ./
+
+# Build the simple auto-update system
+RUN npx tsc -p tsconfig.simple-auto.json
+
+# Build the database (requires n8n packages)
+RUN npm run rebuild
+
+# Stage 2: Runtime (minimal dependencies only)
+FROM node:20-alpine AS runtime
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apk add --no-cache curl git && \
+    rm -rf /var/cache/apk/*
+
+# Copy runtime package.json
+COPY package.runtime.json package.json
+
+# Install only runtime dependencies
+RUN npm install --production --no-audit --no-fund
+
+# Copy built application and database from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/data ./data
+
+# Copy AI Agent Reliability Guide
+COPY AI-AGENT-RELIABILITY-GUIDE.md ./
+
+# Create GitHub cache directory
+RUN mkdir -p /app/data/github-cache
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Environment variables for simple auto-update
+ENV NODE_ENV=production
+ENV IS_DOCKER=true
+ENV UPDATE_INTERVAL_MINUTES=15
+
+# Health check for Docker
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD node -e "const { createSimpleAutoMCPServer } = require('./dist/mcp/simple-auto-server.js'); \
+                 const server = createSimpleAutoMCPServer(); \
+                 server.initialize().then(() => process.exit(0)).catch(() => process.exit(1))"
+
+# Default command: start simple auto-update MCP server
+CMD ["node", "dist/index-simple-auto.js"]

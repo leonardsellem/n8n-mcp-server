@@ -30,6 +30,21 @@ export interface ValidationWarning {
 }
 
 export class ConfigValidator {
+  constructor(nodeRepository?: any) {
+    // Optional repository for enhanced validation
+  }
+
+  /**
+   * Instance method for minimal validation
+   */
+  validateMinimal(
+    nodeType: string,
+    config: Record<string, any>,
+    properties: any[]
+  ): ValidationResult {
+    return ConfigValidator.validate(nodeType, config, properties);
+  }
+
   /**
    * Validate a node configuration
    */

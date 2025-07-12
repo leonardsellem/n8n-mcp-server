@@ -197,6 +197,13 @@ export class PropertyFilter {
   }
   
   /**
+   * Get essential properties for a node type (alias for getEssentials)
+   */
+  static getEssentialProperties(allProperties: any[], nodeType: string): FilteredProperties {
+    return this.getEssentials(allProperties, nodeType);
+  }
+
+  /**
    * Get essential properties for a node type
    */
   static getEssentials(allProperties: any[], nodeType: string): FilteredProperties {

@@ -21,6 +21,40 @@ export interface ParsedNode {
 export class NodeParser {
   private propertyExtractor = new PropertyExtractor();
   
+  /**
+   * Parse a node from GitHub source (for new GitHub-based caching)
+   */
+  async parseFromGitHub(remoteNode: any): Promise<ParsedNode> {
+    // This would need to compile TypeScript and extract node metadata
+    // For now, we'll use a simplified approach
+    const nodeType = this.extractNodeTypeFromPath(remoteNode.path);
+    const packageName = this.extractPackageFromPath(remoteNode.path);
+    
+    return {
+      style: 'programmatic', // Default for GitHub nodes
+      nodeType,
+      displayName: this.extractDisplayNameFromPath(remoteNode.path),
+      description: `Node loaded from GitHub: ${remoteNode.path}`,
+      category: this.extractCategoryFromPath(remoteNode.path),
+      properties: [], // Would need TypeScript analysis
+      credentials: [],
+      isAITool: false, // Would need analysis
+      isTrigger: remoteNode.path.toLowerCase().includes('trigger'),
+      isWebhook: remoteNode.path.toLowerCase().includes('webhook'),
+      operations: [],
+      version: '1.0',
+      isVersioned: false,
+      packageName
+    };
+  }
+  
+  /**
+   * Parse a node from a loaded instance (existing method)
+   */
+  parseFromInstance(nodeClass: any, packageName: string): ParsedNode {
+    return this.parse(nodeClass, packageName);
+  }
+  
   parse(nodeClass: any, packageName: string): ParsedNode {
     // Get base description (handles versioned nodes)
     const description = this.getNodeDescription(nodeClass);
@@ -203,5 +237,60 @@ export class NodeParser {
     }
     
     return false;
+  }
+  
+  /**
+   * Extract node type from GitHub file path
+   */
+  private extractNodeTypeFromPath(path: string): string {
+    // Example: packages/nodes-base/nodes/Slack/Slack.node.ts -> n8n-nodes-base.slack
+    const parts = path.split('/');
+    const filename = parts[parts.length - 1];
+    const nodeName = filename.replace('.node.ts', '').replace('.node.js', '');
+    
+    // Determine package
+    const packageName = this.extractPackageFromPath(path);
+    
+    return `${packageName}.${nodeName.toLowerCase()}`;
+  }
+  
+  /**
+   * Extract package name from GitHub file path
+   */
+  private extractPackageFromPath(path: string): string {
+    if (path.includes('packages/nodes-base/')) {
+      return 'n8n-nodes-base';
+    } else if (path.includes('packages/@n8n/n8n-nodes-langchain/')) {
+      return '@n8n/n8n-nodes-langchain';
+    } else {
+      return 'n8n-nodes-base'; // Default
+    }
+  }
+  
+  /**
+   * Extract display name from GitHub file path
+   */
+  private extractDisplayNameFromPath(path: string): string {
+    const parts = path.split('/');
+    const filename = parts[parts.length - 1];
+    return filename.replace('.node.ts', '').replace('.node.js', '');
+  }
+  
+  /**
+   * Extract category from GitHub file path
+   */
+  private extractCategoryFromPath(path: string): string {
+    const parts = path.split('/');
+    
+    // Try to find category from path structure
+    // Example: packages/nodes-base/nodes/Communication/Slack/Slack.node.ts
+    if (parts.includes('nodes')) {
+      const nodesIndex = parts.indexOf('nodes');
+      if (nodesIndex + 1 < parts.length && parts[nodesIndex + 1] !== parts[parts.length - 1]) {
+        return parts[nodesIndex + 1];
+      }
+    }
+    
+    return 'Other';
   }
 }

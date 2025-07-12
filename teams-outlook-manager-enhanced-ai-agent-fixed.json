@@ -1,0 +1,243 @@
+{
+  "name": "Teams-Outlook Manager Pro - Enhanced AI Agent",
+  "nodes": [
+    {
+      "id": "teams-webhook-enhanced",
+      "name": "Teams Webhook Enhanced",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 400],
+      "parameters": {
+        "path": "teams-outlook-manager-enhanced",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      }
+    },
+    {
+      "id": "input-processor",
+      "name": "Input Processor",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [400, 400],
+      "parameters": {
+        "functionCode": "// Enhanced input processing with attachment detection\nconst body = $json.body || {};\nconst text = body.text || '';\nconst attachments = body.attachments || [];\nconst conversationId = body.conversation?.id || 'default';\nconst userId = body.from?.id || 'anonymous';\n\n// Process attachments\nconst processedAttachments = attachments.map(att => ({\n  name: att.name || 'unknown',\n  contentType: att.contentType || 'application/octet-stream',\n  contentUrl: att.contentUrl || '',\n  content: att.content || ''\n}));\n\n// Extract mentions and commands\nconst mentions = text.match(/@\\w+/g) || [];\nconst hasUrgent = /urgent|asap|priority|important/i.test(text);\nconst hasSchedule = /schedule|meeting|calendar|tomorrow|today|next week/i.test(text);\n\nreturn {\n  json: {\n    originalText: text,\n    cleanText: text.replace(/<[^>]*>/g, '').trim(),\n    conversationId,\n    userId,\n    hasAttachments: processedAttachments.length > 0,\n    attachments: processedAttachments,\n    mentions,\n    hasUrgent,\n    hasSchedule,\n    timestamp: new Date().toISOString(),\n    context: {\n      previousMessages: [],\n      userProfile: {},\n      preferences: {}\n    }\n  }\n};"
+      }
+    },
+    {
+      "id": "memory-retriever",
+      "name": "Conversation Memory Retriever",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [600, 400],
+      "parameters": {
+        "functionCode": "// Simple in-memory conversation storage (in production, use Redis/DB)\nconst conversationId = $json.conversationId;\nconst userId = $json.userId;\n\n// Simulate conversation memory (replace with actual storage)\nconst mockHistory = {\n  recentMessages: [\n    { role: 'user', content: 'What\\'s in my inbox?', timestamp: new Date(Date.now() - 300000).toISOString() },\n    { role: 'assistant', content: 'You have 3 unread emails', timestamp: new Date(Date.now() - 299000).toISOString() }\n  ],\n  userPreferences: {\n    emailPriority: 'urgent',\n    calendarView: 'today',\n    responseStyle: 'concise'\n  },\n  context: {\n    lastEmailCheck: new Date(Date.now() - 600000).toISOString(),\n    lastCalendarCheck: new Date(Date.now() - 900000).toISOString()\n  }\n};\n\nreturn {\n  json: {\n    ...$json,\n    conversationHistory: mockHistory.recentMessages,\n    userPreferences: mockHistory.userPreferences,\n    contextData: mockHistory.context\n  }\n};"
+      }
+    },
+    {
+      "id": "master-ai-agent",
+      "name": "Master AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.4,
+      "position": [800, 400],
+      "parameters": {
+        "agentType": "openAiFunctionsAgent",
+        "systemMessage": "You are a Microsoft Teams and Outlook AI assistant. You help users manage their emails and calendar through natural conversation.\n\n**CORE CAPABILITIES:**\n- Check email status and unread counts\n- Draft and send emails with attachments\n- View and manage calendar events\n- Schedule meetings and appointments\n- Provide intelligent email summaries\n- Handle urgent requests with priority\n\n**CONVERSATION CONTEXT:**\nUser: {{ $json.userId }}\nConversation: {{ $json.conversationId }}\nHas Attachments: {{ $json.hasAttachments }}\nIs Urgent: {{ $json.hasUrgent }}\nSchedule Related: {{ $json.hasSchedule }}\n\n**PREVIOUS CONTEXT:**\n{{ $json.conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\\n') }}\n\n**USER PREFERENCES:**\n{{ JSON.stringify($json.userPreferences, null, 2) }}\n\n**INSTRUCTIONS:**\n1. Always acknowledge the user's request clearly\n2. Use tools to retrieve real-time data when needed\n3. Provide rich, actionable responses\n4. Handle attachments appropriately\n5. Maintain conversation context\n6. Escalate complex requests to specialized agents\n\n**RESPONSE FORMAT:**\nAlways structure responses as JSON with:\n- action: the primary action taken\n- data: relevant data retrieved\n- response: user-friendly response text\n- nextSteps: suggested follow-up actions",
+        "options": {
+          "temperature": 0.3,
+          "maxIterations": 5,
+          "maxTokens": 2000
+        }
+      }
+    },
+    {
+      "id": "openai-model",
+      "name": "OpenAI GPT-4o",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [1000, 200],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 2000
+        }
+      }
+    },
+    {
+      "id": "outlook-email-tool",
+      "name": "Outlook Email Tool",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [1000, 300],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 20,
+        "additionalFields": {
+          "filter": "isRead eq false",
+          "select": "subject,from,receivedDateTime,importance,hasAttachments,bodyPreview"
+        }
+      }
+    },
+    {
+      "id": "outlook-calendar-tool",
+      "name": "Outlook Calendar Tool",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [1000, 400],
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "additionalFields": {
+          "filter": "start/dateTime ge '{{ $now.format('yyyy-MM-dd') }}T00:00:00.000Z' and start/dateTime le '{{ $now.plus({days: 1}).format('yyyy-MM-dd') }}T00:00:00.000Z'",
+          "select": "subject,start,end,location,attendees,importance,body",
+          "orderBy": "start/dateTime"
+        }
+      }
+    },
+    {
+      "id": "email-composer-tool",
+      "name": "Email Composer Tool",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [1000, 500],
+      "parameters": {
+        "resource": "draft",
+        "operation": "create",
+        "subject": "={{ $json.subject }}",
+        "bodyContent": "={{ $json.bodyContent }}",
+        "bodyContentType": "html",
+        "toRecipients": "={{ $json.toRecipients }}",
+        "additionalFields": {
+          "importance": "={{ $json.importance || 'normal' }}",
+          "attachments": "={{ $json.attachments || [] }}"
+        }
+      }
+    },
+    {
+      "id": "intelligent-response-formatter",
+      "name": "Intelligent Response Formatter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1400, 400],
+      "parameters": {
+        "functionCode": "// Enhanced response formatting with AI insights\nconst agentResponse = $json;\nconst originalInput = $('Input Processor').item.json;\n\n// Parse agent response\nlet responseData;\ntry {\n  responseData = typeof agentResponse.output === 'string' ? \n    JSON.parse(agentResponse.output) : agentResponse.output;\n} catch (e) {\n  responseData = { \n    action: 'error',\n    response: agentResponse.output || 'I encountered an issue processing your request.',\n    data: null\n  };\n}\n\n// Generate adaptive card based on action type\nfunction generateAdaptiveCard(action, data, response) {\n  const baseCard = {\n    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n    \"type\": \"AdaptiveCard\",\n    \"version\": \"1.4\",\n    \"body\": []\n  };\n\n  // Header with icon and title\n  const getHeaderConfig = (action) => {\n    const configs = {\n      'email_status': { icon: '📧', title: 'Email Status', color: 'Accent' },\n      'calendar_view': { icon: '📅', title: 'Calendar Overview', color: 'Good' },\n      'draft_email': { icon: '✏️', title: 'Email Draft', color: 'Warning' },\n      'send_email': { icon: '📤', title: 'Email Sent', color: 'Good' },\n      'schedule_meeting': { icon: '🗓️', title: 'Meeting Scheduled', color: 'Good' },\n      'error': { icon: '❌', title: 'Error', color: 'Attention' },\n      'help': { icon: '🤖', title: 'Teams-Outlook Assistant', color: 'Accent' }\n    };\n    return configs[action] || configs.help;\n  };\n\n  const headerConfig = getHeaderConfig(action);\n  \n  baseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": `${headerConfig.icon} ${headerConfig.title}`,\n    \"weight\": \"Bolder\",\n    \"size\": \"Large\",\n    \"color\": headerConfig.color\n  });\n\n  // Main response text\n  baseCard.body.push({\n    \"type\": \"TextBlock\",\n    \"text\": response,\n    \"wrap\": true,\n    \"spacing\": \"Medium\"\n  });\n\n  // Action-specific content\n  if (action === 'email_status' && data && data.emails) {\n    const emailCount = data.emails.length;\n    const urgentCount = data.emails.filter(e => e.importance === 'high').length;\n    \n    baseCard.body.push({\n      \"type\": \"FactSet\",\n      \"facts\": [\n        { \"title\": \"📬 Total Unread:\", \"value\": emailCount.toString() },\n        { \"title\": \"🔥 Urgent:\", \"value\": urgentCount.toString() },\n        { \"title\": \"📊 Last Check:\", \"value\": new Date().toLocaleTimeString() }\n      ]\n    });\n\n    // Show top 3 emails\n    if (emailCount > 0) {\n      baseCard.body.push({\n        \"type\": \"TextBlock\",\n        \"text\": \"Recent Emails:\",\n        \"weight\": \"Bolder\",\n        \"spacing\": \"Large\"\n      });\n      \n      data.emails.slice(0, 3).forEach(email => {\n        baseCard.body.push({\n          \"type\": \"TextBlock\",\n          \"text\": `📧 **${email.subject}**\\n${email.from?.emailAddress?.name || 'Unknown'} • ${new Date(email.receivedDateTime).toLocaleString()}\\n${email.bodyPreview.substring(0, 100)}...`,\n          \"wrap\": true,\n          \"spacing\": \"Small\"\n        });\n      });\n    }\n  }\n\n  if (action === 'calendar_view' && data && data.events) {\n    const eventCount = data.events.length;\n    \n    baseCard.body.push({\n      \"type\": \"FactSet\",\n      \"facts\": [\n        { \"title\": \"📅 Today's Events:\", \"value\": eventCount.toString() },\n        { \"title\": \"⏰ Next Event:\", \"value\": eventCount > 0 ? new Date(data.events[0].start.dateTime).toLocaleTimeString() : 'None' }\n      ]\n    });\n\n    // Show upcoming events\n    if (eventCount > 0) {\n      data.events.forEach(event => {\n        const startTime = new Date(event.start.dateTime).toLocaleTimeString();\n        const endTime = new Date(event.end.dateTime).toLocaleTimeString();\n        \n        baseCard.body.push({\n          \"type\": \"TextBlock\",\n          \"text\": `🗓️ **${event.subject}**\\n${startTime} - ${endTime}${event.location?.displayName ? ` • ${event.location.displayName}` : ''}`,\n          \"wrap\": true,\n          \"spacing\": \"Small\"\n        });\n      });\n    }\n  }\n\n  // Add interactive actions\n  const actions = [];\n  \n  if (action === 'email_status') {\n    actions.push(\n      { \"type\": \"Action.Submit\", \"title\": \"🔄 Refresh\", \"data\": { \"action\": \"refresh_emails\" } },\n      { \"type\": \"Action.Submit\", \"title\": \"✏️ Compose\", \"data\": { \"action\": \"compose_email\" } }\n    );\n  }\n  \n  if (action === 'calendar_view') {\n    actions.push(\n      { \"type\": \"Action.Submit\", \"title\": \"🔄 Refresh\", \"data\": { \"action\": \"refresh_calendar\" } },\n      { \"type\": \"Action.Submit\", \"title\": \"📅 Schedule\", \"data\": { \"action\": \"schedule_meeting\" } }\n    );\n  }\n  \n  if (action === 'draft_email') {\n    actions.push(\n      { \"type\": \"Action.Submit\", \"title\": \"📤 Send\", \"data\": { \"action\": \"send_draft\" } },\n      { \"type\": \"Action.Submit\", \"title\": \"✏️ Edit\", \"data\": { \"action\": \"edit_draft\" } }\n    );\n  }\n\n  // Always add help action\n  actions.push({ \"type\": \"Action.Submit\", \"title\": \"❓ Help\", \"data\": { \"action\": \"help\" } });\n  \n  if (actions.length > 0) {\n    baseCard.actions = actions;\n  }\n\n  return baseCard;\n}\n\n// Memory update for conversation context\nfunction updateConversationMemory(conversationId, userMessage, assistantResponse) {\n  return {\n    conversationId,\n    lastUpdate: new Date().toISOString(),\n    messageCount: 1\n  };\n}\n\n// Generate the response\nconst adaptiveCard = generateAdaptiveCard(\n  responseData.action,\n  responseData.data,\n  responseData.response\n);\n\n// Update conversation memory\nconst memoryUpdate = updateConversationMemory(\n  originalInput.conversationId,\n  originalInput.cleanText,\n  responseData.response\n);\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: adaptiveCard\n    }],\n    conversationUpdate: memoryUpdate,\n    processingTime: Date.now() - new Date(originalInput.timestamp).getTime(),\n    success: true\n  }\n};"
+      }
+    },
+    {
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1200, 600],
+      "parameters": {
+        "functionCode": "// Comprehensive error handling\nconst error = $json.error || $json;\nconst originalInput = $('Input Processor').item?.json || {};\n\n// Classify error type\nfunction getErrorType(error) {\n  const errorString = error.toString().toLowerCase();\n  \n  if (errorString.includes('authentication') || errorString.includes('unauthorized')) {\n    return 'auth';\n  }\n  if (errorString.includes('rate limit') || errorString.includes('quota')) {\n    return 'rate_limit';\n  }\n  if (errorString.includes('network') || errorString.includes('timeout')) {\n    return 'network';\n  }\n  if (errorString.includes('permission') || errorString.includes('forbidden')) {\n    return 'permission';\n  }\n  return 'general';\n}\n\nconst errorType = getErrorType(error);\n\n// Generate user-friendly error messages\nconst errorMessages = {\n  auth: {\n    title: '🔐 Authentication Required',\n    message: 'I need to reconnect to your Microsoft account. Please contact your administrator to refresh the authentication.',\n    actions: [{ \"type\": \"Action.Submit\", \"title\": \"🔄 Retry\", \"data\": { \"action\": \"retry\" } }]\n  },\n  rate_limit: {\n    title: '⏳ Service Busy',\n    message: 'Microsoft services are currently busy. Please try again in a few moments.',\n    actions: [{ \"type\": \"Action.Submit\", \"title\": \"🔄 Try Again\", \"data\": { \"action\": \"retry\" } }]\n  },\n  network: {\n    title: '🌐 Connection Issue',\n    message: 'I am having trouble connecting to Microsoft services. Please check your network connection.',\n    actions: [{ \"type\": \"Action.Submit\", \"title\": \"🔄 Retry\", \"data\": { \"action\": \"retry\" } }]\n  },\n  permission: {\n    title: '🚫 Permission Denied',\n    message: 'I do not have the necessary permissions to perform this action. Please contact your administrator.',\n    actions: [{ \"type\": \"Action.Submit\", \"title\": \"❓ Help\", \"data\": { \"action\": \"help\" } }]\n  },\n  general: {\n    title: '⚠️ Something Went Wrong',\n    message: 'I encountered an unexpected issue. Please try rephrasing your request or contact support.',\n    actions: [\n      { \"type\": \"Action.Submit\", \"title\": \"🔄 Try Again\", \"data\": { \"action\": \"retry\" } },\n      { \"type\": \"Action.Submit\", \"title\": \"❓ Help\", \"data\": { \"action\": \"help\" } }\n    ]\n  }\n};\n\nconst errorConfig = errorMessages[errorType];\n\n// Generate error adaptive card\nconst errorCard = {\n  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n  \"type\": \"AdaptiveCard\",\n  \"version\": \"1.4\",\n  \"body\": [\n    {\n      \"type\": \"TextBlock\",\n      \"text\": errorConfig.title,\n      \"weight\": \"Bolder\",\n      \"size\": \"Large\",\n      \"color\": \"Attention\"\n    },\n    {\n      \"type\": \"TextBlock\",\n      \"text\": errorConfig.message,\n      \"wrap\": true,\n      \"spacing\": \"Medium\"\n    },\n    {\n      \"type\": \"TextBlock\",\n      \"text\": \"💡 **Suggestion:** You can try: 'help' to see available commands, or 'check my emails' to test the connection.\",\n      \"wrap\": true,\n      \"spacing\": \"Medium\",\n      \"color\": \"Good\"\n    }\n  ],\n  \"actions\": errorConfig.actions\n};\n\n// Log error for debugging\nconsole.log('Error Details:', {\n  type: errorType,\n  original: error,\n  timestamp: new Date().toISOString(),\n  user: originalInput.userId,\n  conversation: originalInput.conversationId,\n  input: originalInput.cleanText\n});\n\nreturn {\n  json: {\n    type: \"message\",\n    attachments: [{\n      contentType: \"application/vnd.microsoft.card.adaptive\",\n      content: errorCard\n    }],\n    error: true,\n    errorType,\n    timestamp: new Date().toISOString()\n  }\n};"
+      }
+    },
+    {
+      "id": "teams-response-enhanced",
+      "name": "Teams Response Enhanced",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1600, 400],
+      "parameters": {
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "Content-Type": "application/json"
+          }
+        },
+        "respondWith": "json"
+      }
+    },
+    {
+      "id": "conversation-logger",
+      "name": "Conversation Logger",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1400, 600],
+      "parameters": {
+        "functionCode": "// Enhanced conversation logging and analytics\nconst response = $json;\nconst input = $('Input Processor').item?.json || {};\n\n// Log conversation data (in production, send to analytics service)\nconst logEntry = {\n  timestamp: new Date().toISOString(),\n  conversationId: input.conversationId,\n  userId: input.userId,\n  input: {\n    text: input.cleanText,\n    hasAttachments: input.hasAttachments,\n    attachmentCount: input.attachments?.length || 0,\n    isUrgent: input.hasUrgent,\n    isScheduleRelated: input.hasSchedule,\n    mentions: input.mentions\n  },\n  response: {\n    success: !response.error,\n    errorType: response.errorType,\n    processingTime: response.processingTime,\n    responseType: response.attachments?.[0]?.content?.body?.[0]?.text?.includes('📧') ? 'email' : \n                  response.attachments?.[0]?.content?.body?.[0]?.text?.includes('📅') ? 'calendar' : 'other'\n  },\n  performance: {\n    totalProcessingTime: response.processingTime,\n    nodeExecutionTime: Date.now() - new Date(input.timestamp).getTime()\n  }\n};\n\n// Simple analytics (in production, use proper analytics service)\nconst analytics = {\n  dailyConversations: 1,\n  successRate: response.error ? 0 : 100,\n  averageResponseTime: response.processingTime || 0,\n  popularFeatures: {\n    email: response.attachments?.[0]?.content?.body?.[0]?.text?.includes('📧') ? 1 : 0,\n    calendar: response.attachments?.[0]?.content?.body?.[0]?.text?.includes('📅') ? 1 : 0,\n    help: response.attachments?.[0]?.content?.body?.[0]?.text?.includes('🤖') ? 1 : 0\n  }\n};\n\nconsole.log('Conversation Log:', logEntry);\nconsole.log('Analytics Update:', analytics);\n\n// Pass through the response unchanged\nreturn { json: response };"
+      }
+    }
+  ],
+  "connections": {
+    "Teams Webhook Enhanced": {
+      "main": [
+        [
+          {
+            "node": "Input Processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Processor": {
+      "main": [
+        [
+          {
+            "node": "Conversation Memory Retriever",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory Retriever": {
+      "main": [
+        [
+          {
+            "node": "Master AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Master AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Intelligent Response Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ],
+      "ai_languageModel": [
+        [
+          {
+            "node": "OpenAI GPT-4o",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ],
+      "ai_tool": [
+        [
+          {
+            "node": "Outlook Email Tool",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Outlook Calendar Tool",
+            "type": "ai_tool",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Email Composer Tool",
+            "type": "ai_tool",
+            "index": 2
+          }

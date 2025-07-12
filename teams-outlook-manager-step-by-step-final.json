@@ -1,0 +1,625 @@
+{
+  "meta": {
+    "instanceId": "c0b24caa70b5e0a73ddfa1ab0e2e2db0f96dc20a0b48d6c55bc8f3cd1bbad62e"
+  },
+  "createdAt": "2025-07-06T13:59:44.761Z",
+  "updatedAt": "2025-07-06T15:25:20.879Z",
+  "id": "A9h8Zsm6kYpsmilu",
+  "name": "Teams-Outlook Manager - Step by Step",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "teams-outlook-test",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Teams Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ],
+      "webhookId": "345bd88d-3d1e-4592-ac26-3d8c76092125"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Received Teams message successfully",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Simple input processing\nconst body = $json.body || {};\nconst text = body.text || '';\nconst conversationId = body.conversation?.id || 'default';\nconst userId = body.from?.id || 'anonymous';\n\nreturn {\n  json: {\n    originalText: text,\n    cleanText: text.replace(/<[^>]*>/g, '').trim(),\n    conversationId,\n    userId,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "input-processor",
+      "name": "Input Processor",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        350,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "maxTokens": 1000,
+          "temperature": 0.7
+        }
+      },
+      "id": "openai-model",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        600,
+        150
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a Teams-Outlook Manager assistant. Help users with email and calendar tasks."
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## I'm a note \n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)\n\nYOU ASLO NEED TO ADD NOTES!!!\n",
+        "height": 280,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -280,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "0d5e0c7e-e0fe-4aeb-97f9-f6b03dba8375",
+      "name": "Sticky Note"
+    },
+    {
+      "id": "note-success",
+      "name": "Success Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ],
+      "parameters": {
+        "content": "## 🎉 AI Agent SUCCESS!\n\n**KEY BREAKTHROUGH:**\n- AI Agent node works perfectly\n- Issue was workflow complexity, not the AI Agent itself\n- Building incrementally prevents blank screen\n\n**Next Steps:**\n1. Add more AI tools as needed\n2. Connect Outlook API properly\n3. Add Teams response formatting",
+        "height": 200,
+        "width": 350
+      }
+    },
+    {
+      "id": "note-flow",
+      "name": "Workflow Flow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        100,
+        100
+      ],
+      "parameters": {
+        "content": "## 📋 Workflow Flow\n\n**1. Teams Webhook** → Receives Teams messages\n**2. Input Processor** → Cleans and formats input\n**3. AI Agent** → Powered by OpenAI Chat Model\n**4. Outlook API** → Handles email/calendar ops\n**5. Webhook Response** → Sends response to Teams\n\n**Current Status:** Core AI Agent working ✅",
+        "height": 180,
+        "width": 320
+      }
+    },
+    {
+      "id": "outlook-email-reader",
+      "name": "Outlook Email Reader",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        200
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 10,
+        "additionalFields": {}
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "outlook-email-sender",
+      "name": "Outlook Email Sender",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "subject": "={{ $fromAI('subject') }}",
+        "bodyContent": "={{ $fromAI('body') }}",
+        "toRecipients": "={{ $fromAI('recipients') }}",
+        "bodyContentType": "html"
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "outlook-calendar",
+      "name": "Outlook Calendar",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        400
+      ],
+      "parameters": {
+        "resource": "calendar",
+        "operation": "createEvent",
+        "subject": "={{ $fromAI('subject') }}",
+        "start": "={{ $fromAI('startDateTime') }}",
+        "end": "={{ $fromAI('endDateTime') }}",
+        "additionalFields": {
+          "bodyContent": "={{ $fromAI('description', '') }}",
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "intent-classifier",
+      "name": "Intent Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ],
+      "parameters": {
+        "categories": "email,calendar,general",
+        "options": {
+          "systemPromptTemplate": "Classify the user intent into: email (reading, sending, managing emails), calendar (scheduling, meetings, events), or general (other requests)"
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "id": "teams-adaptive-card",
+      "name": "Teams Adaptive Card",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.serviceUrl }}/v3/conversations/{{ $json.conversation.id }}/activities",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftTeamsOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "message"
+            },
+            {
+              "name": "text",
+              "value": "{{ $fromAI('response', 'Task completed successfully') }}"
+            },
+            {
+              "name": "attachments",
+              "value": "={{ $fromAI('adaptiveCard', []) }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "email-draft-manager",
+      "name": "Email Draft Manager",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        500
+      ],
+      "parameters": {
+        "resource": "draft",
+        "operation": "create",
+        "subject": "={{ $fromAI('subject') }}",
+        "bodyContent": "={{ $fromAI('body') }}",
+        "toRecipients": "={{ $fromAI('recipients') }}",
+        "additionalFields": {
+          "importance": "normal",
+          "bodyContentType": "html"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        500
+      ],
+      "parameters": {
+        "functionCode": "// Error handling and user feedback\nconst error = $json.error || $input.first()?.error || 'Unknown error occurred';\nconst context = $json.context || 'general';\n\nconst errorResponse = {\n  type: 'error',\n  message: `Sorry, I encountered an issue: ${error}`,\n  context: context,\n  timestamp: new Date().toISOString(),\n  suggestedAction: 'Please try again or contact support if the issue persists'\n};\n\nreturn { json: errorResponse };"
+      }
+    },
+    {
+      "id": "attachment-processor",
+      "name": "Attachment Processor",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        800,
+        500
+      ],
+      "parameters": {
+        "functionCode": "// Process attachments from Teams messages\nconst attachments = $json.attachments || [];\nconst processedAttachments = [];\n\nfor (const attachment of attachments) {\n  if (attachment.contentType === 'application/vnd.microsoft.teams.file.download.info') {\n    processedAttachments.push({\n      name: attachment.name,\n      contentUrl: attachment.contentUrl,\n      contentType: attachment.contentType,\n      size: attachment.content?.fileSize || 0\n    });\n  }\n}\n\nreturn {\n  json: {\n    ...($json),\n    processedAttachments: processedAttachments,\n    hasAttachments: processedAttachments.length > 0\n  }\n};"
+      }
+    },
+    {
+      "id": "calendar-reader",
+      "name": "Calendar Reader",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        600
+      ],
+      "parameters": {
+        "resource": "calendar",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 20,
+        "additionalFields": {
+          "startTime": "={{ $fromAI('startDate', new Date().toISOString()) }}",
+          "endTime": "={{ $fromAI('endDate', new Date(Date.now() + 7*24*60*60*1000).toISOString()) }}"
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "email-reply",
+      "name": "Email Reply",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        200
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "reply",
+        "messageId": "={{ $fromAI('messageId') }}",
+        "comment": "={{ $fromAI('replyBody') }}",
+        "additionalFields": {
+          "replyAll": false
+        }
+      },
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "microsoft-outlook-credentials",
+          "name": "Microsoft Outlook OAuth2"
+        }
+      }
+    },
+    {
+      "id": "teams-approval",
+      "name": "Teams Approval",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        600,
+        500
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "teams-approval",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      }
+    },
+    {
+      "id": "conversation-memory",
+      "name": "Conversation Memory",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        400,
+        500
+      ],
+      "parameters": {
+        "functionCode": "// Conversation state management\nconst conversationId = $json.conversationId || 'default';\nconst userId = $json.userId || 'anonymous';\nconst currentMessage = $json.cleanText || '';\n\n// In a real implementation, this would use a database or Redis\n// For now, we'll use workflow static data\nconst staticData = this.getWorkflowStaticData('global');\nif (!staticData.conversations) {\n  staticData.conversations = {};\n}\n\nif (!staticData.conversations[conversationId]) {\n  staticData.conversations[conversationId] = {\n    messages: [],\n    context: {},\n    userId: userId\n  };\n}\n\n// Add current message to conversation\nstaticData.conversations[conversationId].messages.push({\n  text: currentMessage,\n  timestamp: new Date().toISOString(),\n  userId: userId\n});\n\n// Keep only last 10 messages to prevent memory bloat\nif (staticData.conversations[conversationId].messages.length > 10) {\n  staticData.conversations[conversationId].messages = \n    staticData.conversations[conversationId].messages.slice(-10);\n}\n\nreturn {\n  json: {\n    ...($json),\n    conversationHistory: staticData.conversations[conversationId].messages,\n    conversationContext: staticData.conversations[conversationId].context\n  }\n};"
+      }
+    },
+    {
+      "id": "routing-logic",
+      "name": "Routing Logic",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.category }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "email",
+              "output": 0
+            },
+            {
+              "value2": "calendar",
+              "output": 1
+            },
+            {
+              "value2": "general",
+              "output": 2
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Teams Webhook": {
+      "main": [
+        [
+          {
+            "node": "Input Processor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input Processor": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Intent Classifier",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Conversation Memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Teams Adaptive Card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Email Reader": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Email Sender": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Calendar": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intent Classifier": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Routing Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Draft Manager": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attachment Processor": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Reader": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Reply": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Routing Logic": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "81bca5b0-8067-4339-88b4-db453d39c6b9",
+  "triggerCount": 0,
+  "tags": []
+}

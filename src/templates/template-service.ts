@@ -35,6 +35,13 @@ export class TemplateService {
     const templates = this.repository.getTemplatesByNodes(nodeTypes, limit);
     return templates.map(this.formatTemplateInfo);
   }
+
+  /**
+   * Get templates for specific nodes (alias for listNodeTemplates)
+   */
+  async getTemplatesForNodes(nodeTypes: string[], limit: number = 10): Promise<TemplateInfo[]> {
+    return this.listNodeTemplates(nodeTypes, limit);
+  }
   
   /**
    * Get a specific template with full workflow
@@ -139,6 +146,30 @@ export class TemplateService {
     }
   }
   
+  /**
+   * Get templates by category
+   */
+  async getTemplatesByCategory(category: string, limit: number = 10): Promise<TemplateInfo[]> {
+    const templates = this.repository.getTemplatesByCategory(category, limit);
+    return templates.map(this.formatTemplateInfo);
+  }
+
+  /**
+   * Get popular templates
+   */
+  async getPopularTemplates(limit: number = 10): Promise<TemplateInfo[]> {
+    const templates = this.repository.getPopularTemplates(limit);
+    return templates.map(this.formatTemplateInfo);
+  }
+
+  /**
+   * Get template statistics
+   */
+  async getTemplateStatistics(): Promise<any> {
+    return this.repository.getTemplateStats();
+  }
+
+
   /**
    * Format stored template for API response
    */

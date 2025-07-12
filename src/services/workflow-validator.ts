@@ -66,7 +66,7 @@ interface WorkflowValidationResult {
 export class WorkflowValidator {
   constructor(
     private nodeRepository: NodeRepository,
-    private nodeValidator: typeof EnhancedConfigValidator
+    private nodeValidator: typeof EnhancedConfigValidator = EnhancedConfigValidator
   ) {}
 
   /**
@@ -420,10 +420,26 @@ export class WorkflowValidator {
   /**
    * Validate workflow connections
    */
-  private validateConnections(
+  public validateConnections(
     workflow: WorkflowJson,
-    result: WorkflowValidationResult
-  ): void {
+    result?: WorkflowValidationResult
+  ): WorkflowValidationResult {
+    if (!result) {
+      result = {
+        valid: true,
+        errors: [],
+        warnings: [],
+        statistics: {
+          totalNodes: workflow.nodes.length,
+          enabledNodes: workflow.nodes.filter(n => !n.disabled).length,
+          triggerNodes: 0,
+          validConnections: 0,
+          invalidConnections: 0,
+          expressionsValidated: 0
+        },
+        suggestions: []
+      };
+    }
     const nodeMap = new Map(workflow.nodes.map(n => [n.name, n]));
     const nodeIdMap = new Map(workflow.nodes.map(n => [n.id, n]));
 
@@ -541,6 +557,8 @@ export class WorkflowValidator {
         message: 'Workflow contains a cycle (infinite loop)'
       });
     }
+
+    return result;
   }
 
   /**
@@ -694,10 +712,26 @@ export class WorkflowValidator {
   /**
    * Validate expressions in the workflow
    */
-  private validateExpressions(
+  public validateExpressions(
     workflow: WorkflowJson,
-    result: WorkflowValidationResult
-  ): void {
+    result?: WorkflowValidationResult
+  ): WorkflowValidationResult {
+    if (!result) {
+      result = {
+        valid: true,
+        errors: [],
+        warnings: [],
+        statistics: {
+          totalNodes: workflow.nodes.length,
+          enabledNodes: workflow.nodes.filter(n => !n.disabled).length,
+          triggerNodes: 0,
+          validConnections: 0,
+          invalidConnections: 0,
+          expressionsValidated: 0
+        },
+        suggestions: []
+      };
+    }
     const nodeNames = workflow.nodes.map(n => n.name);
 
     for (const node of workflow.nodes) {
@@ -738,6 +772,8 @@ export class WorkflowValidator {
         });
       });
     }
+
+    return result;
   }
 
   /**

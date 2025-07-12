@@ -26,7 +26,23 @@
       "Bash(taskkill:*)",
       "Bash(killall:*)",
       "Bash(npx:*)",
-      "Bash(npm search:*)"
+      "Bash(npm search:*)",
+      "Bash(mv:*)",
+      "Bash(cd:*)",
+      "Bash(sqlite3:*)",
+      "Bash(cd:*)",
+      "Bash(chmod:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker compose:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)",
+      "Bash(docker logs:*)",
+      "Bash(cd:*)",
+      "Bash(cd:*)"
     ],
     "deny": []
   }

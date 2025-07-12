@@ -616,4 +616,11 @@ return results;`
       'AI Tool Usage': ['use_google_sheets_as_tool', 'use_slack_as_tool', 'multi_tool_ai_agent']
     };
   }
+
+  /**
+   * Instance method to get task template
+   */
+  getTaskTemplate(taskId: string): TaskTemplate | undefined {
+    return TaskTemplates.getTaskTemplate(taskId);
+  }
 }
