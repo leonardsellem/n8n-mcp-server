@@ -61,3 +61,6 @@ build/
 *.embedding
 embeddings/
 mcp-config.json
+
+# Local startup scripts
+start-http.sh

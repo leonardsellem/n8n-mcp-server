@@ -155,7 +155,11 @@ Configure the following environment variables:
 
 ### Running the Server
 
-From the installation directory:
+The server supports two transport modes:
+
+#### Stdio Mode (Default)
+
+For local usage with Claude Desktop and other MCP clients:
 
 ```bash
 n8n-mcp-server
@@ -166,6 +170,41 @@ Or if installed globally:
 ```bash
 n8n-mcp-server
 ```
+
+#### HTTP Mode (NEW)
+
+For remote access, API integration, and web applications:
+
+```bash
+# Start HTTP server (default port 3000)
+MCP_TRANSPORT=http \
+N8N_API_URL=http://your-n8n:5678/api/v1 \
+N8N_API_KEY=your_api_key \
+n8n-mcp-server
+
+# Or with custom port and host
+MCP_TRANSPORT=http \
+MCP_HTTP_PORT=9000 \
+MCP_HTTP_HOST=0.0.0.0 \
+N8N_API_URL=http://your-n8n:5678/api/v1 \
+N8N_API_KEY=your_api_key \
+n8n-mcp-server
+```
+
+**HTTP Mode Features:**
+- Exposes MCP server at `http://host:port/mcp` endpoint
+- Health check available at `http://host:port/health`
+- Session-based connection management
+- Supports both POST (JSON-RPC requests) and GET (SSE streams)
+- Compatible with any HTTP client or MCP SDK
+
+**Environment Variables for HTTP Mode:**
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `MCP_TRANSPORT` | Transport mode (`stdio` or `http`) | `stdio` | No |
+| `MCP_HTTP_PORT` | HTTP server port | `3000` | No |
+| `MCP_HTTP_HOST` | HTTP server host | `localhost` | No |
 
 ### Integrating with AI Assistants
 
