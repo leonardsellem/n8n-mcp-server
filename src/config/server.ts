@@ -103,23 +103,30 @@ function setupToolCallRequestHandler(server: Server): void {
       }
 
       // Import handlers
-      const { 
-        ListWorkflowsHandler, 
+      const {
+        ListWorkflowsHandler,
         GetWorkflowHandler,
         CreateWorkflowHandler,
         UpdateWorkflowHandler,
         DeleteWorkflowHandler,
         ActivateWorkflowHandler,
-        DeactivateWorkflowHandler
+        DeactivateWorkflowHandler,
+        // New enhanced handlers
+        SearchWorkflowsHandler,
+        CloneWorkflowHandler,
+        HealthCheckHandler
       } = await import('../tools/workflow/index.js');
-      
+
       const {
         ListExecutionsHandler,
         GetExecutionHandler,
         DeleteExecutionHandler,
-        RunWebhookHandler
+        RunWebhookHandler,
+        // New enhanced handlers
+        ExecuteWorkflowHandler,
+        GetExecutionDetailsHandler
       } = await import('../tools/execution/index.js');
-      
+
       // Route the tool call to the appropriate handler
       if (toolName === 'list_workflows') {
         const handler = new ListWorkflowsHandler();
@@ -142,6 +149,15 @@ function setupToolCallRequestHandler(server: Server): void {
       } else if (toolName === 'deactivate_workflow') {
         const handler = new DeactivateWorkflowHandler();
         result = await handler.execute(args);
+      } else if (toolName === 'search_workflows') {
+        const handler = new SearchWorkflowsHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'clone_workflow') {
+        const handler = new CloneWorkflowHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'health_check') {
+        const handler = new HealthCheckHandler();
+        result = await handler.execute(args);
       } else if (toolName === 'list_executions') {
         const handler = new ListExecutionsHandler();
         result = await handler.execute(args);
@@ -154,8 +170,14 @@ function setupToolCallRequestHandler(server: Server): void {
       } else if (toolName === 'run_webhook') {
         const handler = new RunWebhookHandler();
         result = await handler.execute(args);
+      } else if (toolName === 'execute_workflow') {
+        const handler = new ExecuteWorkflowHandler();
+        result = await handler.execute(args);
+      } else if (toolName === 'get_execution_details') {
+        const handler = new GetExecutionDetailsHandler();
+        result = await handler.execute(args);
       } else {
-        throw new Error(`Unknown tool: ${toolName}`);
+        throw new Error(`Unknown tool: ${toolName}. Available tools: list_workflows, get_workflow, create_workflow, update_workflow, delete_workflow, activate_workflow, deactivate_workflow, search_workflows, clone_workflow, health_check, list_executions, get_execution, delete_execution, run_webhook, execute_workflow, get_execution_details`);
       }
 
       // Converting to MCP SDK expected format

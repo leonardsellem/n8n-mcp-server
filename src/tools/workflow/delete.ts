@@ -7,6 +7,7 @@
 import { BaseWorkflowToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
 import { N8nApiError } from '../../errors/index.js';
+import { workflowCache } from '../../cache/workflow-cache.js';
 
 /**
  * Handler for the delete_workflow tool
@@ -32,7 +33,10 @@ export class DeleteWorkflowHandler extends BaseWorkflowToolHandler {
       
       // Delete the workflow
       await this.apiService.deleteWorkflow(workflowId);
-      
+
+      // Invalidate cache after deletion
+      workflowCache.invalidateAll();
+
       return this.formatSuccess(
         { id: workflowId },
         `Workflow "${workflowName}" (ID: ${workflowId}) has been successfully deleted`

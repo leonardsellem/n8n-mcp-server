@@ -7,6 +7,7 @@
 import { BaseWorkflowToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
 import { N8nApiError } from '../../errors/index.js';
+import { workflowCache } from '../../cache/workflow-cache.js';
 
 /**
  * Handler for the deactivate_workflow tool
@@ -28,7 +29,10 @@ export class DeactivateWorkflowHandler extends BaseWorkflowToolHandler {
       
       // Deactivate the workflow
       const workflow = await this.apiService.deactivateWorkflow(workflowId);
-      
+
+      // Invalidate cache after deactivation
+      workflowCache.invalidateWorkflow(workflowId);
+
       return this.formatSuccess(
         {
           id: workflow.id,

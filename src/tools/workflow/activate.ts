@@ -7,6 +7,7 @@
 import { BaseWorkflowToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
 import { N8nApiError } from '../../errors/index.js';
+import { workflowCache } from '../../cache/workflow-cache.js';
 
 /**
  * Handler for the activate_workflow tool
@@ -28,7 +29,10 @@ export class ActivateWorkflowHandler extends BaseWorkflowToolHandler {
       
       // Activate the workflow
       const workflow = await this.apiService.activateWorkflow(workflowId);
-      
+
+      // Invalidate cache after activation
+      workflowCache.invalidateWorkflow(workflowId);
+
       return this.formatSuccess(
         {
           id: workflow.id,

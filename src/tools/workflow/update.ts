@@ -7,6 +7,7 @@
 import { BaseWorkflowToolHandler } from './base-handler.js';
 import { ToolCallResult, ToolDefinition } from '../../types/index.js';
 import { N8nApiError } from '../../errors/index.js';
+import { workflowCache } from '../../cache/workflow-cache.js';
 
 /**
  * Handler for the update_workflow tool
@@ -56,7 +57,10 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
       
       // Update the workflow
       const updatedWorkflow = await this.apiService.updateWorkflow(workflowId, workflowData);
-      
+
+      // Invalidate cache after mutation
+      workflowCache.invalidateWorkflow(workflowId);
+
       // Build a summary of changes
       const changesArray = [];
       if (name !== undefined && name !== currentWorkflow.name) changesArray.push(`name: "${currentWorkflow.name}" → "${name}"`);
