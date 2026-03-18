@@ -39,12 +39,24 @@ export class UpdateWorkflowHandler extends BaseWorkflowToolHandler {
       // Get the current workflow to update
       const currentWorkflow = await this.apiService.getWorkflow(workflowId);
       
+      // Strip settings properties not accepted by the n8n public API v1 PUT schema.
+      // The GET response returns the full IWorkflowSettings (from n8n-workflow), but the
+      // PUT endpoint uses an OpenAPI schema with additionalProperties: false that only
+      // allows a subset of fields. Internal fields present in GET but absent from the
+      // OpenAPI spec cause: "request/body/settings must NOT have additional properties"
+      // See: n8n/packages/cli/src/public-api/v1/handlers/workflows/spec/schemas/workflowSettings.yml
+      const rejectedSettingsKeys = ['binaryMode', 'timeSavedMode', 'credentialResolverId', 'redactionPolicy'];
+      const filteredSettings = { ...currentWorkflow.settings };
+      for (const key of rejectedSettingsKeys) {
+        delete filteredSettings[key];
+      }
+
       // Prepare update object with only allowed properties (per n8n API schema)
       const workflowData: Record<string, any> = {
         name: name !== undefined ? name : currentWorkflow.name,
         nodes: nodes !== undefined ? nodes : currentWorkflow.nodes,
         connections: connections !== undefined ? connections : currentWorkflow.connections,
-        settings: currentWorkflow.settings
+        settings: filteredSettings
       };
       
       // Add optional staticData if it exists
