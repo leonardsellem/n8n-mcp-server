@@ -27,6 +27,7 @@ export class N8nApiClient {
       headers: {
         'X-N8N-API-KEY': config.n8nApiKey,
         'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
       timeout: 10000, // 10 seconds
     });
