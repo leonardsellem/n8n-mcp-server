@@ -1,0 +1,21 @@
+{
+  "name": "n8n-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server that provides tools and resources for interacting with n8n API",
+  "author": {
+    "name": "Leonard Sellem",
+    "url": "https://github.com/leonardsellem"
+  },
+  "homepage": "https://github.com/leonardsellem/n8n-mcp-server",
+  "repository": "https://github.com/leonardsellem/n8n-mcp-server",
+  "keywords": ["mcp", "codex", "n8n", "workflow", "automation"],
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "n8n Workflow Automation",
+    "shortDescription": "Tools and resources for interacting with n8n API",
+    "longDescription": "MCP server that provides tools and resources for interacting with n8n API. Enables workflow automation and management through the Model Context Protocol.",
+    "category": "API",
+    "websiteURL": "https://github.com/leonardsellem/n8n-mcp-server"
+  }
+}
