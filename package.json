@@ -12,6 +12,7 @@
     "test": "node --experimental-vm-modules run-tests.js",
     "test:watch": "node --experimental-vm-modules run-tests.js --watch",
     "test:coverage": "node --experimental-vm-modules run-tests.js --coverage",
+    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest --config jest.config.integration.cjs --runInBand",
     "prepare": "npm run build"
   },
   "bin": {

@@ -63,32 +63,26 @@ export class RunWebhookHandler extends BaseExecutionToolHandler {
       // Get environment config for auth credentials
       const config = getEnvConfig();
 
-      // Check if webhook credentials are provided, as they are required for this tool
-      if (!config.n8nWebhookUsername || !config.n8nWebhookPassword) {
-        throw new N8nApiError(
-          'Webhook username and password are required for run_webhook tool. ' +
-          'Please set N8N_WEBHOOK_USERNAME and N8N_WEBHOOK_PASSWORD environment variables.',
-          400 // Bad Request, as it's a client-side configuration issue for this specific tool
-        );
-      }
-      
       try {
         // Get the webhook URL with the proper prefix
         const baseUrl = this.getN8nBaseUrl();
         const webhookPath = `webhook/${params.workflowName}`;
         const webhookUrl = new URL(webhookPath, baseUrl).toString();
-        
-        // Prepare request config with basic auth from environment
+
+        // Prepare request config – basic auth is optional
         const requestConfig: any = {
           headers: {
             'Content-Type': 'application/json',
             ...(params.headers || {})
           },
-          auth: {
-            username: config.n8nWebhookUsername,
-            password: config.n8nWebhookPassword
-          }
+          validateStatus: () => true,
         };
+        if (config.n8nWebhookUsername && config.n8nWebhookPassword) {
+          requestConfig.auth = {
+            username: config.n8nWebhookUsername,
+            password: config.n8nWebhookPassword,
+          };
+        }
 
         // Make the request to the webhook
         const response = await axios.post(

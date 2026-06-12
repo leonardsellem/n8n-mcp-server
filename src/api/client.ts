@@ -247,7 +247,9 @@ export class N8nApiClient {
    */
   async activateWorkflow(id: string): Promise<any> {
     try {
-      const response = await this.axiosInstance.post(`/workflows/${id}/activate`);
+      const response = await this.axiosInstance.post(`/workflows/${id}/activate`, {}, {
+        headers: { 'Content-Type': 'application/json' },
+      });
       return response.data;
     } catch (error) {
       throw handleAxiosError(error, `Failed to activate workflow ${id}`);
@@ -256,13 +258,15 @@ export class N8nApiClient {
 
   /**
    * Deactivate a workflow
-   * 
+   *
    * @param id Workflow ID
    * @returns Deactivated workflow
    */
   async deactivateWorkflow(id: string): Promise<any> {
     try {
-      const response = await this.axiosInstance.post(`/workflows/${id}/deactivate`);
+      const response = await this.axiosInstance.post(`/workflows/${id}/deactivate`, {}, {
+        headers: { 'Content-Type': 'application/json' },
+      });
       return response.data;
     } catch (error) {
       throw handleAxiosError(error, `Failed to deactivate workflow ${id}`);
