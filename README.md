@@ -1,5 +1,7 @@
 # n8n MCP Server
 
+[![Protodex Verified](https://img.shields.io/badge/Protodex-Verified_MCP-2DD9E0?style=flat-square&logo=github)](https://protodex.io/servers/leonardsellem-n8n-mcp-server.html)
+
 [![npm version](https://badge.fury.io/js/%40leonardsellem%2Fn8n-mcp-server.svg)](https://badge.fury.io/js/%40leonardsellem%2Fn8n-mcp-server)
 
 A Model Context Protocol (MCP) server that allows AI assistants to interact with n8n workflows through natural language.
